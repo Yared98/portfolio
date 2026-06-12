@@ -1,0 +1,68 @@
+---
+import '@fontsource/geist-sans';
+import '@fontsource/ibm-plex-mono';
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+const { title, description = "Arquitetura de Software & Consultoria Técnica" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={description} />
+		<title>{title}</title>
+		<!-- Open Graph -->
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content="/og-image.png" />
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="pt_BR" />
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content="/og-image.png" />
+	</head>
+	<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col antialiased selection:bg-zinc-800 selection:text-zinc-100">
+		<header class="w-full border-b border-zinc-800/50">
+			<div class="container-base py-6 flex justify-between items-center">
+				<a href="/" class="text-sm font-semibold tracking-tight hover:text-zinc-300 transition-colors">
+					MY.
+				</a>
+				<nav class="flex gap-6 text-sm text-zinc-400">
+					<a href="/projects" class="hover:text-zinc-100 transition-colors">Projetos</a>
+					<a href="/trajetoria" class="hover:text-zinc-100 transition-colors">Trajetória</a>
+				</nav>
+			</div>
+		</header>
+		
+		<main class="flex-grow container-base py-16 md:py-24">
+			<slot />
+		</main>
+
+		<footer class="w-full border-t border-zinc-800/50 mt-auto">
+			<div class="container-base py-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-zinc-500 font-mono">
+				<div class="flex items-center gap-2">
+					<span class="relative flex h-2 w-2">
+					  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+					  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+					</span>
+					<span>Disponível para Consultoria: 3º Trimestre de 2026</span>
+				</div>
+				<div class="flex items-center gap-6">
+					<a href="https://linkedin.com/in/yared98" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-300 transition-colors">LinkedIn &nearr;</a>
+					<a href="mailto:mathyared@gmail.com" class="hover:text-zinc-300 transition-colors">mathyared@gmail.com</a>
+					<span>&copy; {new Date().getFullYear()} Matheus Yared.</span>
+				</div>
+			</div>
+		</footer>
+	</body>
+</html>

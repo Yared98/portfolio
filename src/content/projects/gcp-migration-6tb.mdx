@@ -1,0 +1,45 @@
+---
+title: "Migração de Alta Consistência e Modernização (6TB) para GCP"
+description: "Migração de carga de trabalho crítica (ERP) de Hyper-V Bare Metal para GCP com atualização do SQL Server 2019 para 2022 durante a janela de migração."
+problem: "Migrar ERP crítico (6TB) de Hyper-V Bare Metal para GCP. Limitações em Gen2/UEFI forçaram uma estratégia de Migração Offline (Fria) estritamente controlada."
+solution: "Migração direta (Lift & Shift) via Adaptação de Sistema Operacional (OS Adaptation) com o comando gcloud import. Modernização de banco (SQL Server 2022) via infraestrutura como código (IaC) e conectividade híbrida segura via VPN."
+impact: "6TB migrados com 100% de integridade bit-a-bit. Motor de banco modernizado e operação restabelecida com zero perda transacional."
+date: 2026-03-27
+tags: ["GCP", "Migração em Nuvem", "SQL Server", "Terraform", "Redes"]
+---
+
+## O Desafio
+Migrar uma carga de trabalho (workload) de missão crítica (ERP TOTVS) de um ambiente Hyper-V Bare Metal (Gen2/UEFI) para o Google Cloud (GCP).
+
+- **Volume:** 6TB de dados distribuídos em múltiplos discos virtuais VHDXs.
+- **Restrição Técnica:** Devido a limitações nas ferramentas de replicação e à arquitetura Gen2/UEFI, foi necessária uma estratégia de Migração Offline (Fria, com tempo de inatividade) para garantir a paridade total dos blocos e evitar inconsistências no banco de dados.
+- **Objetivo Paralelo:** Realizar a atualização (upgrade) do motor de banco de dados do SQL Server 2019 para 2022 durante a janela de migração.
+
+## Arquitetura de Solução
+A estratégia focou no fluxo de Importação de Imagens com Adaptação do Sistema Operacional (OS Adaptation), garantindo que o sistema final estivesse otimizado para a nuvem.
+
+- **Processo de Importação:** Uso da ferramenta `gcloud compute images import` com o parâmetro `--os=windows-2019`, permitindo que o GCP injetasse automaticamente os drivers VirtIO e o agente convidado (Guest Agent) necessários para a inicialização em instâncias de máquina virtual protegida (Shielded VM).
+- **Modernização do SQL:** O servidor de banco de dados (db-sql-producao) foi provisionado diretamente com Windows Server 2022 + SQL Server 2022 Standard, realizando o salto de versão no momento da restauração dos dados.
+- **Conectividade:** Implementação de um gateway OpenVPN dedicado para interconectar a rede em nuvem (VPC, 172.17.0.0/16) com a rede local (on-premises, 172.16.0.0/21), permitindo a resolução de nomes via DNS Híbrido.
+
+## Execução Técnica & Decisões de Engenharia
+- **Garantia de Inicialização (Boot UEFI):** Configuração manual de instâncias Shielded VM no Terraform para suportar o particionamento GPT/UEFI vindo do Hyper-V, desabilitando a inicialização segura (Secure Boot) inicialmente para validar drivers de terceiros.
+- **Automação de DNS:** Uso de scripts de inicialização (`configure-dns.ps1`) para injetar os controladores de domínio (Domain Controllers) locais como servidores DNS primários, mantendo o servidor de metadados do GCP (169.254.169.254) como contingência terciária.
+- **Infraestrutura como Código (IaC):** Utilização do Terraform com a política `prevent_destroy = true` em todos os recursos de disco, protegendo os 6TB de dados contra exclusões acidentais durante o provisionamento.
+
+## Análise de Trade-offs
+A escolha do tempo de inatividade planejado vs Replicação Online.
+
+> *"A escolha estratégica pelo tempo de inatividade planejado (Migração Offline) em vez de uma replicação contínua assumiu um risco operacional de curto prazo para garantir 100% de integridade bit-a-bit — o compromisso (trade-off) definitivo para cargas de trabalho críticas sem margem para corrupção transacional."*
+
+| Critério | Replicação Online (Baseada em agentes) | Importação de Imagem (Escolhida) |
+| :--- | :--- | :--- |
+| **Integridade** | Risco de perda de sincronia em volumes de 6TB. | 100% de consistência bit-a-bit (Offline). |
+| **Disponibilidade** | Alta (Online). | Baixa (Tempo de inatividade necessário para exportação). |
+| **Complexidade** | Alta (Monitoramento contínuo de sincronia). | Controlada (Sequenciamento de comandos da CLI do gcloud). |
+| **Compatibilidade** | Pode falhar com partições UEFI/Gen2. | Garantida via OS Adaptation do GCP. |
+
+## Resultados Alcançados
+- **Modernização do Motor de DB:** SQL Server atualizado com sucesso para a versão 2022 em uma instância n2-highmem-8.
+- **Segurança Híbrida:** Túnel VPN estabelecido via OpenVPN, permitindo que as instâncias operem em sub-redes (subnets) 100% privadas sem exposição de IPs públicos.
+- **Consistência de Dados:** 6TB de armazenamento migrados sem corrupção de sistema de arquivos ou perda de transações.

@@ -1,0 +1,38 @@
+---
+const services = [
+  {
+    title: "Arquitetura de Alta Disponibilidade",
+    description: "Desenho de sistemas de retaguarda (back-end) robustos (Node.js, Python) e microsserviços focados na integridade de ecossistemas digitais e operação ininterrupta para escalas corporativas.",
+    href: null
+  },
+  {
+    title: "Engenharia & Otimização de Banco de Dados",
+    description: "Especialista em bancos de dados relacionais e modelagem complexa (SQL Server). Uso profundo de T-SQL para refatoração estrutural, desempenho e inteligência de dados.",
+    href: null
+  },
+  {
+    title: "Infraestrutura em Nuvem & Migrações",
+    description: "Computação em Nuvem (Cloud Computing) focada em estabilidade tática e rentabilidade. Planejamento de arquitetura e execução segura de migrações em massa para AWS, GCP e Azure (com zero indisponibilidade).",
+    href: "/projects/gcp-migration-6tb"
+  },
+  {
+    title: "Resolução de Incidentes & Causa Raiz",
+    description: "Resolução cirúrgica de incidentes críticos e instabilidades sistêmicas. Engenharia de observabilidade aplicada para diagnosticar gargalos complexos em microsserviços e bancos de dados.",
+    href: null
+  }
+];
+---
+<section class="py-12 md:py-20 border-b border-zinc-800/50">
+  <h2 class="text-xl font-semibold text-zinc-100 mb-8 tracking-tight">Consultoria Técnica</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 border-l border-t border-zinc-800/50">
+    {services.map((service) => (
+      <div class="p-6 md:p-8 flex flex-col hover:bg-zinc-800/50 transition-colors duration-300 border-r border-b border-zinc-800/50">
+        <h3 class="text-lg font-mono text-zinc-100 mb-4">{service.title}</h3>
+        <p class="text-sm text-zinc-400 leading-relaxed font-sans">{service.description}</p>
+        {service.href && (
+          <a href={service.href} class="mt-4 text-xs font-mono text-amber-500/80 hover:text-amber-400 transition-colors self-start">Ver estudo de caso &rarr;</a>
+        )}
+      </div>
+    ))}
+  </div>
+</section>

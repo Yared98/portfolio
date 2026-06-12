@@ -1,0 +1,109 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Recommendations from '../components/Recommendations.astro';
+
+const experience = [
+  {
+    role: "Engenheiro de Software Especialista",
+    company: "Grupo Boticário",
+    date: "Julho 2025 — Presente",
+    highlights: [
+      "Evolução do ecossistema de retaguarda das lojas conectado ao ecossistema digital.",
+      "Garantia da integridade e do desempenho do fluxo de dados entre varejo físico e plataformas digitais visando alta disponibilidade.",
+      "Desenvolvimento de serviços fundamentais em Node.js e ferramentas de automação em Python.",
+      "Redução de fricção operacional e suporte direto à capacidade de escala da operação do grupo."
+    ]
+  },
+  {
+    role: "Analista Técnico de Soluções & Negócios",
+    company: "Grupo Boticário",
+    date: "Agosto 2020 — Agosto 2025",
+    highlights: [
+      "Sustentação de arquitetura de alta disponibilidade: Gestão de crises, incidentes críticos e automação de processos de varejo.",
+      "Resolução de problemas sistêmicos e incidentes em fluxos comerciais, financeiros, fiscais e de estoque.",
+      "Uso avançado de T-SQL para inteligência de dados, ajustes cirúrgicos e análise de banco de dados em larga escala.",
+      "Práticas de desenvolvimento e operações: Monitoramento contínuo de implantações (deployments) em homologação e produção, além de scripts para automatizar demandas diárias."
+    ]
+  }
+];
+
+const education = [
+  {
+    degree: "Análise e Desenvolvimento de Sistemas",
+    institution: "Unicesumar",
+    date: "Graduação"
+  },
+  {
+    degree: "Certificações & Especializações",
+    institution: "Segurança de Software (Security Champions), LGPD (Privacidade de Dados), Pensamento Estratégico, Framework Scrum",
+    date: "Qualificações"
+  }
+];
+---
+
+<Layout title="Trajetória Profissional & Especialidade | Matheus Yared">
+  <Breadcrumbs segments={[{ label: 'Trajetória', href: '/trajetoria' }]} />
+  
+  <div class="mt-4 mb-16">
+    <h1 class="text-3xl font-sans font-semibold tracking-tight text-zinc-100 mb-6">Trajetória Profissional.</h1>
+    <p class="text-zinc-300 font-serif max-w-3xl leading-relaxed text-lg mb-4">
+      Atuo na intersecção entre a <span class="text-zinc-100 font-medium">Engenharia de Software</span> e a <span class="text-zinc-100 font-medium">Análise de Negócios</span>. Minha carreira é pautada por resolver problemas complexos com uma visão agnóstica de tecnologia: acredito que a lógica, a integridade operacional e a arquitetura precedem a sintaxe.
+    </p>
+    <p class="text-zinc-400 font-sans max-w-3xl leading-relaxed">
+      <strong class="text-zinc-200 font-mono text-sm uppercase tracking-wider">Abordagem Consultiva:</strong> Possuo uma busca constante pela resolução definitiva de problemas (foco na causa raiz). Se existe um desafio de desempenho, integridade de dados ou processo ineficiente, meu foco é trazer a solução técnica mais estável e rentável para a operação do seu negócio.
+    </p>
+  </div>
+
+  <div class="space-y-16 max-w-3xl">
+    <section>
+      <h2 class="text-xl font-mono text-zinc-500 mb-8 tracking-wider uppercase border-b border-zinc-800/50 pb-4">Experiência em Destaque</h2>
+      <div class="space-y-12 mt-8">
+        {experience.map((job) => (
+          <div class="border-l border-zinc-800 pl-6 relative">
+            <div class="absolute w-2 h-2 bg-zinc-700 -left-[4.5px] top-2.5 rounded-full"></div>
+            <h3 class="text-xl tracking-tight text-zinc-100 font-semibold mb-1">
+              {job.role} <span class="text-zinc-500 font-normal">| {job.company}</span>
+            </h3>
+            <div class="text-xs font-mono text-amber-500/80 mb-6">{job.date}</div>
+            <ul class="list-disc list-inside text-sm text-zinc-300 space-y-3 font-sans leading-relaxed">
+              {job.highlights.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-mono text-zinc-500 mb-8 tracking-wider uppercase pt-12 border-t border-zinc-800/50">Especialidade & Formação</h2>
+      
+      <div class="mb-12">
+        <h3 class="text-md font-mono text-amber-500/80 mb-4">Competências Técnicas & de Negócio</h3>
+        <ul class="space-y-2 text-sm text-zinc-300 font-sans">
+          <li><strong class="text-zinc-100">Arquitetura & Retaguarda (Back-end):</strong> Node.js, Python, PHP (Laravel), C.</li>
+          <li><strong class="text-zinc-100">Dados & Infraestrutura:</strong> T-SQL (análise e ajustes de desempenho), SQL Server, Mentalidade DevOps, Observabilidade.</li>
+          <li><strong class="text-zinc-100">Negócios & Conformidade:</strong> Prevenção a Fraudes, LGPD, Pensamento Estratégico e Segurança Digital.</li>
+        </ul>
+      </div>
+
+      <div class="space-y-8">
+        {education.map((edu) => (
+          <div class="border-l border-zinc-800 pl-6 relative">
+            <div class="absolute w-2 h-2 bg-zinc-700 -left-[4.5px] top-2.5 rounded-full"></div>
+            <h3 class="text-lg tracking-tight text-zinc-100 font-semibold mb-1">
+              {edu.degree} 
+            </h3>
+            <div class="text-sm text-zinc-400 mb-2">{edu.institution}</div>
+            <div class="text-xs font-mono text-zinc-600">{edu.date}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+
+  <div class="mt-16 border-t border-zinc-800/50">
+    <Recommendations />
+  </div>
+</Layout>

@@ -1,0 +1,14 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import ProjectList from '../../components/ProjectList.astro';
+---
+
+<Layout title="Projetos | MY.">
+  <Breadcrumbs segments={[{ label: 'Projetos', href: '/projects' }]} />
+  <h1 class="text-3xl font-sans font-semibold tracking-tight text-zinc-100 mb-8 mt-4">Todos os Casos.</h1>
+  <p class="text-zinc-400 font-serif max-w-2xl mb-12">
+    Um registro das transformações arquiteturais em que atuei diretamente. Casos reais onde a engenharia tática e a execução técnica profunda domaram a complexidade para entregar resultados críticos de negócio.
+  </p>
+  <ProjectList />
+</Layout>

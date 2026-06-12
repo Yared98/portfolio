@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+
+const projects = await getCollection('projects');
+// Sort by date descending
+projects.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+<section class="py-12 md:py-20 border-b border-zinc-800/50">
+  <h2 class="text-xl font-semibold text-zinc-100 mt-2 mb-10 tracking-tight flex items-center gap-4">
+    Projetos em Destaque
+    <span class="text-xs text-zinc-500 font-mono tracking-normal bg-zinc-900 border border-zinc-800/80 px-2 py-0.5">{projects.length} Cases</span>
+  </h2>
+  <div class="space-y-16">
+    {projects.map((project) => (
+      <article class="flex flex-col group">
+        <a href={`/projects/${project.id}`} class="block w-fit mb-4">
+          <h3 class="text-xl font-medium text-zinc-100 group-hover:underline underline-offset-4 decoration-zinc-700">{project.data.title}</h3>
+        </a>
+        {project.data.tags && project.data.tags.length > 0 && (
+          <div class="flex flex-wrap gap-2 mb-4">
+            {project.data.tags.map((tag) => (
+              <span class="text-xs font-mono text-zinc-400 border border-zinc-800 bg-zinc-900/50 px-2 py-0.5">{tag}</span>
+            ))}
+          </div>
+        )}
+        <p class="text-base text-zinc-400 font-serif max-w-2xl mb-6">
+          {project.data.description}
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pt-6 border-t border-zinc-800/30">
+          <div>
+            <h4 class="text-xs font-mono text-amber-500/80 mb-2 uppercase tracking-wider">Problema</h4>
+            <p class="text-sm text-zinc-300 leading-relaxed font-sans">{project.data.problem}</p>
+          </div>
+          <div>
+            <h4 class="text-xs font-mono text-zinc-500 mb-2 uppercase tracking-wider">Solução</h4>
+            <p class="text-sm text-zinc-300 leading-relaxed font-sans">{project.data.solution}</p>
+          </div>
+          <div>
+            <h4 class="text-xs font-mono text-emerald-500/80 mb-2 uppercase tracking-wider">Impacto</h4>
+            <p class="text-sm text-zinc-300 leading-relaxed font-sans">{project.data.impact}</p>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>

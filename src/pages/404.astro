@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="404 — Página não encontrada | MY."
+  description="Esta página não existe ou foi movida."
+>
+  <div class="flex flex-col items-start justify-center min-h-[50vh] py-16">
+    <div class="font-mono text-xs text-zinc-600 mb-6 uppercase tracking-widest">Erro 404</div>
+    <h1 class="text-5xl md:text-7xl font-sans font-semibold tracking-tight text-zinc-100 mb-6">
+      Página não <span class="text-zinc-600">encontrada.</span>
+    </h1>
+    <p class="text-zinc-400 font-mono max-w-md mb-10 leading-relaxed">
+      A rota que você tentou acessar não existe ou foi movida. Confira o endereço ou volte para a home.
+    </p>
+    <a
+      href="/"
+      id="not-found-home-link"
+      class="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-100 text-zinc-950 text-sm font-semibold font-sans hover:bg-white transition-colors"
+    >
+      ← Voltar para home
+    </a>
+  </div>
+</Layout>
