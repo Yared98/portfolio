@@ -1,0 +1,53 @@
+---
+title: "Imobi - Plataforma de Gestão e Exibição Imobiliária"
+description: "Portal imobiliário de alta performance integrado com banco de dados autohospedado no meu homelab, focado em SEO técnico, velocidade de carregamento e facilidade de gerenciamento."
+problem: "Necessidade de um portal de imóveis ágil, com carregamento instantâneo, excelente rankeamento (SEO) no Google e painel de controle direto, sem custos recorrentes elevados ou a lentidão de construtores de site tradicionais."
+solution: "Desenvolvimento de portal de imóveis de alta performance utilizando Laravel com renderização otimizada no lado do servidor (SSR), TailwindCSS e banco PostgreSQL."
+impact: "Plataforma online rodando em https://fariasdourado.com.br/ com carregamento veloz, ótimas pontuações de PageSpeed e SEO técnico impecável."
+date: 2026-05-15
+tags: ["Laravel", "PHP", "LXC", "PostgreSQL", "SEO", "TailwindCSS"]
+---
+
+![Farias Dourado Imóveis - Visualização da Plataforma](../../assets/imobi-preview.png)
+
+## O Desafio
+
+Para corretores e imobiliárias de médio porte, a presença digital é crucial para a captação de clientes. No entanto, soluções prontas de mercado (como WordPress, Wix ou plataformas engessadas de terceiros) trazem problemas graves:
+- **Desempenho sofrível** em conexões móveis devido ao excesso de JavaScript e imagens pesadas não otimizadas.
+- **Indexação precária (SEO)**, dificultando o ranqueamento orgânico no Google para buscas locais de imóveis.
+- **Custos recorrentes elevados** e pouca flexibilidade para customizar a exibição e os fluxos de captura de leads.
+
+A proposta para a **Farias Dourado Imóveis** foi criar um ecossistema próprio, unindo excelente experiência de usuário, controle total sobre os dados e custo de infraestrutura próximo de zero através do aproveitamento de recursos próprios (self-hosting).
+
+## Arquitetura & Integração com o Homelab
+
+Uma das principais vantagens técnicas desse projeto foi sua integração vertical com o meu laboratório de infraestrutura (Homelab). O projeto opera com a seguinte arquitetura de microsserviços isolados:
+
+```
+[ Usuário Final ] ---> [ Cloudflare ] ---> [ Cloudflare Tunnel (Docker / LXC 200) ]
+                                                               |
+                                                               v
+                                                [ LXC 106 - imobi (Laravel App) ]
+                                                               |
+                                                               v
+                                                    [ LXC 101 - db-postgres-01 ]
+```
+
+1. **Monolito Laravel**: Renderização no lado do servidor (SSR) combinada com políticas de cache de rotas e visualizações, rodando no container LXC `106`.
+2. **Banco de Dados Centralizado (LXC 101)**: A aplicação se conecta diretamente à instância PostgreSQL principal do homelab, garantindo isolamento de persistência e backups agendados.
+3. **Exposição Segura (Cloudflare Tunnel)**: A comunicação externa é estabelecida através de um túnel seguro de saída (Cloudflare Tunnel) executado via Docker dentro do container `docker-tools` (LXC 200), direcionando o tráfego externo diretamente ao container do Imobi (LXC 106) sem necessidade de abrir portas no roteador local.
+
+## Processamento de Imagens e Marca D'água
+
+Imagens de imóveis costumam ser arquivos grandes e em alta resolução enviados diretamente pelos corretores. Para garantir a marcação e proteção dos assets:
+- **Serviço de Marca D'água Personalizado (WatermarkService)**: Desenvolvimento de um serviço em PHP que intercepta os uploads no `PropertyImageController`.
+- **Processamento Gráfico**: O serviço utiliza a extensão `Imagick` do PHP para carregar o logotipo vetorial SVG da imobiliária, alterar dinamicamente suas cores para se adaptar à imagem e aplicá-lo com 70% de opacidade no canto inferior das fotos.
+- **Fallback Seguro**: Caso a extensão `Imagick` não esteja disponível no ambiente, o sistema executa um fallback resiliente via biblioteca `GD` do PHP para desenhar uma marca d'água em texto estilizado, evitando que o upload falhe.
+
+## Resultados de Negócio & Técnicos
+
+O projeto está ativo e entregando resultados robustos em [fariasdourado.com.br](https://fariasdourado.com.br/):
+
+- **Excelente Performance:** O site atinge ótimas pontuações de desempenho e Core Web Vitals no Google PageSpeed Insights por meio de otimização de consultas e carregamento eficiente de assets.
+- **Indexação Orgânica:** Imóveis recém-cadastrados aparecem nas buscas locais rapidamente graças a sitemaps dinâmicos e estrutura de dados Schema.org (`JSON-LD`) injetada em cada página.
+- **Zero Custos de Servidor Dedicado:** O backend roda de forma estável dividindo hardware com os demais serviços do homelab, sem comprometer outros sistemas devido ao isolamento completo proporcionado pelo Proxmox (LXC).

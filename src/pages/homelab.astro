@@ -1,0 +1,508 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+// Homelab Data Structure
+const hostInfo = {
+  name: "Proxmox VE (Host)",
+  type: "Bare Metal",
+  status: "active",
+  description: "Servidor de virtualização principal executando em hardware dedicado. Gerencia o provisionamento e isolamento de recursos computacionais.",
+  storage: [
+    { name: "storage_disk_1", type: "ZFS Mirror", role: "Armazenamento principal de alta tolerância a falhas." },
+    { name: "storage_disk_2", type: "ZFS Mirror", role: "Armazenamento complementar e backups frios." }
+  ],
+  services: [
+    { name: "Samba (SMB)", role: "Servidor de arquivos nativo compartilhando datasets ZFS para a rede local.", status: "active" }
+  ]
+};
+
+const lxcContainers = [
+  {
+    id: "101",
+    name: "db-postgres-01",
+    status: "active",
+    ip: "192.168.1.5",
+    role: "Banco de Dados PostgreSQL Principal",
+    details: "Instância central de PostgreSQL que atende o ecossistema local (incluindo o Imobi e Kanbn). Possui rotinas automatizadas de backup incremental (pg_dump) sincronizadas no ZFS.",
+    tech: ["PostgreSQL 16", "LXC Debian"]
+  },
+  {
+    id: "106",
+    name: "imobi",
+    status: "active",
+    ip: "192.168.1.106",
+    role: "Plataforma Imobiliária (Farias Dourado)",
+    details: "Hospeda a API Node.js/Express e o pipeline de otimização de imagens (sharp/webp) para o site fariasdourado.com.br. Conecta-se diretamente ao db-postgres-01.",
+    tech: ["Node.js", "Express", "Sharp", "Nginx"]
+  },
+  {
+    id: "107",
+    name: "jelly-server",
+    status: "active",
+    ip: "192.168.1.107",
+    role: "Servidor de Mídia Jellyfin",
+    details: "Servidor de streaming de mídia pessoal. Configurado com passthrough de aceleração por hardware (Intel iGPU / QuickSync) diretamente para o container LXC, permitindo múltiplos fluxos de transcodificação 4K simultâneos.",
+    tech: ["Jellyfin", "Intel QuickSync", "LXC Ubuntu"]
+  },
+  {
+    id: "111",
+    name: "arr-stack",
+    status: "active",
+    ip: "192.168.1.111",
+    role: "Automação de Downloads",
+    details: "Stack de download e catalogação automatizada de mídia (Sonarr, Radarr, Prowlarr, Transmission). Integrado via montagem NFS local com o compartilhamento Samba do Host.",
+    tech: ["Sonarr", "Radarr", "Prowlarr", "Transmission"]
+  },
+  {
+    id: "200",
+    name: "docker-tools",
+    status: "active",
+    ip: "192.168.1.200",
+    role: "Engine Docker Central",
+    details: "Container de apoio dedicado a rodar ferramentas de microsserviço containerizadas via Docker Compose. Funciona como o 'motor' que centraliza nossa pilha de observabilidade e utilidades.",
+    tech: ["Docker", "Docker Compose", "LXC Ubuntu"]
+  },
+  {
+    id: "300",
+    name: "web-shared",
+    status: "active",
+    ip: "192.168.1.300",
+    role: "Servidor Web Compartilhado",
+    details: "Servidor web Nginx configurado como proxy reverso para múltiplos subdomínios. Centraliza certificados SSL e distribui tráfego de entrada para os containers corretos.",
+    tech: ["Nginx", "Let's Encrypt", "LXC Debian"]
+  },
+  {
+    id: "301",
+    name: "searxng-ai",
+    status: "active",
+    ip: "192.168.1.301",
+    role: "Buscador Privado & IA",
+    details: "Metabuscador SearXNG integrado com inteligência artificial local para processamento de pesquisas sem rastreamento de dados de navegação.",
+    tech: ["SearXNG", "Python", "LXC Debian"]
+  },
+  {
+    id: "102",
+    name: "log4truck",
+    status: "offline",
+    ip: "192.168.1.102",
+    role: "Monitoramento Logístico de Carga",
+    details: "Aplicação legada de registro de dados para transporte rodoviário. Desativada temporariamente para otimização de recursos.",
+    tech: ["PHP/Laravel", "MySQL"]
+  }
+];
+
+const dockerTools = [
+  {
+    name: "Kanbn",
+    category: "Autenticação e Gestão",
+    status: "active",
+    role: "Quadro Kanban Autohospedado",
+    details: "Ferramenta de gestão de tarefas e fluxos integrada localmente com PostgreSQL e armazenamento de arquivos/anexos via MinIO S3 local.",
+    tech: ["Node.js", "MinIO S3", "PostgreSQL"]
+  },
+  {
+    name: "Grafana",
+    category: "Monitoramento e Rede",
+    status: "active",
+    role: "Painel de Visualização de Métricas",
+    details: "Instância de visualização de métricas rodando na porta 3001. Consome dados do InfluxDB para gerar dashboards detalhados da integridade do Proxmox e do roteador OPNsense.",
+    tech: ["Grafana", "React"]
+  },
+  {
+    name: "InfluxDB",
+    category: "Monitoramento e Rede",
+    status: "active",
+    role: "Banco de Séries Temporais (TSDB)",
+    details: "Armazena telemetria do Proxmox VE e dados de tráfego do OPNsense. Otimizado para consultas analíticas rápidas de uso de CPU, memória, temperatura e redes.",
+    tech: ["InfluxDB 2.x"]
+  },
+  {
+    name: "Uptime Kuma",
+    category: "Monitoramento e Rede",
+    status: "active",
+    role: "Monitor de Disponibilidade",
+    details: "Monitoramento em tempo real de ping, portas TCP e requisições HTTP para todos os serviços locais e sites externos. Integrado com alertas via Telegram/Discord.",
+    tech: ["Uptime Kuma", "SQLite"]
+  },
+  {
+    name: "Cloudflare Tunnel",
+    category: "Monitoramento e Rede",
+    status: "active",
+    role: "Túnel de Acesso Externo Seguro",
+    details: "Daemon `cloudflared` que conecta a rede local à rede Cloudflare. Permite expor serviços específicos em domínios públicos *.yared.com.br sem abrir portas no firewall ou IP residencial.",
+    tech: ["Cloudflare Tunnel", "cloudflared"]
+  },
+  {
+    name: "Homepage",
+    category: "Utilidades e Dashboards",
+    status: "active",
+    role: "Dashboard Inicial de Infraestrutura",
+    details: "Página inicial centralizada que consolida links, status e widgets de status de todos os serviços rodando na rede local de forma elegante.",
+    tech: ["Homepage", "Next.js"]
+  },
+  {
+    name: "n8n",
+    category: "Utilidades e Dashboards",
+    status: "active",
+    role: "Automação de Workflows",
+    details: "Plataforma de integração e automação visual de fluxos de dados (tipo Zapier). Conecta webhooks locais, notificações, APIs de terceiros e bancos de dados.",
+    tech: ["n8n", "Node.js"]
+  },
+  {
+    name: "Umami",
+    category: "Utilidades e Dashboards",
+    status: "active",
+    role: "Analytics Focado em Privacidade",
+    details: "Pilha de estatísticas web de código aberto que substitui o Google Analytics. Leve, sem cookies de rastreamento invasivos, rodando sobre Postgres local.",
+    tech: ["Umami", "Next.js", "PostgreSQL"]
+  }
+];
+---
+
+<Layout title="Homelab & Infraestrutura | Matheus Yared">
+  <Breadcrumbs segments={[{ label: 'Homelab', href: '/homelab' }]} />
+  
+  <div class="mt-4 mb-12">
+    <h1 class="text-3xl font-sans font-semibold tracking-tight text-zinc-100 mb-6">Homelab & Infraestrutura.</h1>
+    <p class="text-zinc-300 font-serif max-w-3xl leading-relaxed text-lg mb-4">
+      Mais do que um servidor doméstico, meu laboratório pessoal é onde simulo e convalido arquiteturas de alta disponibilidade, isolamento de microsserviços e segurança de rede. 
+    </p>
+    <p class="text-zinc-400 font-sans max-w-3xl leading-relaxed">
+      Abaixo está a representação atual do meu ecossistema local. <span class="text-amber-400">Clique em qualquer componente</span> para visualizar seus detalhes técnicos, logs simulados e parâmetros no painel lateral de telemetria.
+    </p>
+  </div>
+
+  <!-- Interactive Infrastructure Dashboard Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    
+    <!-- Left Section: Interactive Diagram & Components (8 Columns on desktop) -->
+    <div class="lg:col-span-7 space-y-10">
+      
+      <!-- LEVEL 1: PHYSICAL & HYPERVISOR -->
+      <section class="border border-zinc-800 bg-zinc-950 p-6 rounded-none relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-zinc-900 border-b border-l border-zinc-800/80 flex items-center justify-center text-xs font-mono text-zinc-600">L1</div>
+        <h2 class="text-sm font-mono text-zinc-500 uppercase tracking-wider mb-6 flex items-center gap-2">
+          <span class="w-1.5 h-1.5 bg-zinc-500 rounded-full"></span>
+          Físico & Hipervisor (Proxmox Host)
+        </h2>
+        
+        <div class="space-y-4">
+          <button 
+            data-target="proxmox-host"
+            data-type="host"
+            data-name={hostInfo.name}
+            data-status={hostInfo.status}
+            data-desc={hostInfo.description}
+            data-tech="Proxmox VE (Debian Bare Metal)"
+            data-ip="192.168.1.1 (Gateway Local)"
+            data-storage="ZFS Pools: storage_disk_1 (Mirror) & storage_disk_2 (Mirror)"
+            data-extra="Roda Samba (SMB) compartilhando discos nativos na rede local."
+            class="w-full text-left p-4 bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-500 hover:bg-zinc-900/60 transition-all flex items-start justify-between cursor-pointer focus:outline-none focus:border-amber-500 active-target"
+          >
+            <div>
+              <div class="font-semibold text-zinc-100 flex items-center gap-2 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-amber-500">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a3 3 0 0 0 3 3m13.5 0a3 3 0 0 0 3-3M6.75 6h.008v.008H6.75V6Zm3 0h.008v.008H9.75V6Zm3 0h.008v.008h-.008V6ZM6.75 16.5h.008v.008H6.75v-.008Zm3 0h.008v.008H9.75v-.008Zm3 0h.008v.008h-.008v-.008Z" />
+                </svg>
+                {hostInfo.name}
+              </div>
+              <p class="text-xs text-zinc-400 mt-1 font-mono">{hostInfo.type} &middot; ZFS Storage Mirror</p>
+            </div>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              Ativo
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <!-- LEVEL 2: LXC CONTAINERS -->
+      <section class="border border-zinc-800 bg-zinc-950 p-6 rounded-none relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-zinc-900 border-b border-l border-zinc-800/80 flex items-center justify-center text-xs font-mono text-zinc-600">L2</div>
+        <h2 class="text-sm font-mono text-zinc-500 uppercase tracking-wider mb-6 flex items-center gap-2">
+          <span class="w-1.5 h-1.5 bg-zinc-500 rounded-full"></span>
+          Containers Isolados (LXC)
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {lxcContainers.map((c) => (
+            <button
+              data-target={`lxc-${c.id}`}
+              data-type="lxc"
+              data-name={`${c.id} - ${c.name}`}
+              data-status={c.status}
+              data-desc={c.details}
+              data-tech={c.tech.join(', ')}
+              data-ip={c.ip}
+              data-role={c.role}
+              data-extra={`Container ID: ${c.id}`}
+              class={`text-left p-4 bg-zinc-900/20 border transition-all flex flex-col justify-between cursor-pointer focus:outline-none focus:border-amber-500 ${
+                c.status === 'active' 
+                  ? 'border-zinc-800/80 hover:border-zinc-600 hover:bg-zinc-900/40' 
+                  : 'border-zinc-900 text-zinc-600 hover:border-zinc-800 opacity-60'
+              }`}
+            >
+              <div class="w-full flex items-start justify-between">
+                <div class="font-mono text-xs text-zinc-500">#{c.id}</div>
+                <span class={`inline-flex items-center px-1.5 py-0.2 rounded-none text-[10px] font-mono border ${
+                  c.status === 'active' 
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                    : 'bg-zinc-900 text-zinc-500 border-zinc-800'
+                }`}>
+                  {c.status === 'active' ? 'Ativo' : 'Off'}
+                </span>
+              </div>
+              <div class="mt-2">
+                <div class="font-semibold text-sm text-zinc-200 group-hover:text-zinc-100">{c.name}</div>
+                <div class="text-xs text-zinc-400 font-sans mt-0.5 line-clamp-1">{c.role}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <!-- LEVEL 3: DOCKER APPLICATIONS -->
+      <section class="border border-zinc-800 bg-zinc-950 p-6 rounded-none relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-zinc-900 border-b border-l border-zinc-800/80 flex items-center justify-center text-xs font-mono text-zinc-600">L3</div>
+        <h2 class="text-sm font-mono text-zinc-500 uppercase tracking-wider mb-6 flex items-center gap-2">
+          <span class="w-1.5 h-1.5 bg-zinc-500 rounded-full"></span>
+          Serviços Docker (Hospedados em docker-tools)
+        </h2>
+        
+        <div class="space-y-6">
+          {['Autenticação e Gestão', 'Monitoramento e Rede', 'Utilidades e Dashboards'].map((category) => (
+            <div>
+              <h3 class="text-xs font-mono text-zinc-400 mb-3 uppercase tracking-wider border-b border-zinc-900 pb-1">{category}</h3>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {dockerTools.filter(t => t.category === category).map((t) => (
+                  <button
+                    data-target={`docker-${t.name.toLowerCase()}`}
+                    data-type="docker"
+                    data-name={t.name}
+                    data-status={t.status}
+                    data-desc={t.details}
+                    data-tech={t.tech.join(', ')}
+                    data-ip="Porta-mapeada via docker-compose"
+                    data-role={t.role}
+                    data-extra={`Mapeado em docker-tools (LXC 200)`}
+                    class="text-left p-3 bg-zinc-900/30 border border-zinc-850 hover:border-zinc-600 hover:bg-zinc-900/60 transition-all flex flex-col justify-between cursor-pointer focus:outline-none focus:border-amber-500"
+                  >
+                    <div class="font-semibold text-xs text-zinc-200">{t.name}</div>
+                    <div class="text-[10px] text-zinc-500 font-mono mt-1 mt-auto line-clamp-1">{t.role}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Right Section: Sidebar Telemetry Details Console (5 Columns on desktop) -->
+    <div class="lg:col-span-5 lg:sticky lg:top-6">
+      <div class="border border-zinc-800 bg-zinc-950 rounded-none overflow-hidden font-mono text-xs">
+        
+        <!-- Console Header -->
+        <div class="bg-zinc-900 border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500/70"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/70"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-green-500/70"></span>
+            <span class="text-xs font-semibold text-zinc-400 ml-2 tracking-tight">TELEMETRIA_CONSOLE v1.0.8</span>
+          </div>
+          <span class="text-[10px] text-zinc-600">SSH // SECURE_PORT</span>
+        </div>
+        
+        <!-- Console Output Screen -->
+        <div class="p-5 space-y-5 text-zinc-300 min-h-[420px] bg-zinc-950/80">
+          
+          <!-- Default View (No selection) -->
+          <div id="default-panel" class="space-y-4">
+            <div class="text-amber-500/80">&gt; INICIALIZANDO MONITOR DE TOPOLOGIA...</div>
+            <div class="text-zinc-500">Aguardando seleção do elemento de rede no painel principal.</div>
+            <div class="p-4 bg-zinc-900/30 border border-zinc-900 space-y-2 text-zinc-400 font-sans">
+              <p class="font-mono text-xs text-zinc-300 font-bold mb-1">Dica de Navegação:</p>
+              <p>Clique em qualquer caixa da topologia ao lado (Host, Containers LXC ou aplicações Docker) para carregar os logs e detalhes operacionais neste terminal.</p>
+            </div>
+            
+            <div class="border-t border-zinc-900 pt-4 space-y-2">
+              <div class="flex justify-between text-[11px] text-zinc-500">
+                <span>ESTADO DO CLUSTER:</span>
+                <span class="text-emerald-400">ONLINE</span>
+              </div>
+              <div class="flex justify-between text-[11px] text-zinc-500">
+                <span>TOTAL DE LXC:</span>
+                <span>8 PROVISIONADOS (7 ATIVOS)</span>
+              </div>
+              <div class="flex justify-between text-[11px] text-zinc-500">
+                <span>TOTAL DE DOCKER COMPOSE:</span>
+                <span>8 CONTAINERIZADOS</span>
+              </div>
+              <div class="flex justify-between text-[11px] text-zinc-500">
+                <span>ARMAZENAMENTO ZFS:</span>
+                <span class="text-emerald-400">SAUDÁVEL (DEGRADADOS: 0)</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Dynamic Detail View (Populated by Javascript) -->
+          <div id="details-panel" class="hidden space-y-4">
+            <div class="flex items-center justify-between border-b border-zinc-900 pb-3">
+              <span id="c-badge" class="text-[10px] px-2 py-0.5 font-mono uppercase bg-zinc-900 border border-zinc-800">CATEGORIA</span>
+              <span id="c-status" class="flex items-center gap-1.5 text-emerald-400 text-[10px]">
+                <span class="relative flex h-1.5 w-1.5">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                </span>
+                <span>CONECTADO</span>
+              </span>
+            </div>
+            
+            <div>
+              <div class="text-zinc-500 uppercase text-[10px] tracking-wider mb-1">Nome do Componente:</div>
+              <div id="c-name" class="text-base font-bold text-zinc-50 font-sans tracking-tight">Nome</div>
+            </div>
+            
+            <div>
+              <div class="text-zinc-500 uppercase text-[10px] tracking-wider mb-1">Endereçamento / Rede:</div>
+              <div id="c-ip" class="text-zinc-100 font-mono">192.168.1.X</div>
+            </div>
+
+            <div>
+              <div class="text-zinc-500 uppercase text-[10px] tracking-wider mb-1">Tecnologias Envolvidas:</div>
+              <div id="c-tech" class="text-zinc-300 font-sans">Tech Stack</div>
+            </div>
+
+            <div>
+              <div class="text-zinc-500 uppercase text-[10px] tracking-wider mb-1">Papel no Homelab:</div>
+              <div id="c-role" class="text-amber-500/90 font-mono">Papel</div>
+            </div>
+            
+            <div>
+              <div class="text-zinc-500 uppercase text-[10px] tracking-wider mb-1">Descrição Detalhada:</div>
+              <p id="c-desc" class="text-zinc-400 leading-relaxed font-sans text-xs">Descrição...</p>
+            </div>
+
+            <div id="c-storage-block" class="hidden">
+              <div class="text-zinc-500 uppercase text-[10px] tracking-wider mb-1">Pools de Armazenamento ZFS:</div>
+              <p id="c-storage" class="text-zinc-300 font-sans text-xs"></p>
+            </div>
+
+            <div id="c-extra-block" class="border-t border-zinc-900 pt-3 text-[11px] text-zinc-500 space-y-1">
+              <div>VÍNCULO DO OBJETO: <span id="c-extra" class="text-zinc-400">Nenhum</span></div>
+              <div class="flex items-center justify-between">
+                <span>SIMULAÇÃO DE TELEMETRIA:</span>
+                <span class="text-emerald-400 font-bold">100% OPERACIONAL</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Page Footer Content -->
+  <div class="mt-16 border-t border-zinc-800/50 pt-12 max-w-3xl">
+    <h3 class="text-lg font-sans font-semibold tracking-tight text-zinc-200 mb-4">Filosofia de Self-Hosting</h3>
+    <p class="text-sm text-zinc-400 leading-relaxed font-sans mb-6">
+      A hospedagem em homelab permite o entendimento profundo de toda a pilha de infraestrutura, desde a alocação de IOPS de disco no ZFS até o tuning de buffers de rede no Nginx. Ao hospedar a plataforma do <a href="/projects/imobi" class="text-amber-400 hover:underline">Imobi (Farias Dourado)</a> nesta infraestrutura, consegui alcançar performance máxima controlando cada milissegundo de latência, provando que sistemas de alta performance podem ser desenhados e mantidos com eficiência e baixo custo.
+    </p>
+  </div>
+</Layout>
+
+<script>
+  // Dynamic interactivity logic for the infrastructure elements
+  document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('button[data-target]');
+    const defaultPanel = document.getElementById('default-panel');
+    const detailsPanel = document.getElementById('details-panel');
+    
+    // Panel Elements
+    const cBadge = document.getElementById('c-badge');
+    const cStatus = document.getElementById('c-status');
+    const cName = document.getElementById('c-name');
+    const cIp = document.getElementById('c-ip');
+    const cTech = document.getElementById('c-tech');
+    const cRole = document.getElementById('c-role');
+    const cDesc = document.getElementById('c-desc');
+    const cStorageBlock = document.getElementById('c-storage-block');
+    const cStorage = document.getElementById('c-storage');
+    const cExtra = document.getElementById('c-extra');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active class from all buttons and add to clicked one
+        buttons.forEach(b => b.classList.remove('border-amber-500', 'bg-zinc-900/60'));
+        btn.classList.add('border-amber-500', 'bg-zinc-900/60');
+
+        // Extract dataset
+        const name = btn.getAttribute('data-name');
+        const type = btn.getAttribute('data-type');
+        const status = btn.getAttribute('data-status');
+        const desc = btn.getAttribute('data-desc');
+        const tech = btn.getAttribute('data-tech');
+        const ip = btn.getAttribute('data-ip');
+        const role = btn.getAttribute('data-role') || 'N/A';
+        const storage = btn.getAttribute('data-storage');
+        const extra = btn.getAttribute('data-extra');
+
+        // Populate details
+        if (cName) cName.textContent = name;
+        if (cBadge) cBadge.textContent = type;
+        if (cIp) cIp.textContent = ip;
+        if (cTech) cTech.textContent = tech;
+        if (cRole) cRole.textContent = role;
+        if (cDesc) cDesc.textContent = desc;
+        if (cExtra) cExtra.textContent = extra || 'Nenhum';
+
+        // Manage Status Visual State
+        if (cStatus) {
+          if (status === 'active') {
+            cStatus.innerHTML = `
+              <span class="relative flex h-1.5 w-1.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+              </span>
+              <span>CONECTADO / ATIVO</span>
+            `;
+            cStatus.className = "flex items-center gap-1.5 text-emerald-400 text-[10px]";
+          } else {
+            cStatus.innerHTML = `
+              <span class="relative flex h-1.5 w-1.5">
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-zinc-600"></span>
+              </span>
+              <span>DESATIVADO / OFFLINE</span>
+            `;
+            cStatus.className = "flex items-center gap-1.5 text-zinc-500 text-[10px]";
+          }
+        }
+
+        // Handle storage block visibility
+        if (cStorageBlock && cStorage) {
+          if (storage) {
+            cStorage.textContent = storage;
+            cStorageBlock.classList.remove('hidden');
+          } else {
+            cStorageBlock.classList.add('hidden');
+          }
+        }
+
+        // Swap Panel Views
+        if (defaultPanel && detailsPanel) {
+          defaultPanel.classList.add('hidden');
+          detailsPanel.classList.remove('hidden');
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  /* Extra styling for button target highlight transitions */
+  button[data-target] {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+</style>
