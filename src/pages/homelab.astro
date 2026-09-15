@@ -102,6 +102,14 @@ const dockerTools = [
     tech: ["Node.js", "MinIO S3", "PostgreSQL"]
   },
   {
+    name: "Retroyrd",
+    category: "Autenticação e Gestão",
+    status: "active",
+    role: "Retrospectivas em Tempo Real & MCP",
+    details: "Ferramenta ágil com backend em Rust (<20MB RAM), FSM de 6 fases, WebSockets e servidor nativo de Model Context Protocol (MCP) para automação via IA. Exposta em retro.yared.com.br via Cloudflare Tunnel.",
+    tech: ["Rust", "Axum", "WebSockets", "MCP", "SQLite"]
+  },
+  {
     name: "Grafana",
     category: "Monitoramento e Rede",
     status: "active",
@@ -337,7 +345,7 @@ const dockerTools = [
               </div>
               <div class="flex justify-between text-[11px] text-zinc-500">
                 <span>TOTAL DE DOCKER COMPOSE:</span>
-                <span>8 CONTAINERIZADOS</span>
+                <span>9 CONTAINERIZADOS</span>
               </div>
               <div class="flex justify-between text-[11px] text-zinc-500">
                 <span>ARMAZENAMENTO ZFS:</span>
@@ -408,7 +416,7 @@ const dockerTools = [
   <div class="mt-16 border-t border-zinc-800/50 pt-12 max-w-3xl">
     <h3 class="text-lg font-sans font-semibold tracking-tight text-zinc-200 mb-4">Filosofia de Self-Hosting</h3>
     <p class="text-sm text-zinc-400 leading-relaxed font-sans mb-6">
-      A hospedagem em homelab permite o entendimento profundo de toda a pilha de infraestrutura, desde a alocação de IOPS de disco no ZFS até o tuning de buffers de rede no Nginx. Ao hospedar a plataforma do <a href="/projects/imobi" class="text-amber-400 hover:underline">Imobi (Farias Dourado)</a> nesta infraestrutura, consegui alcançar performance máxima controlando cada milissegundo de latência, provando que sistemas de alta performance podem ser desenhados e mantidos com eficiência e baixo custo.
+      A hospedagem em homelab permite o entendimento profundo de toda a pilha de infraestrutura, desde a alocação de IOPS de disco no ZFS até o tuning de buffers de rede no Nginx. Ao hospedar a plataforma do <a href="/projects/imobi" class="text-amber-400 hover:underline">Imobi (Farias Dourado)</a> e a ferramenta ágil de retrospectivas <a href="/projects/retroyrd" class="text-amber-400 hover:underline">Retroyrd</a> (com backend em Rust e integração MCP) nesta infraestrutura, consegui alcançar performance máxima controlando cada milissegundo de latência, provando que sistemas de alta performance podem ser desenhados e mantidos com eficiência e baixo custo.
     </p>
   </div>
 </Layout>
