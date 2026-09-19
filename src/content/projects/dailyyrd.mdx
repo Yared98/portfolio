@@ -1,0 +1,69 @@
+---
+title: "DailyYrd - Standups Diárias com Roleta Síncrona, Spotlight de Bloqueios e Exportação Slack"
+description: "Ferramenta híbrida para reuniões diárias (síncronas e assíncronas) com roleta de ordem de fala, timer regressivo de 90s, destaque semafórico de impedimentos e exportação em 1 clique."
+problem: "Daily meetings que se arrastam além dos 15 minutos regimentares, monotonia de fala, ausência de registro estruturado e incapacidade de líderes identificarem bloqueios técnicos em tempo hábil."
+solution: "Desenvolvimento de plataforma de Daily Standup em Rust (Axum + WebSockets) unindo check-in assíncrono matinal, roleta síncrona com timer regressivo de 90s por desenvolvedor, spotlight semafórico em Coral/Rose para impedimentos e exportação rica para Slack/Discord."
+impact: "Redução do tempo de reunião para menos de 15 minutos, resolução de bloqueios acelerada no próprio turno matinal, histórico transparente por data e custo de infraestrutura zero."
+date: 2026-08-10
+tags: ["Rust", "Axum", "WebSockets", "Scrum Daily", "React", "SQLite (WAL)", "Slack Export", "Docker"]
+repoUrl: "https://github.com/Yared98/dailyyrd"
+liveUrl: "https://daily.yared.com.br"
+brandColor: "rose"
+toolkit: true
+---
+
+## O Desafio: A Falência da Daily Standup Tradicional
+
+A **Daily Scrum** (ou Daily Standup) foi projetada para ser uma cerimônia ágil de sincronização tática de no máximo 15 minutos. Na prática da maioria dos times de tecnologia, ela se degenera em um rito desgastante:
+
+- **Reuniões Longas e Cansativas:** Discussões pontuais entre dois desenvolvedores sequestram a atenção do time todo, transformando o rito de 15 minutos em uma reunião de 40 minutos.
+- **Dificuldade em Times Híbridos / Remotos:** Engenheiros em diferentes fusos horários ou rotinas flexíveis têm dificuldade de manter presença síncrona sem perder visibilidade das atividades dos pares.
+- **Bloqueios Enterrados:** Problemas impeditivos (*blockers*) costumam ser mencionados timidamente no final da fala individual e são esquecidos logo após a reunião, atrasando a sprint inteira.
+- **Falta de Histórico e Atas Estruturadas:** Ninguém anota o que foi dito, forçando gerentes de projeto e tech leads a caçar updates individualmente no chat corporativo.
+
+Para revitalizar essa cerimônia e torná-la dinâmica, transparente e focada em resultados, desenvolvi o **DailyYrd** ([repositório no GitHub](https://github.com/Yared98/dailyyrd) e operando em produção em [daily.yared.com.br](https://daily.yared.com.br/)).
+
+---
+
+## Modos Operacionais: O Melhor do Síncrono e do Assíncrono
+
+O DailyYrd resolve o dilema entre reuniões ao vivo e comunicação assíncrona oferecendo dois modos complementares em um único painel:
+
+### 1. Modo Assíncrono (Check-in Matinal em 1 Minuto)
+Logo ao iniciar o expediente, cada desenvolvedor acessa a URL do time e responde aos três vetores essenciais:
+- **O que foi concluído ontem?**
+- **Qual é o foco planejado para hoje?**
+- **Existe algum impedimento técnico ou dependência externa?**
+O check-in aceita sintaxe rica em Markdown, seleção de estado de humor (*Foco Total, Motivado, Preciso de Café, etc.*) e salva automaticamente o progresso.
+
+### 2. Spotlight de Bloqueios (Visibilidade Imediata para Lideranças)
+Membros com impedimentos são automaticamente destacados no topo do board em uma área de alta prioridade com pulso semafórico em **Rose Coral** (`#F43F5E`). Tech Leads e Scrum Masters conseguem diagnosticar em menos de 10 segundos quem está travado e agendar auxílio técnico pontual sem reter o restante da squad na chamada.
+
+### 3. Modo Reunião / Roleta Síncrona com Timer de 90s
+Para o alinhamento ao vivo diário, o facilitador aciona o Modo Reunião:
+- **Roleta Aleatória:** Sorteio da ordem de fala para evitar a previsibilidade monótona da chamada em ordem alfabética.
+- **Temporizador Regressivo de 90 Segundos:** Cada participante tem 90 segundos para seu resumo tático. O cronômetro muda para amarelo aos 30 segundos restantes e emite alerta suave ao expirar.
+- **Sincronização em Tempo Real:** Todos os navegadores conectados acompanham exatamente quem está falando e quem é o próximo da fila.
+- **Chuva de Confetes:** Ao concluir a rodada de todos os presentes, uma celebração confirma o fim do rito dentro do prazo estabelecido.
+
+---
+
+## Arquitetura & Especificações Técnicas
+
+O backend segue a mesma linhagem de alta confiabilidade em Rust do **Yrd Agile Toolkit**:
+
+| Camada | Tecnologia | Decisão Arquitetural |
+| :--- | :--- | :--- |
+| **Backend** | **Rust (Axum + Tokio)** | Processamento assíncrono com canais de broadcast para presença ao vivo e controle de cronômetro sincronizado via WebSockets. |
+| **Banco de Dados** | **SQLite (rusqlite + WAL Mode)** | Armazenamento de boards, check-ins e histórico por datas em arquivo único, garantindo integridade e portabilidade. |
+| **Frontend** | **React + Vite + TypeScript** | Interface ágil com Design System *Agile Cadence*, suporte a temas claro/escuro e i18n nativo (PT/EN). |
+| **Exportação Inteligente** | **Parser Markdown & Slack Block Kit** | Conversão imediata dos check-ins do dia em texto formatado para Slack (`*negrito*`, emojis, links) e Discord com um clique. |
+
+---
+
+## Resultados Práticos & Governança Soberana
+
+- **Duração Média das Reuniões:** Reduzida de 35 minutos para **11 a 13 minutos** constantes.
+- **Eliminação de Licenças SaaS:** Substituição de ferramentas de terceiros (como Geekbot, Standuply e Range), economizando centenas de dólares anuais por time.
+- **Privacidade Total:** Todos os dados de entregas diárias, dificuldades operacionais e planos de sprint permanecem resguardados na infraestrutura privada local no homelab.
+- **Deploy Soberano:** Binário compilado com footprint de memória `<20MB`, operando sobre Proxmox VE e túnel de saída Cloudflare Zero-Trust.

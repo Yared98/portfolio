@@ -1,0 +1,84 @@
+---
+title: "CoffeeYrd - Lean Coffee Colaborativo com FSM em Rust, Timer Sincronizado e MCP"
+description: "Ferramenta em tempo real para facilitação de reuniões Lean Coffee com proposição livre, dot-voting sem viés, mesa Kanban sincronizada, votação romana e servidor Model Context Protocol (MCP)."
+problem: "Reuniões corporativas sem pauta definida, longas e monopolizadas por indivíduos específicos, gerando dispersão técnica, frustração do time e ausência de documentação dos pontos decididos."
+solution: "Desenvolvimento de plataforma ágil de Lean Coffee com backend em Rust (Axum + Tokio WebSockets), máquina de estados finitos (FSM) de 4 fases, notas compartilhadas com typing indicator, alarme de consenso romano e servidor MCP nativo."
+impact: "Redução drástica do tempo de reunião com foco exclusivo em pautas votadas pelo time, atas geradas em Markdown instantâneo e consumo de memória <20MB em infraestrutura soberana."
+date: 2026-07-15
+tags: ["Rust", "Axum", "WebSockets", "Lean Coffee", "React 19", "SQLite (WAL)", "MCP", "Docker"]
+repoUrl: "https://github.com/Yared98/coffeeyrd"
+liveUrl: "https://coffee.yared.com.br"
+brandColor: "amber"
+toolkit: true
+---
+
+## O Desafio: Reuniões Desestruturadas e Monopolizadas
+
+Em muitas equipes de engenharia e gestão de produtos, cerimônias de alinhamento e debates técnicos sofrem de problemas crônicos:
+
+- **Falta de Pauta Clara:** Tópicos surgem espontaneamente sem triagem prévia do grupo, transformando reuniões em sessões dispersas de divagação.
+- **Monopólio de Conversa:** Os participantes mais vocais dominam o tempo de fala, silenciando discussões cruciais trazidas por outros membros.
+- **Debates Sem Limite de Tempo:** Discussões técnicas que poderiam ser resolvidas em 5 minutos consomem horas inteiras sem consenso ou próximos passos claros.
+- **Perda de Contexto e Atas Manuais:** Notas tomadas de forma isolada raramente são consolidadas, resultando em retrabalho e esquecimento de decisões estratégicas.
+
+A metodologia **Lean Coffee** surgiu para resolver esse cenário ao democratizar a pauta: os tópicos são sugeridos por todos, votados democraticamente e discutidos em ciclos cronometrados (*timeboxing*) com decisão consensual de extensão.
+
+Para levar esse rito ao nível corporativo em tempo real e com custo zero de licenciamento, construí o **CoffeeYrd** ([repositório no GitHub](https://github.com/Yared98/coffeeyrd) e rodando em produção em [coffee.yared.com.br](https://coffee.yared.com.br/)).
+
+---
+
+## Máquina de Estados Finitos (FSM) de 4 Fases
+
+O fluxo do CoffeeYrd é governado por uma máquina de estados finitos estritamente tipada no backend em Rust, garantindo consistência e impedindo condições de corrida entre múltiplos facilitadores ou participantes:
+
+```
+[ 1. IDEATION ] ➔ [ 2. VOTING ] ➔ [ 3. DISCUSSION ] ➔ [ 4. COMPLETED ]
+```
+
+1. **Proposição Livre (Ideation):** Cada participante propõe tópicos livremente. A interface suporta Markdown e pré-visualização inline de cartões sem bloqueios de concorrência.
+2. **Votação Ponderada (Dot-Voting):** Cada membro recebe uma cota configurável de votos (ex: 3 a 5 votos) para distribuir nos temas prioritários. A contagem permanece oculta durante o rito para evitar o viés de ancoragem.
+3. **Mesa de Discussão (Discussion Kanban):**
+   - **A Discutir:** Fila ordenada automaticamente pela quantidade de votos recebidos.
+   - **Discutindo Agora:** Tópico ativo em destaque com **cronômetro regressivo de 5 minutos**, bloco de notas compartilhado em tempo real e indicador visual de digitação (*"Alice está digitando..."*).
+   - **Votação Romana:** Ao soar o alarme de 5 minutos, abre-se um modal de 10 segundos com votação rápida de consenso coletivo: 👍 Continuar (+2m) · 👎 Próximo tópico · 👉 Neutro.
+   - **Discutido:** Histórico dos itens finalizados com suas respectivas notas preservadas.
+4. **Conclusão & Ata Automática (Completed):** Ao encerrar a sessão, um documento completo em Markdown estruturado é compilado automaticamente, pronto para exportação em um clique para Slack, Jira, Notion ou Git PRs.
+
+---
+
+## Arquitetura & Implementação Técnica
+
+O projeto foi construído sob o padrão **OpenSpec (Spec-Driven Development)**, priorizando separação clara de responsabilidades, previsibilidade e mínima pegada computacional:
+
+| Camada | Tecnologia | Papel Arquitetural |
+| :--- | :--- | :--- |
+| **Backend** | **Rust (Axum + Tokio)** | Event Broker assíncrono em memória via `tokio::sync::broadcast`, validação estrita da FSM e static serving da SPA compilada. |
+| **Banco de Dados** | **SQLite (WAL Mode)** | Persistência transacional em arquivo local único, com leituras não bloqueantes e snapshots atômicos no ZFS. |
+| **Frontend** | **React 19 + TypeScript + Vite** | SPA reativa com WebSockets bidirecionais, debounce de digitação em 900ms, suporte a temas Claro/Escuro e i18n nativo. |
+| **Protocolo de IA** | **Model Context Protocol (MCP)** | Endpoint JSON-RPC 2.0 em `/mcp` para consulta contextual e injeção de tópicos por copilotos e agentes autônomos. |
+
+### Destaque de Engenharia: Digitação Colaborativa em Tempo Real
+
+Para permitir que a ata do tópico atual seja editada sem colisões ou sobrescritas acidentais, a interface implementa um canal dedicado de telemetria de presença via WebSocket:
+- O estado de digitação é transmitido aos demais clientes com debounce responsivo de 900ms.
+- Cada participante visualiza quem está editando a ata em tempo real, enquanto as atualizações de texto são propagadas de forma delta para minimizar o consumo de banda.
+
+---
+
+## Servidor MCP Nativo (Model Context Protocol)
+
+Assim como as demais ferramentas do **Yrd Agile Toolkit**, o CoffeeYrd implementa nativamente o protocolo aberto **Model Context Protocol (MCP)**, permitindo que LLMs (Claude, Gemini, ChatGPT) interajam programaticamente com a sessão:
+
+- **Extração de Decisões:** Agentes de IA podem ler a ata estruturada e transformar discussões em tarefas acionáveis no repositório.
+- **Injeção Inteligente de Pautas:** Antes do início da sessão, um agente pode injetar incidentes recentes, métricas de SLA ou pull requests pendentes diretamente na coluna de ideação.
+- **Resumo Executivo:** Geração automática de sínteses para lideranças com base nas notas colaborativas salvas durante o timeboxing.
+
+---
+
+## Infraestrutura Soberana (Zero Cost)
+
+O CoffeeYrd opera em produção no homelab sob a mesma arquitetura de alta disponibilidade e custo zero de licenças:
+
+- **Binário Único Compilado:** O binário compilado em Rust com assets estáticos embutidos consome **menos de 20MB de memória RAM** em repouso.
+- **Isolamento em Container LXC:** Executado de maneira segregada em Proxmox VE sem interferência em outros serviços.
+- **Borda Segura com Cloudflare Tunnel:** O tráfego para [coffee.yared.com.br](https://coffee.yared.com.br) é roteado por túnel TLS de saída, mantendo 0 portas públicas abertas e nenhuma exposição de IP residencial.

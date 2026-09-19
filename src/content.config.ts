@@ -11,6 +11,10 @@ const projectsCollection = defineCollection({
     impact: z.string(),
     date: z.date(),
     tags: z.array(z.string()).optional(),
+    repoUrl: z.string().url().optional(),
+    liveUrl: z.string().url().optional(),
+    brandColor: z.enum(['indigo', 'amber', 'sky', 'rose', 'emerald', 'zinc']).optional(),
+    toolkit: z.boolean().optional(),
   }),
 });
 

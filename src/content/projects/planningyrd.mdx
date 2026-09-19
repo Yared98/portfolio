@@ -1,0 +1,82 @@
+---
+title: "PlanningYrd - Planning Poker em Tempo Real sem Viés de Ancoragem e com MCP"
+description: "Plataforma de estimativas ágeis em tempo real com múltiplos baralhos, cálculo estatístico de consenso instantâneo, backlog ordenado e servidor nativo Model Context Protocol."
+problem: "Ferramentas comerciais de Planning Poker impõem custos recorrentes abusivos, barreiras de participantes por sala e fortes distorções de estimativa devido ao viés de ancoragem quando membros revelam votos fora de hora."
+solution: "Desenvolvimento de uma ferramenta de poker ágil de alta velocidade com backend em Rust (Axum + Tokio WebSockets), revelação estritamente síncrona, múltiplos baralhos (Fibonacci, T-Shirt, Custom), métricas automáticas de concordância e servidor MCP."
+impact: "Estimativas sem viés cognitivo para squads de engenharia, exportação de histórias estimada para Jira/Markdown em 1 clique, zero custo de licenciamento e governança de dados 100% privada."
+date: 2026-07-28
+tags: ["Rust", "Axum", "WebSockets", "Planning Poker", "React", "SQLite (WAL)", "MCP", "Docker"]
+repoUrl: "https://github.com/Yared98/planningyrd"
+liveUrl: "https://planning.yared.com.br"
+brandColor: "sky"
+toolkit: true
+---
+
+## O Desafio: O Viés de Ancoragem nas Estimativas de Software
+
+O rito de **Planning Poker** é a espinha dorsal do refinamento de histórias nas metodologias ágeis (Scrum/Kanban). O objetivo é alcançar uma estimativa técnica realista do esforço necessário para entregar uma funcionalidade através da discussão coletiva.
+
+Entretanto, as equipes enfrentam barreiras severas no dia a dia:
+
+- **O Efeito Ancoragem:** Quando um desenvolvedor mais sênior verbaliza sua estimativa ("*isso leva 3 pontos*") ou quando uma ferramenta revela votos individualmente antes da conclusão da rodada, os demais participantes tendem a alterar suas notas por conformismo social, destruindo o valor da métrica de divergência.
+- **Cobranças Abusivas de Licenciamento:** Plataformas SaaS populares cobram mensalidades por assento apenas para exibir cartas numeradas em tela, limitando a quantidade de convidados externos ou auditores.
+- **Vazamento de Informações Estratégicas:** Descrições de tarefas, segredos de arquitetura e prioridades de negócio ficam armazenados em nuvens públicas de fornecedores desconhecidos.
+- **Falta de Integração com Fluxos de IA:** Ferramentas convencionais não oferecem endpoints abertos para que agentes autônomos resumam discussões de refinamento ou alimentem backlogs automaticamente.
+
+Para contornar essas limitações de forma definitiva, desenvolvi o **PlanningYrd** ([repositório no GitHub](https://github.com/Yared98/planningyrd) e em produção em [planning.yared.com.br](https://planning.yared.com.br/)).
+
+---
+
+## Mecânica e Princípios de Funcionamento
+
+O PlanningYrd foi concebido com foco absoluto em velocidade, usabilidade e imparcialidade técnica:
+
+### 1. Blind Voting (Votação Cega Rígida)
+Durante a fase de votação, cada participante visualiza apenas se os colegas já emitiram seu voto através de um indicativo de carta virada para baixo no avatar. O valor numérico permanece estritamente criptografado e oculto até que o facilitador acione o comando de **Revelação Simultânea** ou o sistema detecte que 100% dos estimadores votaram (revelação automática configurável).
+
+### 2. Análise Estatística Imediata & Celebração de Consenso
+Assim que as cartas são viradas, o motor realiza a agregação estatística instantânea da rodada:
+- **Média Aritmética e Mediana:** Visão rápida da tendência central do esforço.
+- **Índice de Concordância (%):** Identifica visualmente o nível de alinhamento do time.
+- **Destaque de Divergências:** Identifica o menor e o maior voto da mesa, provocando o debate saudável entre quem achou a tarefa trivial e quem enxergou riscos ocultos.
+- **Celebração de Consenso:** Caso todos os participantes votem o mesmo valor, uma animação fluida de confetes confirma o consenso unânime.
+
+### 3. Flexibilidade de Baralhos
+- **Fibonacci Clássico:** `0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ?, ☕`
+- **T-Shirt Sizing:** `XS, S, M, L, XL, XXL, ?, ☕`
+- **Sequencial / Customizável:** Baralhos adaptados para estimativas de risco ou valor de negócio.
+
+### 4. Backlog Integrado e Gestão de Rodadas
+O facilitador pode cadastrar uma lista de histórias prévias, navegar sequencialmente entre elas e exportar o resultado consolidado em Markdown, CSV e JSON para inclusão direta em ferramentas como Jira, Azure DevOps ou GitHub Issues.
+
+---
+
+## Arquitetura de Baixa Latência em Rust
+
+A comunicação entre a mesa de poker e os navegadores dos desenvolvedores ocorre via WebSockets bidirecionais sincronizados por um Event Broker central em Rust:
+
+| Componente | Tecnologia | Decisão de Design |
+| :--- | :--- | :--- |
+| **Backend Engine** | **Rust (Axum + Tokio)** | Latência de broadcast sub-milissegundo para múltiplos clientes simultâneos, sem dependência de Redis ou brokers externos. |
+| **Persistência** | **SQLite (WAL Mode)** | Histórico de salas, participantes, votos e histórias armazenado de forma concisa e resiliente em arquivo local. |
+| **Frontend Reativo** | **React + TypeScript + Vite** | Interface com Design System *Agile Cadence*, microinterações hápticas, som sutil de clique de carta e tema dark/light. |
+| **Protocolo de IA** | **Model Context Protocol (MCP)** | Endpoint JSON-RPC 2.0 em `/mcp` para consulta da sala e automação de estimativas por LLMs. |
+
+---
+
+## Servidor MCP Nativo (Model Context Protocol)
+
+O PlanningYrd expõe recursos nativos para conexão com agentes de Inteligência Artificial:
+
+- **Estimativa com Auxílio de IA:** Um agente especializado pode ler os requisitos da história em discussão e sugerir uma pontuação preliminar fundamentada em pontos de complexidade técnica.
+- **Alimentação de Backlog:** Agentes podem injetar histórias de usuário a partir de especificações EARS ou épicos documentados diretamente na fila de refinamento da sala.
+- **Resumo de Divergências:** Análise automatizada das justificativas técnicas apresentadas pelos desenvolvedores nos extremos da votação.
+
+---
+
+## Deploy Soberano no Homelab
+
+Implantado no ecossistema de infraestrutura privada:
+- Execução isolada em container leve sobre Proxmox VE.
+- Roteamento seguro por túnel Cloudflare Zero-Trust sem exposição de IP residencial.
+- Persistência com snapshots automáticos de disco ZFS.
