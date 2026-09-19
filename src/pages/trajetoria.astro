@@ -32,43 +32,64 @@ const education = [
   {
     degree: "Análise e Desenvolvimento de Sistemas",
     institution: "Unicesumar",
-    date: "Graduação"
+    date: "Graduação Superior"
   },
   {
     degree: "Certificações & Especializações",
     institution: "Segurança de Software (Security Champions), LGPD (Privacidade de Dados), Pensamento Estratégico, Framework Scrum",
-    date: "Qualificações"
+    date: "Qualificações Contínuas"
   }
+];
+
+const skills = [
+  { category: "Back-end & Arquitetura", items: ["Node.js", "Python", "Rust", "PHP / Laravel", "C"] },
+  { category: "Dados & Desempenho", items: ["T-SQL", "SQL Server", "PostgreSQL", "Otimização de Índices", "ZFS"] },
+  { category: "Operação & Segurança", items: ["Docker / LXC", "Cloudflare Zero-Trust", "LGPD / Governança", "Observabilidade"] }
 ];
 ---
 
-<Layout title="Trajetória Profissional & Especialidade | Matheus Yared">
+<Layout 
+  title="Trajetória Profissional & Especialidade | Matheus Yared"
+  description="Histórico profissional, competências técnicas e abordagem consultiva de engenharia de software de Matheus Yared."
+>
   <Breadcrumbs segments={[{ label: 'Trajetória', href: '/trajetoria' }]} />
   
-  <div class="mt-4 mb-16">
-    <h1 class="text-3xl font-sans font-semibold tracking-tight text-zinc-100 mb-6">Trajetória Profissional.</h1>
+  <section class="mt-4 mb-16">
+    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 mb-6">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+      HISTÓRICO TÉCNICO &middot; 5+ ANOS DE CARREIRA
+    </div>
+    <h1 class="text-3xl md:text-5xl font-sans font-semibold tracking-tight text-zinc-100 mb-6 leading-tight">
+      Engenharia de Software &amp; Soluções de Negócio.
+    </h1>
     <p class="text-zinc-300 font-serif max-w-3xl leading-relaxed text-lg mb-4">
       Atuo na intersecção entre a <span class="text-zinc-100 font-medium">Engenharia de Software</span> e a <span class="text-zinc-100 font-medium">Análise de Negócios</span>. Minha carreira é pautada por resolver problemas complexos com uma visão agnóstica de tecnologia: acredito que a lógica, a integridade operacional e a arquitetura precedem a sintaxe.
     </p>
-    <p class="text-zinc-400 font-sans max-w-3xl leading-relaxed">
-      <strong class="text-zinc-200 font-mono text-sm uppercase tracking-wider">Abordagem Consultiva:</strong> Possuo uma busca constante pela resolução definitiva de problemas (foco na causa raiz). Se existe um desafio de desempenho, integridade de dados ou processo ineficiente, meu foco é trazer a solução técnica mais estável e rentável para a operação do seu negócio.
+    <p class="text-zinc-400 font-sans max-w-3xl leading-relaxed text-sm">
+      <strong class="text-zinc-200 font-mono text-xs uppercase tracking-wider">Abordagem Consultiva:</strong> Possuo uma busca constante pela resolução definitiva de problemas (foco na causa raiz). Se existe um desafio de desempenho, integridade de dados ou processo ineficiente, meu foco é trazer a solução técnica mais estável e rentável para a operação do seu negócio.
     </p>
-  </div>
+  </section>
 
-  <div class="space-y-16 max-w-3xl">
+  <div class="space-y-16">
+    <!-- Experience -->
     <section>
-      <h2 class="text-xl font-mono text-zinc-500 mb-8 tracking-wider uppercase border-b border-zinc-800/50 pb-4">Experiência em Destaque</h2>
-      <div class="space-y-12 mt-8">
+      <h2 class="text-xs font-mono text-zinc-500 mb-8 tracking-wider uppercase border-b border-zinc-800/60 pb-3">
+        Experiência Corporativa
+      </h2>
+      <div class="space-y-8 mt-6">
         {experience.map((job) => (
-          <div class="border-l border-zinc-800 pl-6 relative">
-            <div class="absolute w-2 h-2 bg-zinc-700 -left-[4.5px] top-2.5 rounded-full"></div>
-            <h3 class="text-xl tracking-tight text-zinc-100 font-semibold mb-1">
-              {job.role} <span class="text-zinc-500 font-normal">| {job.company}</span>
-            </h3>
-            <div class="text-xs font-mono text-amber-500/80 mb-6">{job.date}</div>
-            <ul class="list-disc list-inside text-sm text-zinc-300 space-y-3 font-sans leading-relaxed">
+          <div class="border border-zinc-800/80 bg-zinc-900/20 p-6 md:p-8 hover:border-zinc-700 transition-colors">
+            <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-4">
+              <h3 class="text-xl font-semibold text-zinc-100 tracking-tight">
+                {job.role} <span class="text-zinc-400 font-normal">· {job.company}</span>
+              </h3>
+              <span class="text-xs font-mono text-zinc-400 bg-zinc-900 px-2.5 py-1 border border-zinc-800 self-start sm:self-auto">
+                {job.date}
+              </span>
+            </div>
+            <ul class="list-disc list-inside text-sm text-zinc-300 space-y-2.5 font-sans leading-relaxed">
               {job.highlights.map((item) => (
-                <li>{item}</li>
+                <li class="marker:text-zinc-600">{item}</li>
               ))}
             </ul>
           </div>
@@ -76,34 +97,45 @@ const education = [
       </div>
     </section>
 
+    <!-- Skills and Competencies -->
     <section>
-      <h2 class="text-xl font-mono text-zinc-500 mb-8 tracking-wider uppercase pt-12 border-t border-zinc-800/50">Especialidade & Formação</h2>
-      
-      <div class="mb-12">
-        <h3 class="text-md font-mono text-amber-500/80 mb-4">Competências Técnicas & de Negócio</h3>
-        <ul class="space-y-2 text-sm text-zinc-300 font-sans">
-          <li><strong class="text-zinc-100">Arquitetura & Retaguarda (Back-end):</strong> Node.js, Python, PHP (Laravel), C.</li>
-          <li><strong class="text-zinc-100">Dados & Infraestrutura:</strong> T-SQL (análise e ajustes de desempenho), SQL Server, Mentalidade DevOps, Observabilidade.</li>
-          <li><strong class="text-zinc-100">Negócios & Conformidade:</strong> Prevenção a Fraudes, LGPD, Pensamento Estratégico e Segurança Digital.</li>
-        </ul>
+      <h2 class="text-xs font-mono text-zinc-500 mb-8 tracking-wider uppercase border-b border-zinc-800/60 pb-3">
+        Competências &amp; Domínio Técnico
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {skills.map((s) => (
+          <div class="border border-zinc-800/80 bg-zinc-900/30 p-6">
+            <h3 class="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-4">{s.category}</h3>
+            <div class="flex flex-wrap gap-2">
+              {s.items.map((item) => (
+                <span class="text-xs font-mono text-zinc-300 bg-zinc-950 px-2.5 py-1 border border-zinc-800">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
+    </section>
 
-      <div class="space-y-8">
+    <!-- Education -->
+    <section>
+      <h2 class="text-xs font-mono text-zinc-500 mb-8 tracking-wider uppercase border-b border-zinc-800/60 pb-3">
+        Formação &amp; Especializações
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {education.map((edu) => (
-          <div class="border-l border-zinc-800 pl-6 relative">
-            <div class="absolute w-2 h-2 bg-zinc-700 -left-[4.5px] top-2.5 rounded-full"></div>
-            <h3 class="text-lg tracking-tight text-zinc-100 font-semibold mb-1">
-              {edu.degree} 
-            </h3>
-            <div class="text-sm text-zinc-400 mb-2">{edu.institution}</div>
-            <div class="text-xs font-mono text-zinc-600">{edu.date}</div>
+          <div class="border border-zinc-800/80 bg-zinc-900/20 p-6">
+            <div class="text-xs font-mono text-zinc-400 mb-2">{edu.date}</div>
+            <h3 class="text-lg font-semibold text-zinc-100 mb-2 tracking-tight">{edu.degree}</h3>
+            <p class="text-sm text-zinc-400 font-serif leading-relaxed">{edu.institution}</p>
           </div>
         ))}
       </div>
     </section>
   </div>
 
-  <div class="mt-16 border-t border-zinc-800/50">
+  <div class="mt-20 border-t border-zinc-800/60 pt-16">
     <Recommendations />
   </div>
 </Layout>

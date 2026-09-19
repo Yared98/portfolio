@@ -1,37 +1,60 @@
 ---
-const services = [
+const principles = [
   {
-    title: "Arquitetura de Alta Disponibilidade",
-    description: "Desenho de sistemas de retaguarda (back-end) robustos (Node.js, Python) e microsserviços focados na integridade de ecossistemas digitais e operação ininterrupta para escalas corporativas.",
-    href: null
+    code: "01",
+    tag: "SIMPLICIDADE ARQUITETURAL",
+    title: "Arquiteturas sem ilusão",
+    description: "Evito microserviços prematuros e camadas de abstração desnecessárias. Toda decisão técnica deve pagar seu próprio custo operacional e de manutenção.",
+    detail: "Foco em retaguarda resiliente (Node.js, Rust, Python) e alta disponibilidade real."
   },
   {
-    title: "Engenharia & Otimização de Banco de Dados",
-    description: "Especialista em bancos de dados relacionais e modelagem complexa (SQL Server). Uso profundo de T-SQL para refatoração estrutural, desempenho e inteligência de dados.",
-    href: null
+    code: "02",
+    tag: "CONFIABILIDADE DE DADOS",
+    title: "Tolerância zero a perda de estado",
+    description: "Bancos de dados são a espinha dorsal de qualquer operação. Especialista em modelagem relacional, otimização cirúrgica com T-SQL e integridade transacional estrita.",
+    detail: "Experiência profunda em SQL Server corporativo e PostgreSQL de alta densidade."
   },
   {
-    title: "Infraestrutura em Nuvem & Migrações",
-    description: "Computação em Nuvem (Cloud Computing) focada em estabilidade tática e rentabilidade. Planejamento de arquitetura e execução segura de migrações em massa para AWS, GCP e Azure (com zero indisponibilidade).",
-    href: "/projects/gcp-migration-6tb"
+    code: "03",
+    tag: "MIGRAÇÕES & NUVEM",
+    title: "Execução metódica sob pressão",
+    description: "Planejamento tático para migrações de dados em escala de terabytes, garantindo paridade total de blocos, segurança de rede e zero inconsistências.",
+    detail: "Infraestrutura como código (Terraform), gcloud e ambientes híbridos Bare-Metal/Cloud."
   },
   {
-    title: "Resolução de Incidentes & Causa Raiz",
-    description: "Resolução cirúrgica de incidentes críticos e instabilidades sistêmicas. Engenharia de observabilidade aplicada para diagnosticar gargalos complexos em microsserviços e bancos de dados.",
-    href: null
+    code: "04",
+    tag: "RESOLUÇÃO DEFINITIVA",
+    title: "Causa raiz antes do contorno",
+    description: "Tratar incidentes críticos não é apenas reiniciar processos: é auditar o ciclo de vida da transação, o gargalo de I/O ou a concorrência para eliminar a falha para sempre.",
+    detail: "Observabilidade aplicada e resolução cirúrgica de crises sistêmicas."
   }
 ];
 ---
-<section class="py-12 md:py-20 border-b border-zinc-800/50">
-  <h2 class="text-xl font-semibold text-zinc-100 mb-8 tracking-tight">Consultoria Técnica</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 border-l border-t border-zinc-800/50">
-    {services.map((service) => (
-      <div class="p-6 md:p-8 flex flex-col hover:bg-zinc-800/50 transition-colors duration-300 border-r border-b border-zinc-800/50">
-        <h3 class="text-lg font-mono text-zinc-100 mb-4">{service.title}</h3>
-        <p class="text-sm text-zinc-400 leading-relaxed font-sans">{service.description}</p>
-        {service.href && (
-          <a href={service.href} class="mt-4 text-xs font-mono text-amber-500/80 hover:text-amber-400 transition-colors self-start">Ver estudo de caso &rarr;</a>
-        )}
+<section class="py-16 md:py-24 border-b border-zinc-800/40 scroll-mt-20" id="filosofia">
+  <!-- Section Header -->
+  <div class="border-b border-zinc-800/40 pb-6 mb-12">
+    <div class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Filosofia Operacional</div>
+    <h2 class="text-2xl md:text-3xl font-semibold text-zinc-100 tracking-tight">Postura Técnica &amp; Especialidades</h2>
+  </div>
+
+  <!-- Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {principles.map((item) => (
+      <div class="p-6 md:p-8 border border-zinc-800/60 bg-zinc-900/10 hover:bg-zinc-900/25 hover:border-zinc-700/70 rounded transition-colors flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between text-xs font-mono text-zinc-500 mb-3">
+            <span>{item.code} &middot; {item.tag}</span>
+          </div>
+          <h3 class="text-lg md:text-xl font-semibold text-zinc-100 tracking-tight mb-3">
+            {item.title}
+          </h3>
+          <p class="text-sm text-zinc-400 font-sans leading-relaxed mb-6">
+            {item.description}
+          </p>
+        </div>
+        <div class="pt-4 border-t border-zinc-800/40 text-xs font-mono text-zinc-500">
+          {item.detail}
+        </div>
       </div>
     ))}
   </div>

@@ -41,10 +41,14 @@
   }
 }
 
-/* Minimalist document-style container */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Minimalist document-style container with generous editorial breathing room */
 @utility container-base {
   width: 100%;
-  max-width: 48rem; /* max-w-3xl */
+  max-width: 64rem; /* max-w-5xl / 1024px */
   margin-inline: auto;
   padding-inline: 1.5rem;
 }

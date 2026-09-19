@@ -114,7 +114,7 @@ O desenvolvimento do Retroyrd não seguiu o modelo tradicional ad-hoc. O projeto
 
 Alinhado à filosofia de infraestrutura soberana e autossuficiente descrita na página do [Homelab](/homelab), o Retroyrd está implantado em produção com custo zero de infraestrutura:
 
-- **Container Docker Otimizado:** Executado no container de apoio `docker-tools` (LXC 200 no Proxmox VE), dividindo recursos sem interferir nos serviços adjacentes.
+- **Container Otimizado:** Executado em container Linux leve (LXC isolado no Proxmox VE), dividindo recursos sem interferir nos serviços adjacentes.
 - **Exposição Segura via Cloudflare Tunnel:** O tráfego externo para [retro.yared.com.br](https://retro.yared.com.br/) é intermediado pelo daemon `cloudflared` (túnel de saída TLS), eliminando a necessidade de abrir portas no roteador doméstico ou expor endereços IP da rede local.
 - **Volume Local Persistido:** O arquivo de dados do SQLite é mantido em volume Docker sincronizado com rotinas de snapshot no storage ZFS do Proxmox.
 
