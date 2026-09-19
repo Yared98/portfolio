@@ -1,45 +1,91 @@
 ---
-const principles = [
-  {
-    code: "01",
-    tag: "SIMPLICIDADE ARQUITETURAL",
-    title: "Arquiteturas sem ilusão",
-    description: "Evito microserviços prematuros e camadas de abstração desnecessárias. Toda decisão técnica deve pagar seu próprio custo operacional e de manutenção.",
-    detail: "Foco em retaguarda resiliente (Node.js, Rust, Python) e alta disponibilidade real."
-  },
-  {
-    code: "02",
-    tag: "CONFIABILIDADE DE DADOS",
-    title: "Tolerância zero a perda de estado",
-    description: "Bancos de dados são a espinha dorsal de qualquer operação. Especialista em modelagem relacional, otimização cirúrgica com T-SQL e integridade transacional estrita.",
-    detail: "Experiência profunda em SQL Server corporativo e PostgreSQL de alta densidade."
-  },
-  {
-    code: "03",
-    tag: "MIGRAÇÕES & NUVEM",
-    title: "Execução metódica sob pressão",
-    description: "Planejamento tático para migrações de dados em escala de terabytes, garantindo paridade total de blocos, segurança de rede e zero inconsistências.",
-    detail: "Infraestrutura como código (Terraform), gcloud e ambientes híbridos Bare-Metal/Cloud."
-  },
-  {
-    code: "04",
-    tag: "RESOLUÇÃO DEFINITIVA",
-    title: "Causa raiz antes do contorno",
-    description: "Tratar incidentes críticos não é apenas reiniciar processos: é auditar o ciclo de vida da transação, o gargalo de I/O ou a concorrência para eliminar a falha para sempre.",
-    detail: "Observabilidade aplicada e resolução cirúrgica de crises sistêmicas."
-  }
-];
+import { type Lang, defaultLang } from '../i18n/ui';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+
+const principles = {
+  pt: [
+    {
+      code: "01",
+      tag: "SIMPLICIDADE ARQUITETURAL",
+      title: "Arquiteturas sem ilusão",
+      description: "Evito microserviços prematuros e camadas de abstração desnecessárias. Toda decisão técnica deve pagar seu próprio custo operacional e de manutenção.",
+      detail: "Foco em retaguarda resiliente (Node.js, Rust, Python) e alta disponibilidade real."
+    },
+    {
+      code: "02",
+      tag: "CONFIABILIDADE DE DADOS",
+      title: "Tolerância zero a perda de estado",
+      description: "Bancos de dados são a espinha dorsal de qualquer operação. Especialista em modelagem relacional, otimização cirúrgica com T-SQL e integridade transacional estrita.",
+      detail: "Experiência profunda em SQL Server corporativo e PostgreSQL de alta densidade."
+    },
+    {
+      code: "03",
+      tag: "MIGRAÇÕES & NUVEM",
+      title: "Execução metódica sob pressão",
+      description: "Planejamento tático para migrações de dados em escala de terabytes, garantindo paridade total de blocos, segurança de rede e zero inconsistências.",
+      detail: "Infraestrutura como código (Terraform), gcloud e ambientes híbridos Bare-Metal/Cloud."
+    },
+    {
+      code: "04",
+      tag: "RESOLUÇÃO DEFINITIVA",
+      title: "Causa raiz antes do contorno",
+      description: "Tratar incidentes críticos não é apenas reiniciar processos: é auditar o ciclo de vida da transação, o gargalo de I/O ou a concorrência para eliminar a falha para sempre.",
+      detail: "Observabilidade aplicada e resolução cirúrgica de crises sistêmicas."
+    }
+  ],
+  en: [
+    {
+      code: "01",
+      tag: "ARCHITECTURAL SIMPLICITY",
+      title: "Uncompromising Simplicity",
+      description: "I avoid premature microservices and unnecessary abstraction layers. Every technical decision must justify its operational and maintenance overhead.",
+      detail: "Focus on resilient backend services (Node.js, Rust, Python) and pragmatic high availability."
+    },
+    {
+      code: "02",
+      tag: "DATA INTEGRITY & RELIABILITY",
+      title: "Zero-tolerance for state loss",
+      description: "Databases are the foundation of business operations. Deep expertise in relational schema design, surgical T-SQL performance tuning, and strict ACID guarantees.",
+      detail: "Extensive background with enterprise SQL Server and high-throughput PostgreSQL."
+    },
+    {
+      code: "03",
+      tag: "MIGRATIONS & CLOUD",
+      title: "Methodical execution under pressure",
+      description: "Tactical execution for terabyte-scale data transitions, guaranteeing bit-for-bit block parity, network hardening, and zero data discrepancies.",
+      detail: "Infrastructure as Code (Terraform), gcloud automation, and hybrid Bare-Metal/Cloud architectures."
+    },
+    {
+      code: "04",
+      tag: "ROOT-CAUSE RESOLUTION",
+      title: "Root cause over brittle workarounds",
+      description: "Triaging critical incidents is never just restarting services: it demands auditing transactional lifecycles, I/O saturation, and concurrency locks to eradicate failures permanently.",
+      detail: "Applied observability and surgical resolution of systemic production crises."
+    }
+  ]
+};
+
+const items = principles[lang] || principles.pt;
 ---
 <section class="py-16 md:py-24 border-b border-zinc-800/40 scroll-mt-20" id="filosofia">
   <!-- Section Header -->
   <div class="border-b border-zinc-800/40 pb-6 mb-12">
-    <div class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Filosofia Operacional</div>
-    <h2 class="text-2xl md:text-3xl font-semibold text-zinc-100 tracking-tight">Postura Técnica &amp; Especialidades</h2>
+    <div class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">
+      {lang === 'pt' ? 'Filosofia Operacional' : 'Operational Philosophy'}
+    </div>
+    <h2 class="text-2xl md:text-3xl font-semibold text-zinc-100 tracking-tight">
+      {lang === 'pt' ? 'Postura Técnica & Especialidades' : 'Technical Posture & Specialties'}
+    </h2>
   </div>
 
   <!-- Cards Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    {principles.map((item) => (
+    {items.map((item) => (
       <div class="p-6 md:p-8 border border-zinc-800/60 bg-zinc-900/10 hover:bg-zinc-900/25 hover:border-zinc-700/70 rounded transition-colors flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between text-xs font-mono text-zinc-500 mb-3">

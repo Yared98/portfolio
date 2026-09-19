@@ -1,0 +1,207 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Recommendations from '../../components/Recommendations.astro';
+import { type Lang, useTranslations } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'pt' } },
+    { params: { lang: 'en' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
+
+const experienceData = {
+  pt: [
+    {
+      role: "Engenheiro de Software Especialista",
+      company: "Grupo Boticário",
+      date: "Julho 2025 — Presente",
+      highlights: [
+        "Evolução do ecossistema de retaguarda das lojas conectado ao ecossistema digital.",
+        "Garantia da integridade e do desempenho do fluxo de dados entre varejo físico e plataformas digitais visando alta disponibilidade.",
+        "Desenvolvimento de serviços fundamentais em Node.js e ferramentas de automação em Python.",
+        "Redução de fricção operacional e suporte direto à capacidade de escala da operação do grupo."
+      ]
+    },
+    {
+      role: "Analista Técnico de Soluções & Negócios",
+      company: "Grupo Boticário",
+      date: "Agosto 2020 — Agosto 2025",
+      highlights: [
+        "Sustentação de arquitetura de alta disponibilidade: Gestão de crises, incidentes críticos e automação de processos de varejo.",
+        "Resolução de problemas sistêmicos e incidentes em fluxos comerciais, financeiros, fiscais e de estoque.",
+        "Uso avançado de T-SQL para inteligência de dados, ajustes cirúrgicos e análise de banco de dados em larga escala.",
+        "Práticas de desenvolvimento e operações: Monitoramento contínuo de implantações (deployments) em homologação e produção, além de scripts para automatizar demandas diárias."
+      ]
+    }
+  ],
+  en: [
+    {
+      role: "Specialist Software Engineer",
+      company: "Grupo Boticário",
+      date: "July 2025 — Present",
+      highlights: [
+        "Evolution of retail store backend ecosystem integrated with omnichannel digital platforms.",
+        "Ensuring end-to-end data integrity and high-throughput transactional performance between physical retail and digital services.",
+        "Core backend microservices development in Node.js and operational automation tooling in Python.",
+        "Eliminating operational friction and engineering foundation for high-volume enterprise scale."
+      ]
+    },
+    {
+      role: "Technical Solutions & Business Analyst",
+      company: "Grupo Boticário",
+      date: "August 2020 — August 2025",
+      highlights: [
+        "High-availability architecture resilience: critical incident management, crisis mitigation, and retail process automation.",
+        "Resolution of systemic anomalies across commercial, financial, fiscal, and inventory workflows.",
+        "Advanced T-SQL query performance tuning, execution plan analysis, and large-scale enterprise database optimization.",
+        "DevOps & continuous monitoring of production rollouts, automated health-checks, and tactical operational scripts."
+      ]
+    }
+  ]
+};
+
+const educationData = {
+  pt: [
+    {
+      degree: "Análise e Desenvolvimento de Sistemas",
+      institution: "Unicesumar",
+      date: "Graduação Superior"
+    },
+    {
+      degree: "Certificações & Especializações",
+      institution: "Segurança de Software (Security Champions), LGPD (Privacidade de Dados), Pensamento Estratégico, Framework Scrum",
+      date: "Qualificações Contínuas"
+    }
+  ],
+  en: [
+    {
+      degree: "Systems Analysis and Software Development",
+      institution: "Unicesumar",
+      date: "Higher Education Degree"
+    },
+    {
+      degree: "Certifications & Specializations",
+      institution: "Software Security (Security Champions), LGPD / Data Privacy, Strategic Thinking, Scrum Framework",
+      date: "Continuous Education"
+    }
+  ]
+};
+
+const skillsData = {
+  pt: [
+    { category: "Back-end & Arquitetura", items: ["Node.js", "Python", "Rust", "PHP / Laravel", "C"] },
+    { category: "Dados & Desempenho", items: ["T-SQL", "SQL Server", "PostgreSQL", "Otimização de Índices", "ZFS"] },
+    { category: "Operação & Segurança", items: ["Docker / LXC", "Cloudflare Zero-Trust", "LGPD / Governança", "Observabilidade"] }
+  ],
+  en: [
+    { category: "Backend & Architecture", items: ["Node.js", "Python", "Rust", "PHP / Laravel", "C"] },
+    { category: "Data & Performance", items: ["T-SQL", "SQL Server", "PostgreSQL", "Index Optimization", "ZFS"] },
+    { category: "Operations & Security", items: ["Docker / LXC", "Cloudflare Zero-Trust", "Data Governance / LGPD", "Observability"] }
+  ]
+};
+
+const experience = experienceData[lang] || experienceData.pt;
+const education = educationData[lang] || educationData.pt;
+const skills = skillsData[lang] || skillsData.pt;
+---
+
+<Layout 
+  title={`${t('career.title')} | Matheus Yared`}
+  description={t('career.lead')}
+  lang={lang}
+>
+  <Breadcrumbs 
+    segments={[{ label: t('crumbs.trajectory'), href: `/${lang}/trajetoria` }]} 
+    lang={lang}
+  />
+  
+  <section class="mt-4 mb-16">
+    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 mb-6">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+      {t('career.tag')}
+    </div>
+    <h1 class="text-3xl md:text-5xl font-sans font-semibold tracking-tight text-zinc-100 mb-6 leading-tight">
+      {t('career.title')}
+    </h1>
+    <p class="text-zinc-300 font-serif max-w-3xl leading-relaxed text-lg mb-4">
+      {t('career.lead')}
+    </p>
+    <p class="text-zinc-400 font-sans max-w-3xl leading-relaxed text-sm">
+      <strong class="text-zinc-200 font-mono text-xs uppercase tracking-wider">{t('career.consultative_title')}</strong> {t('career.consultative_desc')}
+    </p>
+  </section>
+
+  <div class="space-y-16">
+    <!-- Experience -->
+    <section>
+      <h2 class="text-xs font-mono text-zinc-500 mb-8 tracking-wider uppercase border-b border-zinc-800/60 pb-3">
+        {t('career.experience_title')}
+      </h2>
+      <div class="space-y-8 mt-6">
+        {experience.map((job) => (
+          <div class="border border-zinc-800/80 bg-zinc-900/20 p-6 md:p-8 hover:border-zinc-700 transition-colors">
+            <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-4">
+              <h3 class="text-xl font-semibold text-zinc-100 tracking-tight">
+                {job.role} <span class="text-zinc-400 font-normal">· {job.company}</span>
+              </h3>
+              <span class="text-xs font-mono text-zinc-400 bg-zinc-900 px-2.5 py-1 border border-zinc-800 self-start sm:self-auto">
+                {job.date}
+              </span>
+            </div>
+            <ul class="list-disc list-inside text-sm text-zinc-300 space-y-2.5 font-sans leading-relaxed">
+              {job.highlights.map((item) => (
+                <li class="marker:text-zinc-600">{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Skills and Competencies -->
+    <section>
+      <h2 class="text-xs font-mono text-zinc-500 mb-8 tracking-wider uppercase border-b border-zinc-800/60 pb-3">
+        {t('career.skills_title')}
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {skills.map((s) => (
+          <div class="border border-zinc-800/80 bg-zinc-900/30 p-6">
+            <h3 class="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-4">{s.category}</h3>
+            <div class="flex flex-wrap gap-2">
+              {s.items.map((item) => (
+                <span class="text-xs font-mono text-zinc-300 bg-zinc-950 px-2.5 py-1 border border-zinc-800">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Education -->
+    <section>
+      <h2 class="text-xs font-mono text-zinc-500 mb-8 tracking-wider uppercase border-b border-zinc-800/60 pb-3">
+        {t('career.education_title')}
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {education.map((edu) => (
+          <div class="border border-zinc-800/80 bg-zinc-900/20 p-6">
+            <div class="text-xs font-mono text-zinc-400 mb-2">{edu.date}</div>
+            <h3 class="text-lg font-semibold text-zinc-100 mb-2 tracking-tight">{edu.degree}</h3>
+            <p class="text-sm text-zinc-400 font-serif leading-relaxed">{edu.institution}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+
+  <div class="mt-20 border-t border-zinc-800/60 pt-16">
+    <Recommendations lang={lang} />
+  </div>
+</Layout>

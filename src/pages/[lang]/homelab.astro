@@ -1,0 +1,216 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { type Lang, useTranslations } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'pt' } },
+    { params: { lang: 'en' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
+
+const pillarsData = {
+  pt: [
+    {
+      tag: "VIRTUALIZAÇÃO & ISOLAMENTO",
+      title: "Hipervisor Bare-Metal & LXC",
+      desc: "Execução sobre Debian dedicado via Proxmox VE. Segmentação estrita de serviços em Linux Containers (LXC) não privilegiados, garantindo isolamento de processos, controle granular de limites cgroups (CPU/RAM) e overhead computacional quase nulo (<1% de baseline).",
+      tech: ["Proxmox VE", "Debian Linux", "LXC Containers", "Kernel Namespaces"]
+    },
+    {
+      tag: "ARMAZENAMENTO & INTEGRIDADE",
+      title: "Pools ZFS em Mirror & Snapshots CoW",
+      desc: "Subsistema de armazenamento projetado com pools ZFS espelhados. Proteção ativa contra corrupção silenciosa de dados (bit rot) por meio de verificação contínua de checksums e scrubs programados. Snapshots incrementais Copy-on-Write garantem pontos de restauração imediatos.",
+      tech: ["OpenZFS", "Mirroring (RAID 1)", "CoW Snapshots", "ZFS Datasets"]
+    },
+    {
+      tag: "SEGURANÇA PERIMETRAL",
+      title: "Borda Zero-Trust & Sem Portas Abertas",
+      desc: "Arquitetura com zero portas públicas abertas na borda da rede. A comunicação externa com serviços autorizados é intermediada exclusivamente por túneis de saída criptografados (Cloudflare Zero-Trust Tunnels), eliminando superfície de ataque e exposição de IP.",
+      tech: ["Zero-Trust Network", "Cloudflare Tunnels", "TLS End-to-End", "mTLS"]
+    },
+    {
+      tag: "WORKLOADS & OBSERVABILIDADE",
+      title: "Bancada de Microsserviços & Testes",
+      desc: "Ambiente de experimentação e deploy contínuo para soluções de alta performance (como o Retroyrd em Rust com MCP e microsserviços Node.js/PostgreSQL). Monitoramento ativo de disponibilidade e rotinas de backup off-site para validação de recuperação de desastres.",
+      tech: ["Rust / Axum", "PostgreSQL", "Observabilidade", "Backup Off-site"]
+    }
+  ],
+  en: [
+    {
+      tag: "VIRTUALIZATION & ISOLATION",
+      title: "Bare-Metal Hypervisor & LXC",
+      desc: "Dedicated bare-metal Debian running Proxmox VE. Strict service segmentation inside unprivileged Linux Containers (LXC), ensuring kernel namespace isolation, granular cgroup resource caps (CPU/RAM), and near-zero computational overhead (<1% baseline).",
+      tech: ["Proxmox VE", "Debian Linux", "LXC Containers", "Kernel Namespaces"]
+    },
+    {
+      tag: "STORAGE & DATA INTEGRITY",
+      title: "Mirrored ZFS Pools & CoW Snapshots",
+      desc: "Storage subsystem architected with mirrored OpenZFS pools. Active defense against silent data corruption (bit rot) via continuous cryptographic checksums and scheduled scrubs. Atomic Copy-on-Write snapshots provide instantaneous rollback checkpoints.",
+      tech: ["OpenZFS", "Mirroring (RAID 1)", "CoW Snapshots", "ZFS Datasets"]
+    },
+    {
+      tag: "PERIMETER SECURITY",
+      title: "Zero-Trust Edge with No Open WAN Ports",
+      desc: "Zero open inbound firewall ports. External access to authorized microservices is handled exclusively through encrypted outbound tunnels (Cloudflare Zero-Trust Tunnels), eliminating residential IP exposure and neutralizing port scanning attack vectors.",
+      tech: ["Zero-Trust Network", "Cloudflare Tunnels", "TLS End-to-End", "mTLS"]
+    },
+    {
+      tag: "WORKLOADS & OBSERVABILITY",
+      title: "Microservices Testbed & Resilience",
+      desc: "Staging and sandbox environment for high-throughput workloads (such as RetroYrd in Rust with MCP, CoffeeYrd, and PostgreSQL services). Active uptime telemetry and automated off-site backups validate disaster recovery runbooks before enterprise adoption.",
+      tech: ["Rust / Axum", "PostgreSQL", "Observability", "Off-site Backups"]
+    }
+  ]
+};
+
+const principlesData = {
+  pt: [
+    {
+      title: "Engenharia de Causa Raiz",
+      description: "Permite diagnosticar e entender gargalos de baixo nível — como contenção de I/O em disco, concorrência de rede e alocação de memória — em condições reais antes de desenhar soluções para produção corporativa."
+    },
+    {
+      title: "Soberania & Governança de Dados",
+      description: "Preservação integral da privacidade dos dados e conformidade estrita com princípios de segurança da informação e LGPD, sem dependência opaca de provedores terceiros para infraestrutura básica."
+    },
+    {
+      title: "Pragmatismo Econômico & Eficiência",
+      description: "Demonstra que arquiteturas bem dimensionadas em código compilado e containers leves entregam tempos de resposta sub-milissegundos com fração mínima dos custos de instâncias gerenciadas em nuvem."
+    }
+  ],
+  en: [
+    {
+      title: "Root-Cause Engineering",
+      description: "Enables hands-on diagnosis of low-level bottlenecks — such as disk I/O contention, socket concurrency, and memory allocation — under live load before designing enterprise production solutions."
+    },
+    {
+      title: "Data Sovereignty & Governance",
+      description: "Complete ownership of data privacy and strict compliance with modern information security standards, removing reliance on opaque third-party cloud providers for baseline operations."
+    },
+    {
+      title: "Economic Pragmatism & Efficiency",
+      description: "Proves that lean architectures built with compiled native code and lightweight containers deliver sub-millisecond response times at a microscopic fraction of managed cloud billing."
+    }
+  ]
+};
+
+const pillars = pillarsData[lang] || pillarsData.pt;
+const principles = principlesData[lang] || principlesData.pt;
+---
+
+<Layout 
+  title={`${t('homelab.page_title')} | Matheus Yared`}
+  description={t('homelab.page_lead')}
+  lang={lang}
+>
+  <Breadcrumbs 
+    segments={[{ label: t('crumbs.homelab'), href: `/${lang}/homelab` }]} 
+    lang={lang}
+  />
+  
+  <section class="mt-4 mb-16">
+    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 mb-6">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+      {t('homelab.page_tag')}
+    </div>
+    <h1 class="text-3xl md:text-5xl font-sans font-semibold tracking-tight text-zinc-100 mb-6 leading-tight">
+      {t('homelab.page_title')}
+    </h1>
+    <p class="text-zinc-300 font-serif max-w-3xl leading-relaxed text-lg mb-4">
+      {t('homelab.page_lead')}
+    </p>
+    <p class="text-zinc-400 font-sans max-w-3xl leading-relaxed text-sm">
+      {t('homelab.page_sublead')}
+    </p>
+  </section>
+
+  <!-- Key Architecture Metrics / Quick Overview -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16 border-y border-zinc-800/60 py-6">
+    <div>
+      <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-1">{t('homelab.stat_hypervisor_label')}</div>
+      <div class="text-base font-semibold text-zinc-100">{t('homelab.stat_hypervisor_val')}</div>
+      <div class="text-xs text-zinc-400 mt-0.5">{t('homelab.stat_hypervisor_sub')}</div>
+    </div>
+    <div>
+      <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-1">{t('homelab.stat_storage_label')}</div>
+      <div class="text-base font-semibold text-zinc-100">{t('homelab.stat_storage_val')}</div>
+      <div class="text-xs text-zinc-400 mt-0.5">{t('homelab.stat_storage_sub')}</div>
+    </div>
+    <div>
+      <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-1">{t('homelab.stat_edge_label')}</div>
+      <div class="text-base font-semibold text-zinc-100">{t('homelab.stat_edge_val')}</div>
+      <div class="text-xs text-zinc-400 mt-0.5">{t('homelab.stat_edge_sub')}</div>
+    </div>
+    <div>
+      <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-1">{t('homelab.stat_isolation_label')}</div>
+      <div class="text-base font-semibold text-zinc-100">{t('homelab.stat_isolation_val')}</div>
+      <div class="text-xs text-zinc-400 mt-0.5">{t('homelab.stat_isolation_sub')}</div>
+    </div>
+  </div>
+
+  <!-- 4 Architectural Pillars -->
+  <section class="mb-20">
+    <h2 class="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-8">
+      {t('homelab.pillars_title')}
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {pillars.map((pillar) => (
+        <div class="border border-zinc-800/80 bg-zinc-900/30 p-7 hover:border-zinc-700 transition-colors">
+          <div class="text-xs font-mono text-zinc-500 mb-3">{pillar.tag}</div>
+          <h3 class="text-xl font-semibold text-zinc-100 mb-3 tracking-tight">
+            {pillar.title}
+          </h3>
+          <p class="text-sm text-zinc-400 font-serif leading-relaxed mb-6">
+            {pillar.desc}
+          </p>
+          <div class="flex flex-wrap gap-2 pt-4 border-t border-zinc-800/60">
+            {pillar.tech.map((techItem) => (
+              <span class="text-xs font-mono text-zinc-400 bg-zinc-950 px-2 py-1 border border-zinc-800">
+                {techItem}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Principles Section -->
+  <section class="border-t border-zinc-800/60 pt-16 mb-20">
+    <h2 class="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-8">
+      {t('homelab.why_title')}
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {principles.map((p) => (
+        <div>
+          <h3 class="text-base font-semibold text-zinc-200 mb-2">{p.title}</h3>
+          <p class="text-sm text-zinc-400 font-serif leading-relaxed">
+            {p.description}
+          </p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Project Link Callout -->
+  <div class="border border-zinc-800/80 bg-zinc-900/20 p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="max-w-2xl">
+      <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-1">{t('homelab.case_tag')}</div>
+      <h3 class="text-lg font-semibold text-zinc-100">{t('homelab.case_title')}</h3>
+      <p class="text-sm text-zinc-400 font-serif mt-1">
+        {t('homelab.case_desc')}
+      </p>
+    </div>
+    <a 
+      href={`/${lang}/projects/retroyrd`}
+      class="inline-flex items-center gap-2 text-xs font-mono text-zinc-200 border border-zinc-700 bg-zinc-900 px-4 py-2.5 hover:bg-zinc-800 hover:border-zinc-500 transition-colors whitespace-nowrap"
+    >
+      {t('homelab.case_btn')} &rarr;
+    </a>
+  </div>
+</Layout>

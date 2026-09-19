@@ -1,0 +1,78 @@
+---
+title: "CoffeeYrd - Collaborative Lean Coffee with Rust FSM, Synchronized Timer & MCP"
+description: "Real-time facilitation platform for Lean Coffee ceremonies featuring unconstrained topic proposals, bias-free dot-voting, synchronized Kanban table, Roman voting, and a native Model Context Protocol (MCP) server."
+problem: "Unstructured, meandering corporate meetings monopolized by vocal individuals, leading to wasted engineering hours, derailed discussions, and zero documented decisions."
+solution: "Built a real-time Lean Coffee platform with a Rust backend (Axum + Tokio WebSockets), 4-phase Finite State Machine (FSM), collaborative notes with debounce and typing indicators, Roman voting modals, and an integrated MCP endpoint."
+impact: "Cut meeting times by over 50% with strict democratic agenda control, automated Markdown meeting minutes, and <20MB RAM consumption on sovereign private infrastructure."
+date: 2026-07-15
+tags: ["Rust", "Axum", "WebSockets", "Lean Coffee", "React 19", "SQLite (WAL)", "MCP", "Docker"]
+repoUrl: "https://github.com/Yared98/coffeeyrd"
+liveUrl: "https://coffee.yared.com.br"
+brandColor: "amber"
+toolkit: true
+lang: "en"
+---
+
+## The Challenge: Unstructured, Monopolized Meetings
+
+In many software development and product teams, discussions and alignment syncs suffer from chronic inefficiencies:
+
+- **Lack of Prioritized Agendas:** Topics surface randomly without group vetting, steering meetings off-course into unproductive rabbit holes.
+- **Vocal Monopolies:** The most outspoken attendees dominate conversational airtime, leaving critical issues raised by quieter engineers unaddressed.
+- **Unbounded Timeboxes:** Debates that could be settled in 5 minutes sprawl across hours with no clear consensus or closure.
+- **Context Evaporation:** Fragmented personal notes rarely make it into consolidated action logs, creating costly alignment gaps.
+
+The **Lean Coffee** methodology resolves this by democratizing the agenda: topics are proposed freely by everyone, voted on transparently, and discussed within strict timeboxes backed by collective Roman voting consensus.
+
+To modernize this ceremony for distributed engineering organizations, I engineered **CoffeeYrd** ([GitHub Repository](https://github.com/Yared98/coffeeyrd) and live in production at [coffee.yared.com.br](https://coffee.yared.com.br/)).
+
+---
+
+## 4-Phase Finite State Machine (FSM)
+
+The lifecycle of every CoffeeYrd session is strictly governed by a typed state machine in Rust:
+
+```
+[ 1. IDEATION ] ➔ [ 2. VOTING ] ➔ [ 3. DISCUSSION ] ➔ [ 4. COMPLETED ]
+```
+
+1. **Free Ideation:** Attendees submit topic cards with real-time Markdown formatting and instant card preview.
+2. **Weighted Dot-Voting:** Configurable voting quotas per attendee (e.g., 3-5 votes) to democratically identify priority topics without anchoring bias.
+3. **Synchronized Discussion Kanban:**
+   - **To Discuss:** Prioritized queue automatically sorted by net vote tally.
+   - **Discussing Now:** Spotlight view of the active topic with a **5-minute countdown timer**, collaborative note-taking area, and real-time typing indicators (*"Alice is typing..."*).
+   - **Roman Voting Consensus:** When the timer reaches zero, a 10-second prompt triggers collective Roman voting: 👍 Continue (+2m) · 👎 Next topic · 👉 Neutral.
+   - **Discussed:** Historical archive of completed topics with persistent notes preserved.
+4. **Automated Markdown Minutes (Completed):** Generates clean, copy-ready Markdown meeting notes with one click for direct export to Slack, Discord, Jira, or Git PR descriptions.
+
+---
+
+## Technical Architecture & Real-Time Sync
+
+Following **OpenSpec (Spec-Driven Development)**, the implementation emphasizes low latency and zero external operational dependencies:
+
+| Layer | Technology | Architectural Role |
+| :--- | :--- | :--- |
+| **Backend** | **Rust (Axum + Tokio)** | High-throughput asynchronous event broker with `tokio::sync::broadcast`, FSM state enforcement, and static asset serving. |
+| **Storage** | **SQLite (WAL Mode)** | Zero-overhead, high-concurrency transactional storage using single local file volumes with periodic ZFS snapshots. |
+| **Frontend** | **React 19 + TypeScript + Vite** | Responsive SPA with resilient WebSocket reconnect loops, 900ms input debounce, dark/light themes, and native i18n. |
+| **AI Protocol** | **Model Context Protocol (MCP)** | JSON-RPC 2.0 endpoint at `/mcp` enabling autonomous LLMs to query active sessions and inject topics programmatically. |
+
+---
+
+## Native Model Context Protocol (MCP) Server
+
+CoffeeYrd exposes an Anthropic-compliant **Model Context Protocol** server at `/mcp`:
+
+- **Automated Summary & Action Extraction:** AI agents can inspect completed topic notes and extract concrete tasks for backlog tracking.
+- **Pre-Meeting Topic Injection:** Bots can ingest recent incident reports, SLA breaches, or pull request bottlenecks directly into the ideation queue before the meeting kicks off.
+- **Executive Summarization:** Instant generation of executive-level briefs from raw collaborative meeting notes.
+
+---
+
+## Sovereign Homelab Deployment (Zero Cost)
+
+Running in production with zero SaaS licensing overhead:
+- **Lightweight Footprint:** Consumes **less than 20MB of RAM** at idle.
+- **Containerized Isolation:** Runs within an unprivileged LXC container on Proxmox VE.
+- **Zero Ingress Surface:** Securely routed via outbound Cloudflare Zero-Trust Tunnels without open residential ports.

@@ -1,0 +1,53 @@
+---
+title: "High-Consistency 6TB Workload Migration and Modernization to GCP"
+description: "Migration of a mission-critical ERP workload from on-premises Bare Metal Hyper-V to Google Cloud Platform, including an in-place upgrade from SQL Server 2019 to 2022."
+problem: "Migrating a 6TB critical ERP database from Hyper-V Bare Metal to GCP. Limitations in Gen2/UEFI forced a strictly controlled offline migration window to guarantee byte-for-byte consistency."
+solution: "Executed a direct lift-and-shift migration via OS Adaptation with gcloud import. Modernized the database engine to SQL Server 2022 using Terraform IaC and established secure hybrid interconnects via IPSec VPN."
+impact: "6TB migrated with 100% bit-by-bit integrity. Database engine upgraded and core ERP operations resumed on GCP with zero transactional data loss."
+date: 2026-03-27
+tags: ["GCP", "Cloud Migration", "SQL Server", "Terraform", "Networking"]
+lang: "en"
+---
+
+## The Challenge
+Migrating a mission-critical ERP workload (TOTVS) from a legacy Bare Metal Hyper-V cluster (Gen2/UEFI) to Google Cloud Platform (GCP).
+
+- **Data Volume:** 6TB of structured data distributed across multiple VHDX virtual disks.
+- **Technical Constraint:** Due to architectural limitations with automated continuous replication tools on Gen2/UEFI guests, an offline (cold) migration strategy was chosen to guarantee full parity across storage blocks and prevent database corruption.
+- **Downtime Window:** A single weekend maintenance window to extract, upload, adapt, convert, validate, and restore business operations.
+
+---
+
+## Strategy & Implementation
+
+### 1. Offline Extraction & Block Parity Validation
+To ensure total database consistency, all ERP services and background agents were terminated on-premises. Full bit-level checksums (SHA-256) were generated for all raw disk images before transfer.
+
+### 2. Automated OS Adaptation via Google Cloud CLI
+Because the on-premises virtual machine was configured as a Gen2 UEFI guest, standard Google Cloud automated image imports could fail due to missing VirtIO storage and networking drivers. We employed the Google Cloud OS Adaptation pipeline:
+
+```bash
+gcloud compute images import erp-production-image \
+    --source-file="gs://migration-bucket-6tb/disk-boot.vmdk" \
+    --os="windows-2022-dc" \
+    --project="enterprise-cloud-prod"
+```
+
+The migration engine dynamically injected the required paravirtualized Google Compute Engine drivers and reconfigured the UEFI boot configuration without requiring interactive recovery.
+
+### 3. Infrastructure as Code (Terraform)
+The cloud infrastructure was provisioned via declarative Terraform modules:
+- Dedicated Compute Engine instances with High-Memory sizing and SSD Persistent Disks.
+- Google Cloud Armor edge filtering and fine-grained Cloud IAM service accounts.
+- Redundant Cloud Router and Cloud VPN tunnels connecting GCP VPC directly to corporate branch offices.
+
+### 4. Database Modernization (SQL Server 2022)
+During the same maintenance window, SQL Server was upgraded from 2019 to 2022, leveraging new Cardinality Estimation feedback, automatic parameter sensitive plan optimization, and improved parallel scans.
+
+---
+
+## Results & Business Impact
+
+- **Zero Data Loss:** 6TB migrated with bit-by-bit checksum verification.
+- **Reliable Hybrid Connectivity:** Stable, encrypted transit between cloud infrastructure and physical stores.
+- **Operational Scalability:** Eliminated on-premises physical hardware refresh costs and established automated Google Cloud backup snapshots.

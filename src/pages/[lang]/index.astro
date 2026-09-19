@@ -1,0 +1,42 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/Hero.astro';
+import Services from '../../components/Services.astro';
+import ProjectList from '../../components/ProjectList.astro';
+import HomelabCallout from '../../components/HomelabCallout.astro';
+import Recommendations from '../../components/Recommendations.astro';
+import ConsultationCTA from '../../components/ConsultationCTA.astro';
+import { type Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'pt' } },
+    { params: { lang: 'en' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Lang };
+
+const titles = {
+  pt: "Eliminando gargalos de arquitetura e fricção técnica. | Matheus Yared",
+  en: "Eliminating architectural bottlenecks and technical friction. | Matheus Yared",
+};
+
+const descriptions = {
+  pt: "Atuo na intersecção entre regras de negócio e infraestrutura. Elimino a causa raiz de instabilidades para construir arquiteturas resilientes que suportam escala sustentável.",
+  en: "Operating at the intersection of business logic and systems infrastructure. Eradicating root-cause instability to engineer resilient architectures built for sustainable scale.",
+};
+---
+
+<Layout 
+  title={titles[lang] || titles.pt}
+  description={descriptions[lang] || descriptions.pt}
+  lang={lang}
+>
+  <Hero lang={lang} />
+  <Services lang={lang} />
+  <ProjectList lang={lang} />
+  <HomelabCallout lang={lang} />
+  <Recommendations lang={lang} />
+  <ConsultationCTA lang={lang} />
+</Layout>

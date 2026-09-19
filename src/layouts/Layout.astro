@@ -2,16 +2,22 @@
 import '@fontsource/geist-sans';
 import '@fontsource/ibm-plex-mono';
 import '../styles/global.css';
+import { type Lang, defaultLang, useTranslations, getLocalizedPath } from '../i18n/ui';
 
 interface Props {
 	title: string;
 	description?: string;
+	lang?: Lang;
 }
+
+const currentPath = Astro.url.pathname;
 const { title, description = "Arquitetura de Software & Consultoria Técnica" } = Astro.props;
+const lang: Lang = Astro.props.lang || (currentPath.startsWith('/en') ? 'en' : 'pt');
+const t = useTranslations(lang);
 ---
 
 <!doctype html>
-<html lang="pt-BR">
+<html lang={lang === 'pt' ? 'pt-BR' : 'en'}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,7 +30,7 @@ const { title, description = "Arquitetura de Software & Consultoria Técnica" } 
 		<meta property="og:description" content={description} />
 		<meta property="og:image" content="/og-image.png" />
 		<meta property="og:type" content="website" />
-		<meta property="og:locale" content="pt_BR" />
+		<meta property="og:locale" content={lang === 'pt' ? 'pt_BR' : 'en_US'} />
 		<!-- Twitter Card -->
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
@@ -34,28 +40,46 @@ const { title, description = "Arquitetura de Software & Consultoria Técnica" } 
 	<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col antialiased selection:bg-zinc-800 selection:text-zinc-50">
 		<header class="w-full border-b border-zinc-800/40 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-50">
 			<div class="container-base h-16 flex justify-between items-center">
-				<a href="/" class="flex items-center gap-3 group focus:outline-none">
+				<a href={`/${lang}`} class="flex items-center gap-3 group focus:outline-none">
 					<span class="text-sm font-semibold tracking-tight text-zinc-100 group-hover:text-white transition-colors">
 						Matheus Yared
 					</span>
 					<span class="hidden sm:inline-block text-xs font-mono text-zinc-500 border-l border-zinc-800 pl-3">
-						Software &amp; Architecture
+						{t('nav.software_arch')}
 					</span>
 				</a>
 				
-				<div class="flex items-center gap-6">
-					<nav class="flex items-center gap-5 text-sm text-zinc-400">
-						<a href="/projects" class="hover:text-zinc-100 transition-colors">Projetos</a>
-						<a href="/trajetoria" class="hover:text-zinc-100 transition-colors">Trajetória</a>
-						<a href="/homelab" class="hover:text-zinc-100 transition-colors">Homelab</a>
+				<div class="flex items-center gap-4 sm:gap-6">
+					<nav class="flex items-center gap-4 sm:gap-5 text-sm text-zinc-400">
+						<a href={`/${lang}/projects`} class="hover:text-zinc-100 transition-colors">{t('nav.projects')}</a>
+						<a href={`/${lang}/trajetoria`} class="hover:text-zinc-100 transition-colors">{t('nav.trajectory')}</a>
+						<a href={`/${lang}/homelab`} class="hover:text-zinc-100 transition-colors">{t('nav.homelab')}</a>
 					</nav>
+
+					<!-- Language Switcher Toggle -->
+					<div class="flex items-center p-0.5 rounded border border-zinc-800 bg-zinc-900/90 text-[11px] font-mono">
+						<a 
+							href={getLocalizedPath(currentPath, 'pt')} 
+							class={`px-2 py-0.5 rounded transition-colors ${lang === 'pt' ? 'bg-zinc-800 text-zinc-100 font-semibold shadow-xs' : 'text-zinc-400 hover:text-zinc-200'}`}
+							aria-label="Mudar para Português"
+						>
+							PT
+						</a>
+						<a 
+							href={getLocalizedPath(currentPath, 'en')} 
+							class={`px-2 py-0.5 rounded transition-colors ${lang === 'en' ? 'bg-zinc-800 text-zinc-100 font-semibold shadow-xs' : 'text-zinc-400 hover:text-zinc-200'}`}
+							aria-label="Switch to English"
+						>
+							EN
+						</a>
+					</div>
 					
 					<div class="hidden md:flex items-center gap-2 pl-4 border-l border-zinc-800/60">
 						<span class="relative flex h-2 w-2">
 							<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
 							<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
 						</span>
-						<span class="text-xs font-mono text-zinc-400">Disponível</span>
+						<span class="text-xs font-mono text-zinc-400">{t('nav.available')}</span>
 					</div>
 				</div>
 			</div>
@@ -68,7 +92,7 @@ const { title, description = "Arquitetura de Software & Consultoria Técnica" } 
 		<footer class="w-full border-t border-zinc-800/40 mt-auto bg-zinc-950/50">
 			<div class="container-base py-10 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-zinc-500 font-mono">
 				<div class="flex items-center gap-3">
-					<span>&copy; {new Date().getFullYear()} Matheus Yared &middot; Engenharia de Software &amp; Arquitetura</span>
+					<span>{t('footer.rights')}</span>
 				</div>
 				<div class="flex items-center gap-6">
 					<a href="https://github.com/Yared98" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-300 transition-colors">GitHub &nearr;</a>

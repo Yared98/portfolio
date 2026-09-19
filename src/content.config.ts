@@ -15,6 +15,7 @@ const projectsCollection = defineCollection({
     liveUrl: z.string().url().optional(),
     brandColor: z.enum(['indigo', 'amber', 'sky', 'rose', 'emerald', 'zinc']).optional(),
     toolkit: z.boolean().optional(),
+    lang: z.enum(['pt', 'en']).default('pt'),
   }),
 });
 

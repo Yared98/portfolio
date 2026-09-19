@@ -1,20 +1,28 @@
 ---
+import { type Lang, defaultLang, useTranslations } from '../i18n/ui';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+const t = useTranslations(lang);
 ---
 <section class="pb-16 md:pb-24 border-b border-zinc-800/40">
   <!-- Overline Tag -->
   <div class="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-zinc-500 uppercase mb-6">
     <span class="w-1.5 h-1.5 bg-zinc-500 rounded-none inline-block"></span>
-    Arquitetura de Sistemas &middot; Engenharia de Confiabilidade
+    {t('hero.overline')}
   </div>
 
   <!-- Headline -->
   <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-sans font-semibold tracking-tight text-zinc-50 max-w-4xl leading-[1.15]">
-    Eliminando gargalos de arquitetura <span class="text-zinc-500 font-normal">e fricção técnica.</span>
+    {t('hero.title_start')} <span class="text-zinc-100 font-semibold">{t('hero.title_highlight')}</span> {t('hero.title_end')}
   </h1>
 
   <!-- Subtitle -->
   <p class="mt-6 text-base md:text-lg text-zinc-400 max-w-2xl font-sans leading-relaxed">
-    Atuo na intersecção entre regras de negócio e infraestrutura. Elimino a causa raiz de instabilidades para construir arquiteturas que suportam escala sustentável.
+    {t('hero.lead')}
   </p>
 
   <!-- CTAs -->
@@ -24,15 +32,15 @@
       id="hero-cta-diagnostico"
       class="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-100 text-zinc-950 text-sm font-semibold rounded hover:bg-white transition-colors"
     >
-      <span>Solicitar Diagnóstico Técnico</span>
+      <span>{t('hero.cta_consulting')}</span>
       <span aria-hidden="true">&nearr;</span>
     </a>
     <a
-      href="/trajetoria"
+      href={`/${lang}/trajetoria`}
       id="hero-cta-trajetoria"
       class="inline-flex items-center gap-2 px-4 py-2.5 text-zinc-400 hover:text-zinc-100 text-sm font-medium transition-colors"
     >
-      <span>Ver Trajetória</span>
+      <span>{t('hero.cta_trajectory')}</span>
       <span aria-hidden="true">&rarr;</span>
     </a>
   </div>
@@ -41,37 +49,37 @@
   <div class="grid grid-cols-1 md:grid-cols-3 border border-zinc-800/60 bg-zinc-900/20 divide-y md:divide-y-0 md:divide-x divide-zinc-800/60">
     <div class="p-6 flex flex-col justify-between">
       <div class="text-[11px] font-mono uppercase tracking-wider text-zinc-500 mb-2">
-        Experiência Corporativa
+        {lang === 'pt' ? 'Experiência Corporativa' : 'Enterprise Experience'}
       </div>
       <div class="text-3xl font-semibold text-zinc-100 tracking-tight mb-2">
-        +5 anos
+        {t('hero.stat_years_value')}
       </div>
       <p class="text-xs text-zinc-400 font-sans leading-relaxed">
-        em ambientes corporativos de alta disponibilidade e sustentação crítica.
+        {lang === 'pt' ? 'em ambientes corporativos de alta disponibilidade e sustentação crítica.' : 'in high-availability enterprise environments and mission-critical support.'}
       </p>
     </div>
 
     <div class="p-6 flex flex-col justify-between">
       <div class="text-[11px] font-mono uppercase tracking-wider text-zinc-500 mb-2">
-        Volume &amp; Consistência
+        {lang === 'pt' ? 'Volume & Consistência' : 'Volume & Consistency'}
       </div>
       <div class="text-3xl font-semibold text-zinc-100 tracking-tight mb-2">
-        Escala TB
+        {t('hero.stat_scale_value')}
       </div>
       <p class="text-xs text-zinc-400 font-sans leading-relaxed">
-        em dados migrados e sustentados com zero perda de integridade transacional.
+        {lang === 'pt' ? 'em dados migrados e sustentados com zero perda de integridade transacional.' : 'migrated and maintained with zero transactional integrity loss.'}
       </p>
     </div>
 
     <div class="p-6 flex flex-col justify-between">
       <div class="text-[11px] font-mono uppercase tracking-wider text-zinc-500 mb-2">
-        Abordagem Metódica
+        {lang === 'pt' ? 'Abordagem Metódica' : 'Methodical Mindset'}
       </div>
       <div class="text-3xl font-semibold text-zinc-100 tracking-tight mb-2">
-        Causa raiz
+        {t('hero.stat_focus_value')}
       </div>
       <p class="text-xs text-zinc-400 font-sans leading-relaxed">
-        foco obsessivo em resolução definitiva e simplicidade arquitetural sustentável.
+        {lang === 'pt' ? 'foco obsessivo em resolução definitiva e simplicidade arquitetural sustentável.' : 'disciplined focus on root-cause resolution and durable architectural simplicity.'}
       </p>
     </div>
   </div>

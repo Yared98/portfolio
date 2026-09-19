@@ -1,36 +1,70 @@
 ---
-const recommendations = [
-  {
-    name: "Rahula Palu",
-    role: "Full Stack Developer",
-    text: "Eu nunca tinha conhecido alguém tão ágil e determinado a resolver problemas como o Matheus. Possui conhecimento holístico abrangente e decisivo. Um programador focado e experiente em várias linguagens, além de colega fenômeno, com um coração gigante."
-  },
-  {
-    name: "Rodrigo Mastini",
-    role: "SR IT Operation Manager",
-    text: "Matheus é um rapaz com muita responsabilidade, postura e entregas exemplares! Fez um trabalho muito importante em um de nossos clientes, com bastante relevância. Um profissional que certamente indico com prazer!"
-  },
-  {
-    name: "Thiago José",
-    role: "Coordenador de Infraestrutura de TI",
-    text: "Matheus Yared é um ótimo profissional. Desde o começo demonstrou interesse nos processos da empresa. Adaptou-se rapidamente às rotinas, contribuindo para a produtividade. Sem dúvidas, um ótimo colaborador!"
-  },
-  {
-    name: "Gustavo Zilli",
-    role: "Analista de Gestão de Riscos",
-    text: "Menino muito astuto e focado. Sempre mostra grande empenho e vontade de aprender."
-  }
-];
----
+import { type Lang, defaultLang, useTranslations } from '../i18n/ui';
 
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+const t = useTranslations(lang);
+
+const recommendations = {
+  pt: [
+    {
+      name: "Rahula Palu",
+      role: "Full Stack Developer",
+      text: "Eu nunca tinha conhecido alguém tão ágil e determinado a resolver problemas como o Matheus. Possui conhecimento holístico abrangente e decisivo. Um programador focado e experiente em várias linguagens, além de colega fenômeno, com um coração gigante."
+    },
+    {
+      name: "Rodrigo Mastini",
+      role: "SR IT Operation Manager",
+      text: "Matheus é um rapaz com muita responsabilidade, postura e entregas exemplares! Fez um trabalho muito importante em um de nossos clientes, com bastante relevância. Um profissional que certamente indico com prazer!"
+    },
+    {
+      name: "Thiago José",
+      role: "Coordenador de Infraestrutura de TI",
+      text: "Matheus Yared é um ótimo profissional. Desde o começo demonstrou interesse nos processos da empresa. Adaptou-se rapidamente às rotinas, contribuindo para a produtividade. Sem dúvidas, um ótimo colaborador!"
+    },
+    {
+      name: "Gustavo Zilli",
+      role: "Analista de Gestão de Riscos",
+      text: "Menino muito astuto e focado. Sempre mostra grande empenho e vontade de aprender."
+    }
+  ],
+  en: [
+    {
+      name: "Rahula Palu",
+      role: "Full Stack Developer",
+      text: "I had never met anyone as agile and determined to solve problems as Matheus. He possesses comprehensive and decisive holistic systems knowledge. A focused engineer across multiple languages and an exceptional teammate."
+    },
+    {
+      name: "Rodrigo Mastini",
+      role: "SR IT Operation Manager",
+      text: "Matheus demonstrates exemplary responsibility, professionalism, and delivery quality! He executed a critical migration for one of our enterprise clients with remarkable precision. A professional I recommend without hesitation!"
+    },
+    {
+      name: "Thiago José",
+      role: "IT Infrastructure Coordinator",
+      text: "Matheus Yared is an outstanding professional. From day one, he engaged deeply with company operations, adapting swiftly to high-demand routines and boosting overall team productivity."
+    },
+    {
+      name: "Gustavo Zilli",
+      role: "Risk Management Analyst",
+      text: "Extremely sharp, analytical, and focused. Consistently exhibits strong dedication, autonomy, and continuous learning."
+    }
+  ]
+};
+
+const items = recommendations[lang] || recommendations.pt;
+---
 <section class="py-16 md:py-24 border-b border-zinc-800/40 overflow-hidden">
   <div class="flex items-end justify-between mb-10">
     <div>
-      <div class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Validação Profissional</div>
-      <h2 class="text-2xl md:text-3xl font-semibold text-zinc-100 tracking-tight">Recomendações de Pares &amp; Liderança</h2>
+      <div class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">{t('rec.tag')}</div>
+      <h2 class="text-2xl md:text-3xl font-semibold text-zinc-100 tracking-tight">{t('rec.title')}</h2>
     </div>
     <a href="https://linkedin.com/in/yared98" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-zinc-100 transition-colors">
-      <span>Ver no LinkedIn</span>
+      <span>{t('rec.linkedin')}</span>
       <span aria-hidden="true">&nearr;</span>
     </a>
   </div>
@@ -38,7 +72,7 @@ const recommendations = [
   <div class="relative w-full">
     <!-- CSS-only horizontal scroll carousel with custom scrollbar -->
     <div class="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-6 pt-2 custom-scrollbar w-full">
-      {recommendations.map((rec) => (
+      {items.map((rec) => (
         <div class="snap-start shrink-0 w-[85%] sm:w-[50%] lg:w-[38%] flex flex-col justify-between border border-zinc-800/60 bg-zinc-900/15 p-6 md:p-7 rounded hover:border-zinc-700/60 transition-colors">
           <blockquote class="text-sm md:text-base text-zinc-300 font-sans leading-relaxed mb-8 relative">
             <span class="text-3xl text-zinc-700 font-serif leading-none select-none block mb-2">&ldquo;</span>

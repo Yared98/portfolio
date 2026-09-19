@@ -1,0 +1,33 @@
+---
+title: "Imobi - Real Estate Management and High-Performance Showcase Platform"
+description: "High-performance real estate web portal integrated with a self-hosted PostgreSQL database in my private homelab, engineered for technical SEO, instant page loads, and intuitive administration."
+problem: "Need for an agile real estate portal with instant loading speeds, high Google search rankings (SEO), and straightforward administration without expensive recurring SaaS builder fees or bloated CMS performance."
+solution: "Engineered a high-performance web portal using Laravel with optimized server-side rendering (SSR), TailwindCSS, and a self-hosted PostgreSQL database cluster."
+impact: "Live in production at https://fariasdourado.com.br/ with sub-second page loads, excellent PageSpeed metrics, and flawless technical SEO."
+date: 2026-05-15
+tags: ["Laravel", "PHP", "LXC", "PostgreSQL", "SEO", "TailwindCSS"]
+liveUrl: "https://fariasdourado.com.br"
+brandColor: "emerald"
+lang: "en"
+---
+
+![Farias Dourado Real Estate - Platform Showcase](../../../assets/imobi-preview.png)
+
+## The Challenge
+
+For medium-sized real estate brokerages, digital reach is critical for lead acquisition. However, off-the-shelf market alternatives (WordPress, Wix, or bloated proprietary portals) carry severe operational liabilities:
+
+- **Poor Mobile Performance:** Sluggish responsiveness on mobile devices caused by heavy client-side JavaScript libraries and uncompressed imagery.
+- **Weak Technical SEO:** Suboptimal schema markup and slow rendering hurt organic search rankings for competitive local real estate queries.
+- **Costly Subscriptions:** High recurring monthly fees paired with rigid templates that limit custom lead capture funnels.
+
+The solution delivered for **Farias Dourado Imóveis** unified an exceptional end-user browsing experience, complete data ownership, and near-zero recurring hosting overhead by leveraging self-hosted private infrastructure.
+
+---
+
+## Technical Architecture & Highlights
+
+- **Server-Side Rendering (SSR) with Laravel:** Generates semantic, search-indexable HTML on the server before client dispatch, maximizing Core Web Vitals.
+- **Automated Image Optimization Pipeline:** High-resolution property uploads are automatically converted to next-generation WebP formats via Sharp/GD, slashing image payloads by up to 75% without perceptible loss in visual fidelity.
+- **Dedicated PostgreSQL Database:** Robust schema design with spatial indexes for geographic distance queries and compound indexes for rapid price/neighborhood filtering.
+- **Homelab Self-Hosting with Zero Open Ports:** Deployed inside an unprivileged LXC container in Proxmox VE and served publicly via Cloudflare Zero-Trust Tunnels.

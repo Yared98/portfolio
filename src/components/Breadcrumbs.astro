@@ -1,19 +1,25 @@
 ---
+import { type Lang, useTranslations } from '../i18n/ui';
+
 interface Props {
   segments: {
     label: string;
     href?: string;
   }[];
+  lang?: Lang;
 }
 
+const currentPath = Astro.url.pathname;
 const { segments } = Astro.props;
+const lang: Lang = Astro.props.lang || (currentPath.startsWith('/en') ? 'en' : 'pt');
+const t = useTranslations(lang);
 ---
 <nav aria-label="Breadcrumb" class="pb-8 pt-4">
   <ol role="list" class="flex items-center space-x-2 text-xs font-mono text-zinc-500">
     <li>
-      <a href="/" class="hover:text-zinc-300 transition-colors">Início</a>
+      <a href={`/${lang}`} class="hover:text-zinc-300 transition-colors">{t('crumbs.home')}</a>
     </li>
-    {segments.map((segment, index) => (
+    {segments.map((segment) => (
       <>
         <li>
           <span class="text-zinc-700">/</span>

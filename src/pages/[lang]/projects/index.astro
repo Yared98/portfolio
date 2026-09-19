@@ -1,0 +1,52 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import ProjectList from '../../../components/ProjectList.astro';
+import { type Lang, useTranslations } from '../../../i18n/ui';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'pt' } },
+    { params: { lang: 'en' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
+
+const titles = {
+  pt: "Projetos & Casos de Engenharia | Matheus Yared",
+  en: "Projects & Engineering Case Studies | Matheus Yared",
+};
+
+const descriptions = {
+  pt: "Registro de projetos de software, migrações de dados em escala de terabytes e arquiteturas em produção.",
+  en: "Technical portfolio of software projects, terabyte-scale data migrations, and production systems.",
+};
+---
+
+<Layout 
+  title={titles[lang] || titles.pt}
+  description={descriptions[lang] || descriptions.pt}
+  lang={lang}
+>
+  <Breadcrumbs 
+    segments={[{ label: t('crumbs.projects'), href: `/${lang}/projects` }]} 
+    lang={lang}
+  />
+  
+  <section class="mt-4 mb-16">
+    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 mb-6">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+      {lang === 'pt' ? 'CASOS SELECIONADOS · PRODUÇÃO REAL' : 'SELECTED CASES · PRODUCTION SYSTEMS'}
+    </div>
+    <h1 class="text-3xl md:text-5xl font-sans font-semibold tracking-tight text-zinc-100 mb-6 leading-tight">
+      {t('projects.all_cases_title')}
+    </h1>
+    <p class="text-zinc-300 font-serif max-w-3xl leading-relaxed text-lg">
+      {t('projects.all_cases_desc')}
+    </p>
+  </section>
+
+  <ProjectList lang={lang} />
+</Layout>

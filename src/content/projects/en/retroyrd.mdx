@@ -1,0 +1,77 @@
+---
+title: "RetroYrd - Real-Time Agile Retrospectives with Rust and Native MCP"
+description: "Sovereign real-time agile retrospective platform with a high-performance Rust backend (<20MB RAM), strict data governance, cryptographic anonymity, and an integrated Model Context Protocol (MCP) server."
+problem: "Dependence on proprietary SaaS retrospective tools imposing recurring seat licenses, artificial board limits, third-party storage of sensitive post-mortem reflections, and lack of native AI automation."
+solution: "Engineered a self-hosted, ultra-low-latency platform with a Rust backend (Axum + Tokio WebSockets), 6-phase FSM, SQLite in WAL mode, network-level author masking, and a native Model Context Protocol (MCP) endpoint."
+impact: "100% data governance over strategic team reflections, zero recurring SaaS licensing overhead, <20MB baseline RAM footprint, and real-time AI-assisted action item generation."
+date: 2026-06-20
+tags: ["Rust", "Axum", "WebSockets", "MCP (Model Context Protocol)", "React", "SQLite", "OpenSpec", "Docker"]
+repoUrl: "https://github.com/Yared98/retroyrd"
+liveUrl: "https://retro.yared.com.br"
+brandColor: "indigo"
+toolkit: true
+lang: "en"
+---
+
+![RetroYrd - Real-Time Agile Retrospective Platform](../../../assets/retroyrd-preview.png)
+
+## The Challenge
+
+Retrospectives are the most sensitive ceremonies in engineering teams: they are where operational failures, architectural bottlenecks, process frustrations, and continuous improvement plans are debated openly. However, existing commercial platforms suffer from critical flaws:
+
+- **Recurring Seat Costs & Artificial Limits:** SaaS tools enforce per-seat billing, strict caps on active boards, and gated export functionality.
+- **Data Sovereignty & Compliance Risks:** Transmitting internal engineering post-mortems and candid team evaluations to third-party multitenant clouds poses unnecessary security and compliance liabilities.
+- **Fragile Psychological Safety:** Many commercial solutions retain author telemetry, IP traces, or identifiable session tokens, suppressing genuine team transparency.
+- **Absence of Native AI Integration:** Facilitating retrospectives requires synthesizing dozens of scattered cards into actionable items manually, without native support for autonomous AI copilots.
+
+To solve these pain points definitively, I engineered **RetroYrd** ([GitHub Repository](https://github.com/Yared98/retroyrd) and running live at [retro.yared.com.br](https://retro.yared.com.br/)): a real-time, sovereign, zero-licensing-cost platform equipped with a native **Model Context Protocol (MCP)** server for bidirectional LLM orchestration.
+
+---
+
+## 6-Phase Finite State Machine (FSM)
+
+RetroYrd replaces uncoordinated boards with a strictly typed 6-phase lifecycle governed by a backend state machine in Rust:
+
+```
+[ 1. ICEBREAKER ] ➔ [ 2. REFLECT ] ➔ [ 3. GROUP ] ➔ [ 4. VOTE ] ➔ [ 5. DISCUSS ] ➔ [ 6. ACTION ITEMS ]
+```
+
+1. **Icebreaker:** Synchronous team warm-up with mood check-ins and energizers to set an inclusive tone.
+2. **Reflect (Blind Reflection):** Participants compose cards independently. During this phase, other members' cards remain hidden to eliminate herd bias and social conformity.
+3. **Group (Topic Clustering):** Real-time grouping of duplicate or related themes into unified debate threads.
+4. **Vote (Dot-Voting):** Allocated voting quotas per participant to democratically rank priority topics.
+5. **Discuss (Timeboxed Debate):** Ordered discussion queue with synchronized countdown timers.
+6. **Action Items:** Structured generation of assignable action points, assignees, and automatic Markdown summary export.
+
+---
+
+## Technical Architecture & Performance
+
+The architecture adheres to **OpenSpec (Spec-Driven Development)**, achieving exceptional resource efficiency:
+
+| Layer | Technology | Architectural Role |
+| :--- | :--- | :--- |
+| **Backend** | **Rust (Axum + Tokio)** | Asynchronous event broker using `tokio::sync::broadcast` channels, in-memory presence, and static SPA serving. |
+| **Persistence** | **SQLite (WAL Mode)** | Atomic, lock-free local database transactions with zero external database dependencies and instant snapshotting. |
+| **Frontend** | **React 19 + TypeScript + Vite** | Lightweight SPA with bidirectional WebSocket sync, dark/light themes, and *Agile Cadence* design system. |
+| **AI Protocol** | **Model Context Protocol (MCP)** | Native JSON-RPC 2.0 endpoint at `/mcp` enabling autonomous LLMs to query board status and propose action items. |
+
+---
+
+## Native Model Context Protocol (MCP) Server
+
+RetroYrd implements an integrated **Model Context Protocol** server compliant with the open standard established by Anthropic. Through this endpoint, external AI agents can:
+
+- Query the real-time state of the board (active phase, votes, clusters).
+- Analyze patterns across team reflections to uncover recurring systemic issues.
+- Synthesize actionable sprint tickets and export directly to project management tracking tools.
+
+---
+
+## Sovereign Homelab Deployment (Zero Cost)
+
+Operating in high-availability self-hosted production:
+
+- **Ultra-Low Resource Footprint:** The compiled Rust binary runs continuously consuming **less than 20MB of RAM**.
+- **Isolated Linux Container:** Hosted within an unprivileged LXC container on Proxmox VE.
+- **Zero Public Ingress:** Secure traffic routing via outbound Cloudflare Zero-Trust Tunnels with zero open WAN router ports.

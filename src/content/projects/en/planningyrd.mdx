@@ -1,0 +1,82 @@
+---
+title: "PlanningYrd - Real-Time Planning Poker Free of Anchoring Bias & with Native MCP"
+description: "Real-time agile estimation platform featuring diverse card decks, instantaneous consensus metrics, backlog management, and native Model Context Protocol (MCP) support."
+problem: "Commercial Planning Poker tools enforce steep per-user licensing fees, leak sensitive roadmap details to third-party clouds, and introduce severe cognitive anchoring when votes are revealed prematurely."
+solution: "Engineered an ultra-fast estimation engine in Rust (Axum + Tokio WebSockets) with strictly concealed voting until simultaneous flip, automated central tendency statistics, celebratory consensus animations, and an MCP server."
+impact: "Bias-free sprint point estimations, one-click story export to Jira/Markdown, zero licensing expenditure, and 100% data sovereignty on private hardware."
+date: 2026-07-28
+tags: ["Rust", "Axum", "WebSockets", "Planning Poker", "React", "SQLite (WAL)", "MCP", "Docker"]
+repoUrl: "https://github.com/Yared98/planningyrd"
+liveUrl: "https://planning.yared.com.br"
+brandColor: "sky"
+toolkit: true
+lang: "en"
+---
+
+## The Challenge: Cognitive Anchoring in Software Estimation
+
+**Planning Poker** is a foundational ritual for sizing engineering effort in Scrum and Kanban workflows. Its efficacy relies on uncovering divergent assumptions: when developers assess a ticket independently, outlying estimates reveal hidden technical complexities.
+
+However, standard commercial estimation tools fall short:
+
+- **The Anchoring Effect:** When senior developers articulate their points out loud ("*this should take 3 points*") or platforms reveal cards progressively, other team members adjust their estimates to conform, neutralizing the metric's diagnostic value.
+- **Excessive Subscription Costs:** Popular SaaS providers charge substantial per-seat fees merely to present synchronized card counters on screen, forcing teams to restrict observer access.
+- **Intellectual Property Leaks:** Proprietary feature scopes and architectural debt discussions end up stored indefinitely in third-party databases.
+- **Zero AI Extensibility:** Conventional tools lack open API protocols for AI copilots to assist in sprint sizing or backlog management.
+
+To overcome these constraints, I created **PlanningYrd** ([GitHub Repository](https://github.com/Yared98/planningyrd) and live at [planning.yared.com.br](https://planning.yared.com.br/)).
+
+---
+
+## Core Estimation Mechanics
+
+PlanningYrd was designed with speed, ergonomic simplicity, and cognitive impartiality at its center:
+
+### 1. Strict Blind Voting
+During estimation, participants see only that peers have selected a card via a face-down visual indicator on their avatar. Numeric card values remain encrypted and strictly hidden until the facilitator triggers **Simultaneous Reveal** or the room reaches 100% completion (optional auto-flip).
+
+### 2. Instant Statistical Consensus & Celebration
+The moment cards flip, the engine computes statistical aggregates in real time:
+- **Mean & Median:** Rapid visibility into the central distribution of team effort.
+- **Agreement Percentage (%):** Instantly gauges alignment level across participants.
+- **Divergence Highlighting:** Automatically spotlights the highest and lowest votes, prompting constructive debate between optimistic and cautious perspectives.
+- **Consensus Celebration:** When unanimous agreement occurs, a lightweight confetti burst confirms team alignment.
+
+### 3. Comprehensive Deck Support
+- **Fibonacci Standard:** `0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ?, ☕`
+- **T-Shirt Sizing:** `XS, S, M, L, XL, XXL, ?, ☕`
+- **Sequential & Custom Decks:** Tailored scales for business value or risk estimation.
+
+### 4. Backlog Queue & Effort Export
+Facilitators can queue multiple user stories in advance, step through them sequentially, and export finalized points in Markdown, CSV, or JSON for direct import into Jira, Azure DevOps, or GitHub Issues.
+
+---
+
+## Low-Latency Rust Architecture
+
+Real-time message routing between poker tables and browsers occurs over bi-directional WebSockets managed by an in-memory Rust event broker:
+
+| Component | Technology | Design Choice |
+| :--- | :--- | :--- |
+| **Backend Engine** | **Rust (Axum + Tokio)** | Sub-millisecond broadcast latency without external message queue dependencies like Redis. |
+| **Persistence** | **SQLite (WAL Mode)** | Persistent room state, story history, and participant records stored safely in local volume files. |
+| **Reactive Frontend** | **React + TypeScript + Vite** | Lightweight UI styled with the *Agile Cadence* design system, subtle card haptics, and dark/light modes. |
+| **AI Protocol** | **Model Context Protocol (MCP)** | JSON-RPC 2.0 endpoint at `/mcp` for autonomous LLM participation and backlog population. |
+
+---
+
+## Native Model Context Protocol (MCP) Server
+
+PlanningYrd provides first-class support for AI agents:
+- **AI-Assisted Complexity Estimation:** Agents can read technical requirements and propose baseline story points based on code complexity metrics.
+- **Backlog Ingestion:** Automated story ticket creation directly from EARS requirements documents or product PRDs.
+- **Discussion Summaries:** Synthesizes the core debate between highest and lowest estimators into concise architectural notes.
+
+---
+
+## Sovereign Homelab Deployment
+
+Hosted on dedicated bare-metal infrastructure:
+- Running inside an isolated LXC container on Proxmox VE.
+- Zero open ingress ports via Cloudflare Zero-Trust Tunnels.
+- Persistent database backed by atomic ZFS copy-on-write snapshots.

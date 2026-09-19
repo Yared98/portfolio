@@ -1,0 +1,70 @@
+---
+title: "DailyYrd - Standup Ceremonies with Synchronized Roulette, Blocker Spotlight & Slack Export"
+description: "Hybrid daily standup platform supporting both asynchronous check-ins and live sync meetings with a randomized speaker roulette, 90s countdown timer, and high-visibility blocker triage."
+problem: "Daily standup meetings that routinely exceed 15 minutes, devolve into tedious status reports, and fail to give technical leads immediate visibility into critical team blockers."
+solution: "Engineered a high-performance daily standup platform in Rust (Axum + WebSockets) combining morning asynchronous check-ins, a live roulette with a 90-second countdown timer per engineer, Rose Coral blocker spotlighting, and direct Slack/Discord export."
+impact: "Consistently keeps daily syncs under 15 minutes, accelerates impediment resolution within the morning cycle, provides transparent date-based history, and incurs zero infrastructure costs."
+date: 2026-08-10
+tags: ["Rust", "Axum", "WebSockets", "Scrum Daily", "React", "SQLite (WAL)", "Slack Export", "Docker"]
+repoUrl: "https://github.com/Yared98/dailyyrd"
+liveUrl: "https://daily.yared.com.br"
+brandColor: "rose"
+toolkit: true
+lang: "en"
+---
+
+## The Challenge: The Failure of the Traditional Standup
+
+The **Daily Scrum** was originally devised as a fast, 15-minute tactical synchronization meeting. In modern distributed organizations, however, it frequently breaks down:
+
+- **Drawn-Out, Exhausting Calls:** Detailed technical discussions between two engineers hijack everyone's focus, turning what should be a 15-minute check-in into a 40-minute drag.
+- **Hybrid & Remote Friction:** Engineers operating in different time zones or on flexible schedules struggle with rigid morning calendar holds without losing track of peers' deliverables.
+- **Buried Blockers:** Impediments are often whispered meekly at the end of an individual update and forgotten immediately once the call ends, stalling sprint milestones.
+- **Zero Persistent History:** Verbal updates leave no written record, forcing project leads to track down status updates manually in chat channels.
+
+To make standup ceremonies crisp, transparent, and actionable, I developed **DailyYrd** ([GitHub Repository](https://github.com/Yared98/dailyyrd) and live at [daily.yared.com.br](https://daily.yared.com.br/)).
+
+---
+
+## Dual Operational Modes: Asynchronous + Live Synchronous
+
+DailyYrd bridges the gap between async communication and high-energy live alignment:
+
+### 1. Asynchronous Mode (1-Minute Morning Check-in)
+At the start of the workday, engineers submit three core updates in under a minute:
+- **What was accomplished yesterday?**
+- **What is the primary focus for today?**
+- **Are there any technical blockers or external dependencies?**
+Supports rich Markdown syntax, mood indicators (*Full Focus, Motivated, Need Coffee, etc.*), and instant autosaving.
+
+### 2. Blocker Spotlight (Immediate Triage for Tech Leads)
+Team members with blockers are automatically elevated to a dedicated high-priority zone at the top of the board with an animated **Rose Coral** pulse (`#F43F5E`). Engineering managers and Tech Leads can instantly spot who is blocked and coordinate pairing sessions without detaining the entire squad on the call.
+
+### 3. Live Meeting Mode with 90-Second Speaker Roulette
+For synchronous morning syncs, the facilitator activates Live Meeting mode:
+- **Randomized Roulette:** Shuffles speaking order with a single click, eliminating the predictable monotony of alphabetical roll calls.
+- **90-Second Countdown Timer:** Enforces concise updates with gentle auditory and visual alerts as time elapses.
+- **Real-Time Presence:** Synchronized indicator across all connected client browsers showing who is speaking and who is up next.
+- **Confetti Celebration:** Concludes the meeting with celebratory confetti upon the final participant's completion.
+
+---
+
+## Architecture & Technical Specifications
+
+Built with the same high-reliability Rust foundation as the rest of the **Yrd Agile Toolkit**:
+
+| Layer | Technology | Architectural Decision |
+| :--- | :--- | :--- |
+| **Backend** | **Rust (Axum + Tokio)** | Asynchronous event processing with broadcast channels for live presence and synchronized timers. |
+| **Database** | **SQLite (rusqlite + WAL)** | High-concurrency, zero-configuration local database storing boards, check-ins, and daily history. |
+| **Frontend** | **React + Vite + TypeScript** | Sleek UI styled with *Agile Cadence*, dark/light mode support, and native Portuguese and English translations. |
+| **Export Engine** | **Markdown & Slack Block Kit Parser** | One-click export converting daily updates into rich, formatted text for Slack and Discord. |
+
+---
+
+## Practical Impact & Sovereign Governance
+
+- **Average Meeting Duration:** Cut from 35 minutes down to **11-13 minutes** consistently.
+- **Eliminated SaaS Subscriptions:** Replaces third-party bots (Geekbot, Standuply), saving hundreds of dollars annually per team.
+- **Total Data Privacy:** Sprint deliverables and operational hurdles remain safeguarded on local, private infrastructure.
+- **Production Efficiency:** Lightweight binary footprint consuming `<20MB` of RAM on Proxmox VE behind Cloudflare Zero-Trust Tunnels.
