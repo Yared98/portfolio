@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Recommendations from '../../components/Recommendations.astro';
+import TechBadge from '../../components/TechBadge.astro';
 import { type Lang, useTranslations } from '../../i18n/ui';
 
 export function getStaticPaths() {
@@ -173,10 +174,8 @@ const skills = skillsData[lang] || skillsData.pt;
           <div class="border border-zinc-800/80 bg-zinc-900/30 p-6">
             <h3 class="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-4">{s.category}</h3>
             <div class="flex flex-wrap gap-2">
-              {s.items.map((item) => (
-                <span class="text-xs font-mono text-zinc-300 bg-zinc-950 px-2.5 py-1 border border-zinc-800">
-                  {item}
-                </span>
+              {s.items.map((item: string) => (
+                <TechBadge tech={item} />
               ))}
             </div>
           </div>

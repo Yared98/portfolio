@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import TechBadge from '../../components/TechBadge.astro';
 import { type Lang, useTranslations } from '../../i18n/ui';
 
 export function getStaticPaths() {
@@ -169,10 +170,8 @@ const principles = principlesData[lang] || principlesData.pt;
             {pillar.desc}
           </p>
           <div class="flex flex-wrap gap-2 pt-4 border-t border-zinc-800/60">
-            {pillar.tech.map((techItem) => (
-              <span class="text-xs font-mono text-zinc-400 bg-zinc-950 px-2 py-1 border border-zinc-800">
-                {techItem}
-              </span>
+            {pillar.tech.map((techItem: string) => (
+              <TechBadge tech={techItem} />
             ))}
           </div>
         </div>

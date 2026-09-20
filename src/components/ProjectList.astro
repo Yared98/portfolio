@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import TechBadge from './TechBadge.astro';
 import { type Lang, defaultLang, useTranslations } from '../i18n/ui';
 
 interface Props {
@@ -81,9 +82,7 @@ const colorStyles: Record<string, { btn: string; dot: string }> = {
             {project.data.tags && project.data.tags.length > 0 && (
               <div class="flex flex-wrap gap-1.5 lg:justify-end">
                 {project.data.tags.map((tag) => (
-                  <span class="text-[11px] font-mono text-zinc-400 bg-zinc-900/60 border border-zinc-800 px-2 py-0.5 rounded">
-                    {tag}
-                  </span>
+                  <TechBadge tech={tag} />
                 ))}
               </div>
             )}

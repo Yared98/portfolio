@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import TechBadge from '../../../components/TechBadge.astro';
 import { type Lang, useTranslations } from '../../../i18n/ui';
 
 export async function getStaticPaths() {
@@ -84,10 +85,11 @@ const theme = project.data.brandColor ? colorStyles[project.data.brandColor] || 
             </>
           )}
           {project.data.tags && project.data.tags.length > 0 && (
-            <>
-              <span aria-hidden="true">&middot;</span>
-              <span>{project.data.tags.join(', ')}</span>
-            </>
+            <div class="flex flex-wrap gap-1.5 items-center">
+              {project.data.tags.map((tag: string) => (
+                <TechBadge tech={tag} />
+              ))}
+            </div>
           )}
         </div>
         

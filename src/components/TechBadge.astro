@@ -1,0 +1,16 @@
+---
+import { getTechBadgeStyle } from '../utils/techColors';
+
+interface Props {
+  tech: string;
+  size?: 'xs' | 'sm';
+  class?: string;
+}
+
+const { tech, size = 'xs', class: className = '' } = Astro.props;
+const style = getTechBadgeStyle(tech);
+---
+<span class={`inline-flex items-center gap-1.5 font-mono rounded border transition-colors ${style.bg} ${style.border} ${style.text} ${size === 'sm' ? 'text-xs px-2.5 py-1' : 'text-[11px] px-2 py-0.5'} ${className}`}>
+  <span class={`w-1.5 h-1.5 rounded-full ${style.dot} shrink-0`} aria-hidden="true"></span>
+  <span>{tech}</span>
+</span>

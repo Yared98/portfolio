@@ -1,5 +1,6 @@
 ---
 import { type Lang, defaultLang, useTranslations } from '../i18n/ui';
+import TechBadge from './TechBadge.astro';
 
 interface Props {
   lang?: Lang;
@@ -22,10 +23,10 @@ const t = useTranslations(lang);
         {t('homelab.callout_desc')}
       </p>
       <div class="flex flex-wrap gap-2 mt-4">
-        <span class="text-[11px] font-mono text-zinc-500 bg-zinc-900/80 border border-zinc-800/80 px-2 py-0.5 rounded">Proxmox VE</span>
-        <span class="text-[11px] font-mono text-zinc-500 bg-zinc-900/80 border border-zinc-800/80 px-2 py-0.5 rounded">ZFS Mirror</span>
-        <span class="text-[11px] font-mono text-zinc-500 bg-zinc-900/80 border border-zinc-800/80 px-2 py-0.5 rounded">Zero-Trust Tunnels</span>
-        <span class="text-[11px] font-mono text-zinc-500 bg-zinc-900/80 border border-zinc-800/80 px-2 py-0.5 rounded">Isolamento LXC</span>
+        <TechBadge tech="Proxmox VE" />
+        <TechBadge tech="ZFS Mirror" />
+        <TechBadge tech="Zero-Trust Tunnels" />
+        <TechBadge tech={lang === 'pt' ? 'Isolamento LXC' : 'LXC Isolation'} />
       </div>
     </div>
     
