@@ -3,7 +3,7 @@ title: "Migração de Alta Consistência e Modernização (6TB) para GCP"
 description: "Migração de carga de trabalho crítica (ERP) de Hyper-V Bare Metal para GCP com atualização do SQL Server 2019 para 2022 durante a janela de migração."
 problem: "Migrar ERP crítico (6TB) de Hyper-V Bare Metal para GCP. Limitações em Gen2/UEFI forçaram uma estratégia de Migração Offline (Fria) estritamente controlada."
 solution: "Migração direta (Lift & Shift) via Adaptação de Sistema Operacional (OS Adaptation) com o comando gcloud import. Modernização de banco (SQL Server 2022) via infraestrutura como código (IaC) e conectividade híbrida segura via VPN."
-impact: "6TB migrados com 100% de integridade bit-a-bit. Motor de banco modernizado e operação restabelecida com zero perda transacional."
+impact: "6TB migrados com 100% de integridade bit-a-bit. Janela de manutenção estritamente cumprida no final de semana sem impacto no faturamento e operação restabelecida com zero perda transacional."
 date: 2026-03-27
 tags: ["GCP", "Migração em Nuvem", "SQL Server", "Terraform", "Redes"]
 lang: "pt"
@@ -40,7 +40,9 @@ A escolha do tempo de inatividade planejado vs Replicação Online.
 | **Complexidade** | Alta (Monitoramento contínuo de sincronia). | Controlada (Sequenciamento de comandos da CLI do gcloud). |
 | **Compatibilidade** | Pode falhar com partições UEFI/Gen2. | Garantida via OS Adaptation do GCP. |
 
-## Resultados Alcançados
-- **Modernização do Motor de DB:** SQL Server atualizado com sucesso para a versão 2022 em uma instância n2-highmem-8.
-- **Segurança Híbrida:** Túnel VPN estabelecido via OpenVPN, permitindo que as instâncias operem em sub-redes (subnets) 100% privadas sem exposição de IPs públicos.
-- **Consistência de Dados:** 6TB de armazenamento migrados sem corrupção de sistema de arquivos ou perda de transações.
+## Resultados de Negócio & Impacto Operacional
+- **Continuidade de Faturamento:** Janela de manutenção concluída estritamente dentro do final de semana programado; no primeiro minuto da segunda-feira, as operações de emissão fiscal, faturamento e logística foram retomadas sem interrupção.
+- **Zero Corrupção Transacional:** 6TB de dados migrados com 100% de paridade bit-a-bit e sem inconsistências de chaves relacionais no ERP.
+- **Salto de Performance no Banco de Dados:** SQL Server atualizado com sucesso para 2022 em instância n2-highmem-8 no GCP com discos balanceados, reduzindo travamentos e tempos de processamento de relatórios pesados.
+- **Segurança Corporativa Híbrida:** Nenhuma instância ou porta do banco exposta publicamente na internet; comunicação 100% privada por túnel VPN criptografado.
+- **Mitigação de Riscos de Hardware Legado:** Eliminação da dependência de servidores físicos Hyper-V locais obsoletos com risco de falha mecânica de discos e placas.

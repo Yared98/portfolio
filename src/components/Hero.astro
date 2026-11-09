@@ -36,7 +36,7 @@ const t = useTranslations(lang);
       <span aria-hidden="true">&nearr;</span>
     </a>
     <a
-      href={`/${lang}/trajetoria`}
+      href={`/${lang}/trajetoria/`}
       id="hero-cta-trajetoria"
       class="inline-flex items-center gap-2 px-4 py-2.5 text-zinc-400 hover:text-zinc-100 text-sm font-medium transition-colors"
     >
@@ -46,40 +46,40 @@ const t = useTranslations(lang);
   </div>
 
   <!-- Metrics Row (Quiet, clean hairline 3-column block) -->
-  <div class="grid grid-cols-1 md:grid-cols-3 border border-zinc-800/60 bg-zinc-900/20 divide-y md:divide-y-0 md:divide-x divide-zinc-800/60">
+  <div class="grid grid-cols-1 md:grid-cols-3 border border-zinc-800/60 bg-zinc-900/70 divide-y md:divide-y-0 md:divide-x divide-zinc-800/60">
     <div class="p-6 flex flex-col justify-between">
       <div class="text-[11px] font-mono uppercase tracking-wider text-zinc-500 mb-2">
-        {lang === 'pt' ? 'Experiência Corporativa' : 'Enterprise Experience'}
+        {t('hero.stat_years_label')}
       </div>
       <div class="text-3xl font-semibold text-zinc-100 tracking-tight mb-2">
         {t('hero.stat_years_value')}
       </div>
       <p class="text-xs text-zinc-400 font-sans leading-relaxed">
-        {lang === 'pt' ? 'em ambientes corporativos de alta disponibilidade e sustentação crítica.' : 'in high-availability enterprise environments and mission-critical support.'}
+        {t('hero.stat_years_sub')}
       </p>
     </div>
 
     <div class="p-6 flex flex-col justify-between">
       <div class="text-[11px] font-mono uppercase tracking-wider text-zinc-500 mb-2">
-        {lang === 'pt' ? 'Volume & Consistência' : 'Volume & Consistency'}
+        {t('hero.stat_scale_label')}
       </div>
       <div class="text-3xl font-semibold text-zinc-100 tracking-tight mb-2">
         {t('hero.stat_scale_value')}
       </div>
       <p class="text-xs text-zinc-400 font-sans leading-relaxed">
-        {lang === 'pt' ? 'em dados migrados e sustentados com zero perda de integridade transacional.' : 'migrated and maintained with zero transactional integrity loss.'}
+        {t('hero.stat_scale_sub')}
       </p>
     </div>
 
     <div class="p-6 flex flex-col justify-between">
       <div class="text-[11px] font-mono uppercase tracking-wider text-zinc-500 mb-2">
-        {lang === 'pt' ? 'Abordagem Metódica' : 'Methodical Mindset'}
+        {t('hero.stat_focus_label')}
       </div>
       <div class="text-3xl font-semibold text-zinc-100 tracking-tight mb-2">
         {t('hero.stat_focus_value')}
       </div>
       <p class="text-xs text-zinc-400 font-sans leading-relaxed">
-        {lang === 'pt' ? 'foco obsessivo em resolução definitiva e simplicidade arquitetural sustentável.' : 'disciplined focus on root-cause resolution and durable architectural simplicity.'}
+        {t('hero.stat_focus_sub')}
       </p>
     </div>
   </div>

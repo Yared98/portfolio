@@ -30,12 +30,30 @@ export const ui = {
     'hero.lead': 'Desenvolvo softwares resilientes, migrações de dados em larga escala e infraestruturas de alta disponibilidade. Atuação tática onde a estabilidade do negócio não pode falhar.',
     'hero.cta_consulting': 'Solicitar Diagnóstico Técnico',
     'hero.cta_trajectory': 'Ver Trajetória',
-    'hero.stat_years_value': '+5 anos',
-    'hero.stat_years_label': 'Experiência em produção',
-    'hero.stat_scale_value': 'Escala TB',
-    'hero.stat_scale_label': 'Migrações e dados críticos',
-    'hero.stat_focus_value': 'Causa raiz',
-    'hero.stat_focus_label': 'Arquitetura pragmática',
+    'hero.stat_years_value': '6 TB+',
+    'hero.stat_years_label': 'Dados migrados e validados',
+    'hero.stat_years_sub': 'com 100% de integridade bit-a-bit e paridade transacional em carga corporativa.',
+    'hero.stat_scale_value': 'Missão Crítica',
+    'hero.stat_scale_label': 'Alta disponibilidade real',
+    'hero.stat_scale_sub': 'em sustentações de ERP, bancos de dados e ambientes onde downtime custa caro.',
+    'hero.stat_focus_value': 'Causa Raiz',
+    'hero.stat_focus_label': 'Diagnóstico & Rigor',
+    'hero.stat_focus_sub': 'atuação cirúrgica para neutralizar o gargalo definitivo em vez de soluções paliativas.',
+
+    // Critical Problem Triage (Layer below Hero)
+    'triage.tag': 'DIAGNÓSTICO OPERACIONAL',
+    'triage.title': 'Você tem um problema técnico crítico na sua operação?',
+    'triage.lead': 'Sistemas lentos, bancos degradando e migrações de alto risco não se resolvem jogando mais código por cima. Atuo diretamente na identificação da causa raiz e estruturação da solução definitiva.',
+    'triage.s1_title': 'Banco de dados degradando sob carga',
+    'triage.s1_desc': 'Consultas com tempo de resposta inaceitável, deadlocks, gargalos de I/O ou estouro de conexões em SQL Server e PostgreSQL.',
+    'triage.s2_title': 'Migração volumosa ou arriscada',
+    'triage.s2_desc': 'Transição de dados na escala de terabytes entre on-premises e nuvem com tolerância zero para perda de transações ou inconsistências.',
+    'triage.s3_title': 'Aplicação que funciona, mas não escala',
+    'triage.s3_desc': 'Instabilidade em horários de pico, consumo desproporcional de memória ou falta de visibilidade para diagnosticar falhas intermitentes.',
+    'triage.s4_title': 'Infraestrutura cara e frágil',
+    'triage.s4_desc': 'Faturas de nuvem escalando sem retorno proporcional, ausência de automação (IaC) e ambientes sem isolamento seguro.',
+    'triage.bottom_pitch': 'Minha abordagem: entrar, investigar a causa raiz, desenhar a solução mais simples e sustentável possível e executar sem expor o negócio a riscos desnecessários.',
+    'triage.cta_btn': 'Solicitar Análise de Causa Raiz',
 
     // Services / Operational Philosophy
     'services.tag': 'DIRETRIZES TÉCNICAS',
@@ -64,7 +82,12 @@ export const ui = {
     'projects.github': 'GitHub',
     'projects.code_github': 'Código no GitHub',
     'projects.view_study': 'Ver Estudo Completo',
+    'projects.read_article': 'Ler Artigo Técnico',
     'projects.toolkit_badge': 'Yrd Agile Toolkit',
+    'projects.toolkit_suite_badge': 'Suite de Microsserviços Distribuídos',
+    'projects.toolkit_subtools_title': 'Aplicações Integradas da Suite',
+    'projects.case_enterprise_badge': 'Case Corporativo · Missão Crítica',
+    'projects.case_production_badge': 'Produção Real · Arquitetura Web',
 
     // Homelab Callout
     'homelab.callout_tag': 'INFRAESTRUTURA & EXPERIMENTAÇÃO',
@@ -147,12 +170,30 @@ export const ui = {
     'hero.lead': 'I build resilient software, execute large-scale data migrations, and design high-availability infrastructure. Tactical execution where business stability is non-negotiable.',
     'hero.cta_consulting': 'Request Technical Diagnosis',
     'hero.cta_trajectory': 'View Career Journey',
-    'hero.stat_years_value': '+5 years',
-    'hero.stat_years_label': 'Production experience',
-    'hero.stat_scale_value': 'TB Scale',
-    'hero.stat_scale_label': 'Critical data migrations',
-    'hero.stat_focus_value': 'Root cause',
-    'hero.stat_focus_label': 'Pragmatic architecture',
+    'hero.stat_years_value': '6 TB+',
+    'hero.stat_years_label': 'Migrated & validated data',
+    'hero.stat_years_sub': 'with 100% bit-by-bit integrity and zero transactional loss in enterprise workloads.',
+    'hero.stat_scale_value': 'Mission-Critical',
+    'hero.stat_scale_label': 'True high availability',
+    'hero.stat_scale_sub': 'in ERP maintenance, enterprise databases, and environments where downtime is unacceptable.',
+    'hero.stat_focus_value': 'Root Cause',
+    'hero.stat_focus_label': 'Diagnosis & Rigor',
+    'hero.stat_focus_sub': 'surgical intervention targeting the core flaw instead of stacking fragile workarounds.',
+
+    // Critical Problem Triage (Layer below Hero)
+    'triage.tag': 'OPERATIONAL TRIAGE',
+    'triage.title': 'Do you have a critical technical bottleneck in your operation?',
+    'triage.lead': 'Sluggish systems, degrading databases, and high-risk migrations aren\'t solved by throwing more code on top. I step in to identify root causes and engineer definitive architectural remedies.',
+    'triage.s1_title': 'Database degrading under production load',
+    'triage.s1_desc': 'Unacceptable latency, lock contention, deadlocks, I/O bottlenecks, or connection pool exhaustion in SQL Server and PostgreSQL.',
+    'triage.s2_title': 'High-stakes or large-scale data migration',
+    'triage.s2_desc': 'Terabyte-scale workloads transitioning from on-premises to cloud with zero tolerance for corruption, schema drift, or historical loss.',
+    'triage.s3_title': 'Application works, but fails under scale',
+    'triage.s3_desc': 'Instability during traffic spikes, runaway memory footprints, or architectural blind spots obscuring intermittent failures.',
+    'triage.s4_title': 'Bloated, fragile cloud infrastructure',
+    'triage.s4_desc': 'Escalating cloud invoices without technical justification, missing IaC foundations, and brittle deployment environments.',
+    'triage.bottom_pitch': 'My approach: enter, diagnose the root cause, design the simplest durable architecture, and execute with zero uncalculated risk to the business.',
+    'triage.cta_btn': 'Request Root-Cause Diagnosis',
 
     // Services / Operational Philosophy
     'services.tag': 'TECHNICAL GUIDELINES',
@@ -181,7 +222,12 @@ export const ui = {
     'projects.github': 'GitHub',
     'projects.code_github': 'Source on GitHub',
     'projects.view_study': 'View Case Study',
+    'projects.read_article': 'Read Technical Article',
     'projects.toolkit_badge': 'Yrd Agile Toolkit',
+    'projects.toolkit_suite_badge': 'Distributed Microservices Suite',
+    'projects.toolkit_subtools_title': 'Integrated Suite Applications',
+    'projects.case_enterprise_badge': 'Enterprise Case · Mission-Critical',
+    'projects.case_production_badge': 'Production System · Web Architecture',
 
     // Homelab Callout
     'homelab.callout_tag': 'INFRASTRUCTURE & EXPERIMENTATION',
@@ -254,5 +300,5 @@ export function getLocalizedPath(currentPath: string, targetLang: Lang): string 
   // Strip leading locale (/pt or /en) if present
   const cleaned = currentPath.replace(/^\/(pt|en)(\/|$)/, '/');
   const path = cleaned === '/' ? '' : cleaned;
-  return `/${targetLang}${path}`;
+  return `/${targetLang}${path.replace(/\/+$/, '')}/`;
 }

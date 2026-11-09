@@ -18,6 +18,9 @@ RUN npm run build
 # Estágio de Produção (Servidor Web)
 FROM nginx:alpine
 
+# Configuração do Nginx (redirects 301, 404 customizado, cache)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Copia os arquivos compilados da etapa anterior para a pasta do Nginx
 COPY --from=builder /app/dist /usr/share/nginx/html
 

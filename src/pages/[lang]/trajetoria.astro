@@ -117,7 +117,7 @@ const skills = skillsData[lang] || skillsData.pt;
   lang={lang}
 >
   <Breadcrumbs 
-    segments={[{ label: t('crumbs.trajectory'), href: `/${lang}/trajetoria` }]} 
+    segments={[{ label: t('crumbs.trajectory'), href: `/${lang}/trajetoria/` }]} 
     lang={lang}
   />
   
@@ -145,7 +145,7 @@ const skills = skillsData[lang] || skillsData.pt;
       </h2>
       <div class="space-y-8 mt-6">
         {experience.map((job) => (
-          <div class="border border-zinc-800/80 bg-zinc-900/20 p-6 md:p-8 hover:border-zinc-700 transition-colors">
+          <div class="border border-zinc-800/80 bg-zinc-900/70 p-6 md:p-8 hover:border-zinc-700 transition-colors">
             <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-4">
               <h3 class="text-xl font-semibold text-zinc-100 tracking-tight">
                 {job.role} <span class="text-zinc-400 font-normal">· {job.company}</span>
@@ -171,7 +171,7 @@ const skills = skillsData[lang] || skillsData.pt;
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         {skills.map((s) => (
-          <div class="border border-zinc-800/80 bg-zinc-900/30 p-6">
+          <div class="border border-zinc-800/80 bg-zinc-900/70 p-6">
             <h3 class="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-4">{s.category}</h3>
             <div class="flex flex-wrap gap-2">
               {s.items.map((item: string) => (
@@ -190,7 +190,7 @@ const skills = skillsData[lang] || skillsData.pt;
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {education.map((edu) => (
-          <div class="border border-zinc-800/80 bg-zinc-900/20 p-6">
+          <div class="border border-zinc-800/80 bg-zinc-900/70 p-6">
             <div class="text-xs font-mono text-zinc-400 mb-2">{edu.date}</div>
             <h3 class="text-lg font-semibold text-zinc-100 mb-2 tracking-tight">{edu.degree}</h3>
             <p class="text-sm text-zinc-400 font-serif leading-relaxed">{edu.institution}</p>

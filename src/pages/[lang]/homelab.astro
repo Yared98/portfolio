@@ -110,7 +110,7 @@ const principles = principlesData[lang] || principlesData.pt;
   lang={lang}
 >
   <Breadcrumbs 
-    segments={[{ label: t('crumbs.homelab'), href: `/${lang}/homelab` }]} 
+    segments={[{ label: t('crumbs.homelab'), href: `/${lang}/homelab/` }]} 
     lang={lang}
   />
   
@@ -161,7 +161,7 @@ const principles = principlesData[lang] || principlesData.pt;
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       {pillars.map((pillar) => (
-        <div class="border border-zinc-800/80 bg-zinc-900/30 p-7 hover:border-zinc-700 transition-colors">
+        <div class="border border-zinc-800/80 bg-zinc-900/70 p-7 hover:border-zinc-700 transition-colors">
           <div class="text-xs font-mono text-zinc-500 mb-3">{pillar.tag}</div>
           <h3 class="text-xl font-semibold text-zinc-100 mb-3 tracking-tight">
             {pillar.title}
@@ -197,7 +197,7 @@ const principles = principlesData[lang] || principlesData.pt;
   </section>
 
   <!-- Project Link Callout -->
-  <div class="border border-zinc-800/80 bg-zinc-900/20 p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+  <div class="border border-zinc-800/80 bg-zinc-900/70 p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
     <div class="max-w-2xl">
       <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-1">{t('homelab.case_tag')}</div>
       <h3 class="text-lg font-semibold text-zinc-100">{t('homelab.case_title')}</h3>
@@ -206,7 +206,7 @@ const principles = principlesData[lang] || principlesData.pt;
       </p>
     </div>
     <a 
-      href={`/${lang}/projects/retroyrd`}
+      href={`/${lang}/projects/retroyrd/`}
       class="inline-flex items-center gap-2 text-xs font-mono text-zinc-200 border border-zinc-700 bg-zinc-900 px-4 py-2.5 hover:bg-zinc-800 hover:border-zinc-500 transition-colors whitespace-nowrap"
     >
       {t('homelab.case_btn')} &rarr;

@@ -10,7 +10,7 @@ const { lang = defaultLang } = Astro.props;
 const t = useTranslations(lang);
 ---
 <section class="py-16 md:py-24 border-b border-zinc-800/40 scroll-mt-20" id="homelab">
-  <div class="border border-zinc-800/60 bg-zinc-900/15 hover:border-zinc-700/60 rounded p-6 md:p-8 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-6">
+  <div class="border border-zinc-800/60 bg-zinc-900/70 hover:border-zinc-700/60 rounded p-6 md:p-8 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-6">
     <div class="max-w-2xl">
       <div class="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2">
         <span class="w-1.5 h-1.5 bg-zinc-500 rounded-none inline-block"></span>
@@ -32,7 +32,7 @@ const t = useTranslations(lang);
     
     <div class="flex-shrink-0 self-start md:self-center">
       <a
-        href={`/${lang}/homelab`}
+        href={`/${lang}/homelab/`}
         class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-mono text-zinc-300 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded transition-colors bg-zinc-900/40"
       >
         <span>{t('homelab.callout_btn')}</span>

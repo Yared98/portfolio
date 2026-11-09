@@ -19,5 +19,15 @@ export default defineConfig({
       redirectToDefaultLocale: true
     }
   },
-  integrations: [mdx(), sitemap()]
+  integrations: [
+    mdx(),
+    sitemap({
+      // A raiz "/" apenas redireciona para /pt/ — não deve constar no sitemap
+      filter: (page) => page !== 'https://yared.com.br/',
+      i18n: {
+        defaultLocale: 'pt',
+        locales: { pt: 'pt-BR', en: 'en' },
+      },
+    }),
+  ]
 });

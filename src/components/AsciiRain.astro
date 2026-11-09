@@ -1,0 +1,316 @@
+---
+// Fundo decorativo: cidade noturna em ASCII com chuva, letreiros neon e respingos.
+// Canvas fixo atrás do conteúdo, sem interação e escondido de leitores de tela.
+---
+
+<canvas id="ascii-rain" aria-hidden="true" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+<script>
+	const canvas = document.getElementById('ascii-rain') as HTMLCanvasElement | null;
+	const ctx = canvas?.getContext('2d');
+
+	if (canvas && ctx) {
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+		const MONO = '"IBM Plex Mono", ui-monospace, monospace';
+		const GRID_FONT = 13;
+		const BG = '#09090b';
+		const NEON = ['#22d3ee', '#a78bfa', '#f472b6', '#34d399', '#fbbf24'];
+		const SIGNS = ['SUDO', 'ROOT', 'SSH', 'K8S', 'SQL', 'UP', '404', 'GCP', 'BASH', 'GIT'];
+
+		type Win = { x: number; y: number; color: string; on: boolean; layer: number };
+		type Sign = { x: number; y: number; text: string; color: string; off: number; next: number };
+		type Beacon = { x: number; y: number; phase: number };
+		type Drop = { x: number; y: number; vy: number; len: number; ground: number; color: string; head: string };
+		type Splash = { x: number; y: number; age: number; color: string };
+
+		const LAYERS = [
+			{ hMin: 0.16, hMax: 0.36, wMin: 7, wMax: 15, gap: [-2, 0], edge: 0.16, fill: 0.07, win: 0.3 }, // fundo
+			{ hMin: 0.1, hMax: 0.3, wMin: 7, wMax: 14, gap: [-1, 1], edge: 0.3, fill: 0.0, win: 0.5 }, // meio
+			{ hMin: 0.05, hMax: 0.22, wMin: 6, wMax: 12, gap: [0, 2], edge: 0.55, fill: 0.0, win: 0.85 }, // frente
+		];
+
+		const bg = document.createElement('canvas');
+		const bgCtx = bg.getContext('2d')!;
+
+		let W = 0;
+		let H = 0;
+		let cols = 0;
+		let rows = 0;
+		let cw = 8;
+		let ch = 15;
+		let wins: Win[] = [];
+		let signs: Sign[] = [];
+		let beacons: Beacon[] = [];
+		let far: Drop[] = [];
+		let near: Drop[] = [];
+		let splashes: Splash[] = [];
+		let raf = 0;
+		let last = 0;
+		let clock = 0;
+
+		const rand = (a: number, b: number) => a + Math.random() * (b - a);
+		const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+
+		function buildCity() {
+			const g = bgCtx;
+			g.clearRect(0, 0, W, H);
+			g.font = `${GRID_FONT}px ${MONO}`;
+			g.textBaseline = 'top';
+			wins = [];
+			signs = [];
+			beacons = [];
+
+			// Névoa neon no horizonte
+			const haze = g.createLinearGradient(0, H * 0.45, 0, H);
+			haze.addColorStop(0, 'rgba(167,139,250,0)');
+			haze.addColorStop(0.6, 'rgba(167,139,250,0.07)');
+			haze.addColorStop(1, 'rgba(34,211,238,0.13)');
+			g.fillStyle = haze;
+			g.fillRect(0, 0, W, H);
+
+			LAYERS.forEach((L, li) => {
+				let col = -Math.floor(rand(0, 4));
+				while (col < cols) {
+					const w = Math.floor(rand(L.wMin, L.wMax));
+					const h = Math.max(5, Math.floor(rand(rows * L.hMin, rows * L.hMax)));
+					const r0 = rows - h;
+					const x0 = col * cw;
+					const bw = w * cw;
+
+					// Oculta o que está atrás
+					g.globalAlpha = 1;
+					g.fillStyle = BG;
+					g.fillRect(x0, r0 * ch, bw, h * ch + ch);
+
+					// Preenchimento pontilhado (só camada de fundo)
+					if (L.fill > 0) {
+						g.fillStyle = '#a1a1aa';
+						g.globalAlpha = L.fill;
+						for (let r = r0 + 1; r < rows; r++) {
+							for (let c = col + 1; c < col + w - 1; c++) g.fillText('·', c * cw, r * ch);
+						}
+					}
+
+					// Contorno com caracteres de caixa
+					g.fillStyle = li === 2 ? '#a1a1aa' : '#71717a';
+					g.globalAlpha = L.edge;
+					for (let c = col; c < col + w; c++) {
+						const t = c === col ? '┌' : c === col + w - 1 ? '┐' : '─';
+						g.fillText(t, c * cw, r0 * ch);
+					}
+					for (let r = r0 + 1; r < rows; r++) {
+						g.fillText('│', col * cw, r * ch);
+						g.fillText('│', (col + w - 1) * cw, r * ch);
+					}
+
+					// Antena no topo
+					if (h > rows * 0.14 && Math.random() < 0.55) {
+						const ac = col + Math.floor(w / 2);
+						const ah = 2 + Math.floor(rand(0, 3));
+						for (let i = 1; i <= ah; i++) g.fillText('│', ac * cw, (r0 - i) * ch);
+						beacons.push({ x: ac * cw, y: (r0 - ah - 1) * ch, phase: rand(0, 6) });
+					}
+
+					// Janelas
+					for (let r = r0 + 2; r < rows - 1; r += 2) {
+						for (let c = col + 2; c < col + w - 2; c += 2) {
+							const on = Math.random() < 0.38;
+							wins.push({ x: c * cw, y: r * ch, color: pick(NEON), on, layer: li });
+							if (!on) {
+								g.fillStyle = '#52525b';
+								g.globalAlpha = L.edge * 0.55;
+								g.fillText('·', c * cw, r * ch);
+							}
+						}
+					}
+
+					// Letreiro vertical neon na lateral
+					if (li > 0 && h >= 9 && w >= 8 && Math.random() < 0.3) {
+						const text = pick(SIGNS);
+						signs.push({
+							x: (col + w - 1) * cw,
+							y: (r0 + 2) * ch,
+							text,
+							color: pick(NEON),
+							off: 0,
+							next: rand(1, 6),
+						});
+					}
+
+					col += w + Math.floor(rand(L.gap[0], L.gap[1] + 1));
+				}
+			});
+			g.globalAlpha = 1;
+		}
+
+		function newDrop(isFar: boolean, anywhere: boolean): Drop {
+			const vy = isFar ? rand(260, 380) : rand(520, 760);
+			const roll = Math.random();
+			return {
+				x: rand(-40, W + 40),
+				y: anywhere ? rand(-100, H) : rand(-200, -20),
+				vy,
+				len: isFar ? 4 + Math.floor(rand(0, 3)) : 6 + Math.floor(rand(0, 5)),
+				ground: H - rand(4, H * 0.12),
+				color: roll < 0.12 ? '#a78bfa' : roll < 0.2 ? '#34d399' : '#67e8f9',
+				head: '#f0fdff',
+			};
+		}
+
+		function resize() {
+			const dpr = Math.min(window.devicePixelRatio || 1, 2);
+			W = window.innerWidth;
+			H = window.innerHeight;
+			for (const c of [canvas!, bg]) {
+				c.width = W * dpr;
+				c.height = H * dpr;
+			}
+			ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+			bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+			bgCtx.font = `${GRID_FONT}px ${MONO}`;
+			cw = bgCtx.measureText('M').width;
+			ch = GRID_FONT * 1.15;
+			cols = Math.ceil(W / cw);
+			rows = Math.ceil(H / ch);
+
+			buildCity();
+			const small = W < 640;
+			far = Array.from({ length: small ? 28 : Math.min(Math.floor(cols * 0.55), 110) }, () => newDrop(true, true));
+			near = Array.from({ length: small ? 18 : Math.min(Math.floor(cols * 0.4), 80) }, () => newDrop(false, true));
+			splashes = [];
+			if (reduceMotion.matches) draw(0);
+		}
+
+		function drawRain(list: Drop[], size: number, headAlpha: number, trailAlpha: number, wind: number) {
+			const g = ctx!;
+			g.font = `${size}px ${MONO}`;
+			const step = size * 1.05;
+			for (const d of list) {
+				for (let i = 0; i < d.len; i++) {
+					const y = d.y - i * step;
+					if (y < -step || y > H) continue;
+					const x = d.x - i * step * wind;
+					const f = 1 - i / d.len;
+					g.fillStyle = i === 0 ? d.head : d.color;
+					g.globalAlpha = i === 0 ? headAlpha : trailAlpha * f;
+					g.fillText('/', x, y);
+				}
+			}
+		}
+
+		function draw(dt: number) {
+			const g = ctx!;
+			clock += dt;
+			g.clearRect(0, 0, W, H);
+			g.drawImage(bg, 0, 0, W, H);
+			g.textBaseline = 'top';
+			g.font = `${GRID_FONT}px ${MONO}`;
+
+			// Janelas acesas
+			for (const w of wins) {
+				if (dt > 0 && Math.random() < dt * 0.012) w.on = !w.on;
+				if (!w.on) continue;
+				g.fillStyle = w.color;
+				g.globalAlpha = LAYERS[w.layer].win;
+				g.fillText('▪', w.x, w.y);
+			}
+
+			// Luzes de aviso nas antenas
+			for (const b of beacons) {
+				const a = 0.3 + 0.7 * Math.max(0, Math.sin(clock * 2.2 + b.phase));
+				g.fillStyle = '#fb7185';
+				g.globalAlpha = a;
+				g.shadowColor = '#fb7185';
+				g.shadowBlur = 10;
+				g.fillText('•', b.x, b.y);
+			}
+
+			// Letreiros neon com falha ocasional
+			for (const s of signs) {
+				s.next -= dt;
+				if (s.next <= 0) {
+					s.off = rand(0.05, 0.25);
+					s.next = rand(2, 9);
+				}
+				if (s.off > 0) s.off -= dt;
+				g.fillStyle = s.color;
+				g.shadowColor = s.color;
+				g.shadowBlur = 14;
+				g.globalAlpha = s.off > 0 ? 0.12 : 0.95;
+				for (let i = 0; i < s.text.length; i++) g.fillText(s.text[i], s.x, s.y + i * ch);
+			}
+			g.shadowBlur = 0;
+
+			// Física da chuva
+			for (const list of [far, near]) {
+				const isFar = list === far;
+				for (let i = 0; i < list.length; i++) {
+					const d = list[i];
+					d.y += d.vy * dt;
+					d.x += d.vy * dt * 0.16;
+					if (d.y >= d.ground) {
+						if (!isFar && splashes.length < 140) splashes.push({ x: d.x, y: d.ground, age: 0, color: d.color });
+						list[i] = newDrop(isFar, false);
+					}
+				}
+			}
+			drawRain(far, 11, 0.45, 0.22, 0.16);
+			drawRain(near, 15, 0.95, 0.6, 0.16);
+
+			// Respingos
+			g.font = `12px ${MONO}`;
+			for (let i = splashes.length - 1; i >= 0; i--) {
+				const s = splashes[i];
+				s.age += dt;
+				if (s.age > 0.5) {
+					splashes.splice(i, 1);
+					continue;
+				}
+				const f = s.age / 0.5;
+				g.fillStyle = s.color;
+				g.globalAlpha = 0.8 * (1 - f);
+				if (f < 0.3) {
+					g.fillText('.', s.x, s.y);
+				} else {
+					g.fillText('(', s.x - 3 - f * 12, s.y);
+					g.fillText(')', s.x + 3 + f * 12, s.y);
+				}
+			}
+			g.globalAlpha = 1;
+		}
+
+		function frame(now: number) {
+			raf = requestAnimationFrame(frame);
+			if (now - last < 33) return; // ~30fps: visual ASCII e menos bateria
+			const dt = Math.min((now - last) / 1000, 0.1);
+			last = now;
+			draw(dt);
+		}
+
+		function start() {
+			cancelAnimationFrame(raf);
+			if (reduceMotion.matches || document.hidden) return;
+			last = performance.now();
+			raf = requestAnimationFrame(frame);
+		}
+
+		let resizeTimer: number;
+		window.addEventListener('resize', () => {
+			clearTimeout(resizeTimer);
+			resizeTimer = window.setTimeout(resize, 150);
+		});
+		document.addEventListener('visibilitychange', start);
+		reduceMotion.addEventListener('change', () => {
+			resize();
+			start();
+		});
+
+		// Espera a fonte mono carregar para medir a largura correta
+		(document.fonts?.load(`13px ${MONO}`) ?? Promise.resolve()).catch(() => {}).then(() => {
+			resize();
+			start();
+		});
+	}
+</script>

@@ -3,7 +3,7 @@ title: "High-Consistency 6TB Workload Migration and Modernization to GCP"
 description: "Migration of a mission-critical ERP workload from on-premises Bare Metal Hyper-V to Google Cloud Platform, including an in-place upgrade from SQL Server 2019 to 2022."
 problem: "Migrating a 6TB critical ERP database from Hyper-V Bare Metal to GCP. Limitations in Gen2/UEFI forced a strictly controlled offline migration window to guarantee byte-for-byte consistency."
 solution: "Executed a direct lift-and-shift migration via OS Adaptation with gcloud import. Modernized the database engine to SQL Server 2022 using Terraform IaC and established secure hybrid interconnects via IPSec VPN."
-impact: "6TB migrated with 100% bit-by-bit integrity. Database engine upgraded and core ERP operations resumed on GCP with zero transactional data loss."
+impact: "6TB migrated with 100% bit-by-bit integrity. Maintenance window strictly met over the weekend with zero business disruption and zero transactional loss."
 date: 2026-03-27
 tags: ["GCP", "Cloud Migration", "SQL Server", "Terraform", "Networking"]
 lang: "en"
@@ -48,6 +48,8 @@ During the same maintenance window, SQL Server was upgraded from 2019 to 2022, l
 
 ## Results & Business Impact
 
-- **Zero Data Loss:** 6TB migrated with bit-by-bit checksum verification.
-- **Reliable Hybrid Connectivity:** Stable, encrypted transit between cloud infrastructure and physical stores.
-- **Operational Scalability:** Eliminated on-premises physical hardware refresh costs and established automated Google Cloud backup snapshots.
+- **Zero Operational Interruption:** Completed strictly within the designated weekend window; all accounting, logistics, and billing systems went live on Monday morning without missing a single fiscal transaction.
+- **100% Transactional Integrity:** 6TB of enterprise relational data migrated with complete byte-level consistency and zero schema divergence.
+- **Database Query Acceleration:** Upgrading to SQL Server 2022 on high-memory GCP instances with persistent SSDs substantially lowered query latency during month-end closing procedures.
+- **Private Hybrid Security:** 100% private subnets with zero public database exposure; all traffic secured through end-to-end encrypted VPN tunnels.
+- **Elimination of Legacy Hardware Liabilities:** Decommissioned aging physical servers, moving to cloud-managed SLAs and automated snapshot disaster recovery.

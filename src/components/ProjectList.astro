@@ -11,38 +11,98 @@ const { lang = defaultLang } = Astro.props;
 const t = useTranslations(lang);
 
 const allProjects = await getCollection('projects');
-// Filter projects by current language (matching either frontmatter lang or directory prefix)
+// Filter projects by current language
 const projects = allProjects.filter(p => p.data.lang === lang || p.id.startsWith(`${lang}/`));
-// Sort by date descending
-projects.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-const colorStyles: Record<string, { btn: string; dot: string }> = {
+const gcpProject = projects.find(p => p.id.includes('gcp-migration-6tb'));
+const imobiProject = projects.find(p => p.id.includes('imobi'));
+
+const retroProject = projects.find(p => p.id.includes('retroyrd'));
+const dailyProject = projects.find(p => p.id.includes('dailyyrd'));
+const planningProject = projects.find(p => p.id.includes('planningyrd'));
+const coffeeProject = projects.find(p => p.id.includes('coffeeyrd'));
+
+const colorStyles: Record<string, { btn: string; dot: string; border: string }> = {
   indigo: {
     btn: "bg-indigo-950/60 hover:bg-indigo-900/80 text-indigo-300 border-indigo-500/40 hover:border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]",
-    dot: "bg-indigo-400"
+    dot: "bg-indigo-400",
+    border: "border-indigo-500/30",
   },
   amber: {
     btn: "bg-amber-950/60 hover:bg-amber-900/80 text-amber-300 border-amber-500/40 hover:border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]",
-    dot: "bg-amber-400"
+    dot: "bg-amber-400",
+    border: "border-amber-500/30",
   },
   sky: {
     btn: "bg-sky-950/60 hover:bg-sky-900/80 text-sky-300 border-sky-500/40 hover:border-sky-400 shadow-[0_0_15px_rgba(14,165,233,0.2)]",
-    dot: "bg-sky-400"
+    dot: "bg-sky-400",
+    border: "border-sky-500/30",
   },
   rose: {
     btn: "bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border-rose-500/40 hover:border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)]",
-    dot: "bg-rose-400"
+    dot: "bg-rose-400",
+    border: "border-rose-500/30",
   },
   emerald: {
     btn: "bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border-emerald-500/40 hover:border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]",
-    dot: "bg-emerald-400"
+    dot: "bg-emerald-400",
+    border: "border-emerald-500/30",
   },
   zinc: {
     btn: "bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border-zinc-700 hover:border-zinc-500",
-    dot: "bg-zinc-400"
+    dot: "bg-zinc-400",
+    border: "border-zinc-700",
   }
 };
+
+const suiteTools = [
+  {
+    name: 'RetroYrd',
+    slug: 'retroyrd',
+    role: lang === 'pt' ? 'Retrospectivas Ágeis & IA (MCP)' : 'Agile Retrospectives & AI (MCP)',
+    desc: lang === 'pt' 
+      ? 'Máquina de estados finitos (FSM) de 6 fases, anonimato real e servidor nativo MCP para agentes de IA estruturarem planos de ação em tempo real.'
+      : 'Deterministic 6-phase FSM, real anonymity, and native MCP server for AI agents to synthesize action items in real time.',
+    color: 'indigo',
+    liveUrl: 'https://retro.yared.com.br',
+    repoUrl: 'https://github.com/Yared98/retroyrd',
+  },
+  {
+    name: 'DailyYrd',
+    slug: 'dailyyrd',
+    role: lang === 'pt' ? 'Dailies Síncronas & Assíncronas' : 'Synchronous & Async Dailies',
+    desc: lang === 'pt'
+      ? 'Dailies de alta velocidade com cronômetro sincronizado via WebSockets, orquestração de turnos de fala e exportação atômica de impedimentos.'
+      : 'High-speed standups with distributed WebSocket timers, speaking queue orchestration, and atomic blocker exports.',
+    color: 'amber',
+    liveUrl: 'https://daily.yared.com.br',
+    repoUrl: 'https://github.com/Yared98/dailyyrd',
+  },
+  {
+    name: 'PlanningYrd',
+    slug: 'planningyrd',
+    role: lang === 'pt' ? 'Planning Poker & Estimativas' : 'Planning Poker & Estimation',
+    desc: lang === 'pt'
+      ? 'Votação simultânea e cega com cálculo automático de dispersão estatística e consenso da equipe sem viés de ancoragem.'
+      : 'Simultaneous blind voting with automated statistical consensus and complexity variance calculation without anchoring bias.',
+    color: 'sky',
+    liveUrl: 'https://planning.yared.com.br',
+    repoUrl: 'https://github.com/Yared98/planningyrd',
+  },
+  {
+    name: 'CoffeeYrd',
+    slug: 'coffeeyrd',
+    role: lang === 'pt' ? 'Pausas Sincronizadas & Foco' : 'Synchronized Breaks & Focus',
+    desc: lang === 'pt'
+      ? 'Quick break coletivo com sincronização em tempo real e retorno coordenado para manter a energia e foco das equipes técnicas.'
+      : 'Collective quick-break room with real-time synchronized timers to coordinate team cadence and preserve focus.',
+    color: 'rose',
+    liveUrl: 'https://coffee.yared.com.br',
+    repoUrl: 'https://github.com/Yared98/coffeeyrd',
+  },
+];
 ---
+
 <section class="py-16 md:py-24 border-b border-zinc-800/40 scroll-mt-20" id="projetos">
   <!-- Section Header -->
   <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-zinc-800/40 pb-6 mb-12 gap-4">
@@ -55,113 +115,323 @@ const colorStyles: Record<string, { btn: string; dot: string }> = {
     </p>
   </div>
 
-  <!-- Editorial Case Cards -->
-  <div class="space-y-8">
-    {projects.map((project) => {
-      const theme = project.data.brandColor ? colorStyles[project.data.brandColor] || colorStyles.zinc : colorStyles.zinc;
-      const slug = project.id.replace(/^(pt|en)\//, '');
-      return (
-        <article class="border border-zinc-800/60 bg-zinc-900/10 hover:bg-zinc-900/25 hover:border-zinc-700/70 rounded p-6 md:p-8 transition-colors duration-150 flex flex-col group">
-          <!-- Card Header -->
-          <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4">
-            <div class="space-y-2">
-              {project.data.toolkit && (
-                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800">
-                  <span class={`w-1.5 h-1.5 rounded-full ${theme.dot}`}></span>
-                  <span>{t('projects.toolkit_badge')}</span>
-                </div>
-              )}
-              <a href={`/${lang}/projects/${slug}`} class="block group-hover:text-white transition-colors">
-                <h3 class="text-xl md:text-2xl font-semibold text-zinc-100 tracking-tight flex items-center gap-2">
-                  <span>{project.data.title}</span>
-                  <span class="text-zinc-600 group-hover:text-zinc-400 group-hover:translate-x-0.5 transition-all text-base">&nearr;</span>
-                </h3>
-              </a>
+  <div class="space-y-12">
+    <!-- ========================================== -->
+    <!-- 1. CROWNING CASE: 6TB GCP ENTERPRISE MIGRATION -->
+    <!-- ========================================== -->
+    {gcpProject && (
+      <article class="border border-zinc-800/80 bg-zinc-900/70 hover:bg-zinc-900/85 hover:border-zinc-700/80 rounded p-6 md:p-8 transition-colors duration-150 flex flex-col group relative overflow-hidden">
+        <!-- Accent indicator bar -->
+        <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500/60 via-amber-400 to-amber-500/20"></div>
+
+        <!-- Card Header -->
+        <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4">
+          <div class="space-y-2">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-mono font-medium text-amber-300 bg-amber-950/50 border border-amber-500/40">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              <span>{t('projects.case_enterprise_badge')}</span>
             </div>
-            
-            {project.data.tags && project.data.tags.length > 0 && (
-              <div class="flex flex-wrap gap-1.5 lg:justify-end">
-                {project.data.tags.map((tag) => (
-                  <TechBadge tech={tag} />
-                ))}
-              </div>
+            <a href={`/${lang}/projects/gcp-migration-6tb/`} class="block group-hover:text-white transition-colors">
+              <h3 class="text-xl md:text-2xl font-semibold text-zinc-100 tracking-tight flex items-center gap-2">
+                <span>{gcpProject.data.title}</span>
+                <span class="text-zinc-600 group-hover:text-zinc-400 group-hover:translate-x-0.5 transition-all text-base">&nearr;</span>
+              </h3>
+            </a>
+          </div>
+          
+          {gcpProject.data.tags && (
+            <div class="flex flex-wrap gap-1.5 lg:justify-end">
+              {gcpProject.data.tags.map((tag) => (
+                <TechBadge tech={tag} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <!-- Description -->
+        <p class="text-sm md:text-base text-zinc-300 leading-relaxed max-w-3xl mb-8 font-sans">
+          {gcpProject.data.description}
+        </p>
+        
+        <!-- 3-Column Architecture Breakdown -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-zinc-800/40 text-sm">
+          <div>
+            <div class="text-[11px] font-mono text-amber-400 uppercase tracking-wider mb-1.5">
+              {t('projects.problem')}
+            </div>
+            <p class="text-zinc-400 font-sans leading-relaxed text-xs md:text-sm">
+              {gcpProject.data.problem}
+            </p>
+          </div>
+          <div>
+            <div class="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1.5">
+              {t('projects.solution')}
+            </div>
+            <p class="text-zinc-400 font-sans leading-relaxed text-xs md:text-sm">
+              {gcpProject.data.solution}
+            </p>
+          </div>
+          <div>
+            <div class="text-[11px] font-mono text-emerald-400 uppercase tracking-wider mb-1.5">
+              {t('projects.impact')}
+            </div>
+            <p class="text-zinc-200 font-sans leading-relaxed text-xs md:text-sm font-medium">
+              {gcpProject.data.impact}
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="flex items-center justify-between gap-4 pt-6 mt-6 border-t border-zinc-800/40 text-xs font-mono">
+          <div class="text-zinc-500 text-xs">
+            {lang === 'pt' ? 'Infraestrutura como Código · Terraform · Windows Server 2022' : 'Infrastructure as Code · Terraform · Windows Server 2022'}
+          </div>
+          <a
+            href={`/${lang}/projects/gcp-migration-6tb/`}
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 rounded transition-colors group/link"
+          >
+            <span>{t('projects.view_study')}</span>
+            <span class="group-hover/link:translate-x-0.5 transition-transform" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </article>
+    )}
+
+    <!-- ========================================== -->
+    <!-- 2. PRODUCTION SYSTEM: IMOBI -->
+    <!-- ========================================== -->
+    {imobiProject && (
+      <article class="border border-zinc-800/80 bg-zinc-900/70 hover:bg-zinc-900/85 hover:border-zinc-700/80 rounded p-6 md:p-8 transition-colors duration-150 flex flex-col group relative overflow-hidden">
+        <!-- Accent indicator bar -->
+        <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-500/60 via-emerald-400 to-emerald-500/20"></div>
+
+        <!-- Card Header -->
+        <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4">
+          <div class="space-y-2">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-mono font-medium text-emerald-300 bg-emerald-950/50 border border-emerald-500/40">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>{t('projects.case_production_badge')}</span>
+            </div>
+            <a href={`/${lang}/projects/imobi/`} class="block group-hover:text-white transition-colors">
+              <h3 class="text-xl md:text-2xl font-semibold text-zinc-100 tracking-tight flex items-center gap-2">
+                <span>{imobiProject.data.title}</span>
+                <span class="text-zinc-600 group-hover:text-zinc-400 group-hover:translate-x-0.5 transition-all text-base">&nearr;</span>
+              </h3>
+            </a>
+          </div>
+          
+          {imobiProject.data.tags && (
+            <div class="flex flex-wrap gap-1.5 lg:justify-end">
+              {imobiProject.data.tags.map((tag) => (
+                <TechBadge tech={tag} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <!-- Description -->
+        <p class="text-sm md:text-base text-zinc-300 leading-relaxed max-w-3xl mb-8 font-sans">
+          {imobiProject.data.description}
+        </p>
+        
+        <!-- 3-Column Architecture Breakdown -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-zinc-800/40 text-sm">
+          <div>
+            <div class="text-[11px] font-mono text-amber-400 uppercase tracking-wider mb-1.5">
+              {t('projects.problem')}
+            </div>
+            <p class="text-zinc-400 font-sans leading-relaxed text-xs md:text-sm">
+              {imobiProject.data.problem}
+            </p>
+          </div>
+          <div>
+            <div class="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1.5">
+              {t('projects.solution')}
+            </div>
+            <p class="text-zinc-400 font-sans leading-relaxed text-xs md:text-sm">
+              {imobiProject.data.solution}
+            </p>
+          </div>
+          <div>
+            <div class="text-[11px] font-mono text-emerald-400 uppercase tracking-wider mb-1.5">
+              {t('projects.impact')}
+            </div>
+            <p class="text-zinc-200 font-sans leading-relaxed text-xs md:text-sm font-medium">
+              {imobiProject.data.impact}
+            </p>
+          </div>
+        </div>
+
+        <!-- Direct Actions Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 pt-6 mt-6 border-t border-zinc-800/40 text-xs font-mono">
+          <div class="flex flex-wrap items-center gap-3">
+            {imobiProject.data.liveUrl && (
+              <a
+                href={imobiProject.data.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border transition-all bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border-emerald-500/40 hover:border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>{t('projects.open_tool_online')}</span>
+                <span aria-hidden="true">&nearr;</span>
+              </a>
             )}
           </div>
 
-          <!-- Description -->
-          <p class="text-sm md:text-base text-zinc-300 leading-relaxed max-w-3xl mb-8 font-sans">
-            {project.data.description}
+          <a
+            href={`/${lang}/projects/imobi/`}
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 rounded transition-colors group/link"
+          >
+            <span>{t('projects.view_study')}</span>
+            <span class="group-hover/link:translate-x-0.5 transition-transform" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </article>
+    )}
+
+    <!-- ========================================== -->
+    <!-- 3. CONSOLIDATED MASTER CARD: YRD AGILE TOOLKIT -->
+    <!-- ========================================== -->
+    <article class="border border-zinc-800/80 bg-zinc-900/70 hover:border-zinc-700/80 rounded p-6 md:p-8 transition-colors duration-150 flex flex-col group relative overflow-hidden">
+      <!-- Accent indicator bar -->
+      <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-indigo-500/60 via-purple-400 to-indigo-500/20"></div>
+
+      <!-- Card Header -->
+      <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4">
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-mono font-medium text-indigo-300 bg-indigo-950/50 border border-indigo-500/40">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+            <span>{t('projects.toolkit_suite_badge')}</span>
+          </div>
+          <h3 class="text-xl md:text-2xl font-semibold text-zinc-100 tracking-tight">
+            Yrd Agile Toolkit — {lang === 'pt' ? 'Suite de Microsserviços Colaborativos em Tempo Real' : 'Real-Time Collaborative Microservices Suite'}
+          </h3>
+        </div>
+        
+        <div class="flex flex-wrap gap-1.5 lg:justify-end">
+          <TechBadge tech="Rust" />
+          <TechBadge tech="Axum" />
+          <TechBadge tech="WebSockets" />
+          <TechBadge tech="SQLite" />
+          <TechBadge tech="MCP (Model Context Protocol)" />
+          <TechBadge tech="React" />
+          <TechBadge tech="Docker" />
+        </div>
+      </div>
+
+      <!-- Suite Description -->
+      <p class="text-sm md:text-base text-zinc-300 leading-relaxed max-w-4xl mb-8 font-sans">
+        {lang === 'pt'
+          ? 'Arquitetura distribuída autohospedada de ferramentas colaborativas em tempo real. Cada microsserviço é um binário autônomo nativo em Rust (Axum + Tokio WebSockets) com banco embarcado SQLite em modo WAL, comunicação bidirecional de sub-milissegundo, integração com IA via Model Context Protocol (MCP) e pegada inferior a 20MB de RAM por serviço.'
+          : 'Sovereign distributed real-time collaborative platform. Each microservice is an autonomous native Rust binary (Axum + Tokio WebSockets) with embedded SQLite WAL storage, sub-millisecond bidirectional WebSockets, native AI orchestration via Model Context Protocol (MCP), and a memory footprint under 20MB RAM per instance.'}
+      </p>
+
+      <!-- 3-Column Architecture Breakdown -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-zinc-800/40 text-sm mb-8">
+        <div>
+          <div class="text-[11px] font-mono text-amber-400 uppercase tracking-wider mb-1.5">
+            {t('projects.problem')}
+          </div>
+          <p class="text-zinc-400 font-sans leading-relaxed text-xs md:text-sm">
+            {lang === 'pt'
+              ? 'Dependência de múltiplos SaaS proprietários com cobrança mensal por usuário, consumo pesado de memória no navegador e histórico sensível de discussões armazenado em servidores externos.'
+              : 'Reliance on expensive per-seat SaaS meeting platforms, browser bloat, and proprietary clouds holding confidential team discussions and strategic planning data.'}
           </p>
-          
-          <!-- 3-Column Architecture Breakdown -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-zinc-800/40 text-sm">
-            <div>
-              <div class="text-[11px] font-mono text-amber-500/90 uppercase tracking-wider mb-1.5">
-                {t('projects.problem')}
-              </div>
-              <p class="text-zinc-400 font-sans leading-relaxed text-xs md:text-sm">
-                {project.data.problem}
-              </p>
-            </div>
-            <div>
-              <div class="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1.5">
-                {t('projects.solution')}
-              </div>
-              <p class="text-zinc-400 font-sans leading-relaxed text-xs md:text-sm">
-                {project.data.solution}
-              </p>
-            </div>
-            <div>
-              <div class="text-[11px] font-mono text-emerald-400/90 uppercase tracking-wider mb-1.5">
-                {t('projects.impact')}
-              </div>
-              <p class="text-zinc-200 font-sans leading-relaxed text-xs md:text-sm font-medium">
-                {project.data.impact}
-              </p>
-            </div>
+        </div>
+        <div>
+          <div class="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1.5">
+            {t('projects.solution')}
           </div>
-
-          <!-- Direct Actions Bar (Live Tool, GitHub, and Case Study) -->
-          <div class="flex flex-wrap items-center justify-between gap-4 pt-6 mt-6 border-t border-zinc-800/40 text-xs font-mono">
-            <div class="flex flex-wrap items-center gap-3">
-              {project.data.liveUrl && (
-                <a
-                  href={project.data.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border transition-all ${theme.btn}`}
-                >
-                  <span class={`w-1.5 h-1.5 rounded-full ${theme.dot}`}></span>
-                  <span>{t('projects.open_tool')}</span>
-                  <span aria-hidden="true">&nearr;</span>
-                </a>
-              )}
-              {project.data.repoUrl && (
-                <a
-                  href={project.data.repoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs text-zinc-400 hover:text-zinc-100 bg-zinc-900/60 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-                  </svg>
-                  <span>{t('projects.github')}</span>
-                  <span aria-hidden="true">&nearr;</span>
-                </a>
-              )}
-            </div>
-
-            <a
-              href={`/${lang}/projects/${slug}`}
-              class="inline-flex items-center gap-1 text-zinc-400 hover:text-white transition-colors group/link"
-            >
-              <span>{t('projects.view_study')}</span>
-              <span class="group-hover/link:translate-x-0.5 transition-transform" aria-hidden="true">&rarr;</span>
-            </a>
+          <p class="text-zinc-400 font-sans leading-relaxed text-xs md:text-sm">
+            {lang === 'pt'
+              ? 'Suite integrada de 4 microsserviços autônomos em Rust, com sincronização em tempo real via WebSockets, FSM determinística, persistência atômica e conectores MCP para agentes de IA.'
+              : 'Unified suite of 4 autonomous Rust microservices featuring real-time WebSocket state synchronization, deterministic state machines, atomic persistence, and MCP connectors for AI agents.'}
+          </p>
+        </div>
+        <div>
+          <div class="text-[11px] font-mono text-emerald-400 uppercase tracking-wider mb-1.5">
+            {t('projects.impact')}
           </div>
-        </article>
-      );
-    })}
+          <p class="text-zinc-200 font-sans leading-relaxed text-xs md:text-sm font-medium">
+            {lang === 'pt'
+              ? '100% de soberania sobre os dados, zero custo de licença recorrente, footprint inferior a 20MB de RAM por nó e síntese automatizada de planos de ação via IA.'
+              : '100% data sovereignty, zero recurring SaaS seat licensing, sub-20MB RAM memory footprint per node, and automated AI action item synthesis.'}
+          </p>
+        </div>
+      </div>
+
+      <!-- Integrated Suite Applications (2x2 Grid) -->
+      <div class="border-t border-zinc-800/50 pt-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="text-xs font-mono uppercase tracking-wider text-zinc-400">
+            {t('projects.toolkit_subtools_title')}
+          </div>
+          <div class="text-xs font-mono text-zinc-500">
+            {lang === 'pt' ? '4 nós operacionais independentes' : '4 independent operational nodes'}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {suiteTools.map((tool) => {
+            const style = colorStyles[tool.color] || colorStyles.zinc;
+            return (
+              <div class="border border-zinc-800/80 bg-zinc-950/80 hover:bg-zinc-950/90 hover:border-zinc-700/80 rounded p-5 flex flex-col justify-between transition-colors">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class={`w-2 h-2 rounded-full ${style.dot}`}></span>
+                      <h4 class="text-base font-semibold text-zinc-100 tracking-tight">
+                        {tool.name}
+                      </h4>
+                    </div>
+                    <span class="text-[11px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded">
+                      {tool.role}
+                    </span>
+                  </div>
+                  <p class="text-xs text-zinc-400 font-sans leading-relaxed mb-4">
+                    {tool.desc}
+                  </p>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-zinc-800/50 text-xs font-mono">
+                  <div class="flex items-center gap-2">
+                    <a
+                      href={tool.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium border transition-all ${style.btn}`}
+                    >
+                      <span class={`w-1.5 h-1.5 rounded-full ${style.dot}`}></span>
+                      <span>{t('projects.open_tool')}</span>
+                      <span aria-hidden="true">&nearr;</span>
+                    </a>
+                    <a
+                      href={tool.repoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] text-zinc-400 hover:text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors"
+                      title="GitHub"
+                    >
+                      <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                      </svg>
+                      <span>GitHub</span>
+                    </a>
+                  </div>
+                  <a
+                    href={`/${lang}/projects/${tool.slug}/`}
+                    class="text-zinc-400 hover:text-zinc-100 transition-colors inline-flex items-center gap-1 text-[11px]"
+                  >
+                    <span>{t('projects.read_article')}</span>
+                    <span aria-hidden="true">&rarr;</span>
+                  </a>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </article>
   </div>
 </section>
