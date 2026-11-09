@@ -48,7 +48,7 @@ function validate(spec) {
   for (const n of spec.nodes) {
     const pad = n.center ? 2 : 4;
     if (n.label.length + pad > n.w) fail(`rótulo "${n.label}" não cabe em w=${n.w}`);
-    if (n.sub && n.sub.length > n.w - 2) fail(`sub "${n.sub}" não cabe em w=${n.w}`);
+    if (n.sub && n.sub.length > n.w - (n.center ? 2 : 4)) fail(`sub "${n.sub}" não cabe em w=${n.w}`);
     if (n.x < 0 || n.y < 0 || n.x + n.w > spec.cols || n.y + nodeH(n) > spec.rows) fail(`nó "${n.label}" fora da grade`);
   }
   for (const e of spec.edges) {

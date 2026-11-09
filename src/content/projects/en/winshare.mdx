@@ -1,0 +1,43 @@
+---
+title: "winshare - Share a Windows Window or Monitor with Audio, Straight to the Browser"
+description: "A Rust program that captures a Windows window or monitor, with audio, and streams it over WebRTC to anyone who opens a link in a browser, with nothing to install on the viewer's side."
+problem: "Sharing a window with audio usually means every viewer installs a client or signs up for a platform, and meeting tools handle per-application audio and unstable networks in a limited way."
+solution: "Native capture with Windows Graphics Capture, per-application audio through Process Loopback, one H.264/Opus encoder fanned out through an independent queue per viewer, and WebRTC with NACK, PLI and adaptive video bitrate."
+impact: "A link with a random 128-bit token that dies when the program closes, a local dashboard with each viewer's health, NAT/CGNAT support through TURN, and no third-party platform in the media path."
+date: 2026-11-08
+tags: ["Rust", "WebRTC", "H.264", "Opus", "Windows", "Cloudflare Tunnel"]
+repoUrl: "https://github.com/Yared98/winshare"
+brandColor: "indigo"
+lang: "en"
+---
+import AsciiPiece from '../../../components/AsciiPiece.astro';
+
+## The Challenge: Sharing a Window with Audio, Nothing to Install
+
+Show a Windows window, with that program's sound, to someone who only has a browser. The viewer opens a link and watches. On the broadcaster's side, the program has to capture video and audio cheaply, speak WebRTC, and keep working when one viewer's network gets worse.
+
+## Streaming Pipeline
+
+<AsciiPiece piece="winshare-en" label="winshare pipeline: Windows capture feeds a single H.264 and Opus encoder, which fans out to one queue per viewer and goes over WebRTC to the browser. Loss feedback adjusts the video bitrate." />
+
+- **Native capture:** Windows Graphics Capture for a window or a monitor. For a window, audio comes only from that program (Process Loopback); for a monitor, it is the whole system's audio.
+- **One encoder for everyone:** video is encoded once (OpenH264) and each viewer gets it through its own queue. A slow viewer drops frames without delaying the others.
+- **Unstable networks:** the browser can ask for retransmission of lost packets (NACK) and a fresh full frame (PLI). The video bitrate adapts to the worst viewer's loss, between a configurable floor and ceiling.
+- **NAT and CGNAT:** supports a static TURN server or Cloudflare Realtime's ephemeral TURN. The public link can go out through a Cloudflare Tunnel on the user's own domain.
+
+## Secure by Construction
+
+- **Two ports:** the public one only serves the viewer page and its WebSocket. The dashboard and API exist only on `127.0.0.1` and reject requests that arrive through a proxy or with a different `Host`.
+- **Unguessable link:** a random 128-bit token generated on every run. Close the program and the link stops working.
+- **Room controls:** optional password and a cap on simultaneous viewers.
+- **Logs without exposure:** daily logs with the reason for each disconnect and masked IPs.
+
+## Day-to-Day Operation
+
+A local dashboard with a preview, a copy-link button, window or monitor selection and each viewer's health (direct path or relay, RTT, loss, fps, kbps and reconnects). Tray icon, single instance, and automatic restart with growing backoff if the process crashes.
+
+## Known Limitations
+
+- A minimized window delivers no frames, and the dashboard warns about it. To switch windows, share the monitor.
+- Encoding is software-based (OpenH264), with no hardware acceleration.
+- There is no SFU: each viewer gets a direct connection from the PC, so upload grows with the number of viewers.

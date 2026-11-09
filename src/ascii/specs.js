@@ -16,20 +16,20 @@ function imobi(lang) {
     titleRight: 'fariasdourado.com.br',
     nodes: [
       { x: 1, y: 2, w: 13, label: t(lang, 'Usuário', 'User'), sub: t(lang, 'navegador', 'browser'), color: '3' },
-      { x: 18, y: 2, w: 15, label: 'Cloudflare', sub: t(lang, 'DNS · borda', 'DNS · edge'), color: '7' },
-      { x: 37, y: 2, w: 18, label: 'Tunnel', sub: 'Docker · LXC 200', color: '6' },
-      { x: 59, y: 2, w: 19, label: 'Imobi', sub: 'Laravel · LXC 106', color: '4' },
+      { x: 17, y: 2, w: 15, label: 'Cloudflare', sub: t(lang, 'DNS · borda', 'DNS · edge'), color: '7' },
+      { x: 35, y: 2, w: 20, label: 'Tunnel', sub: 'Docker · LXC 200', color: '6' },
+      { x: 58, y: 2, w: 21, label: 'Imobi', sub: 'Laravel · LXC 106', color: '4' },
       { x: 82, y: 2, w: 15, label: 'PostgreSQL', sub: 'LXC 101', color: '5', double: true },
     ],
     edges: [
-      { pts: [[14, 3], [17, 3]], color: '3', rate: 1.6, label: { x: 14, y: 6, text: 'HTTPS' } },
-      { pts: [[33, 3], [36, 3]], color: '7', rate: 1.4, label: { x: 33, y: 6, text: 'tunnel' } },
-      { pts: [[55, 3], [58, 3]], color: '6', rate: 1.2, label: { x: 55, y: 6, text: 'LAN' } },
-      { pts: [[78, 3], [81, 3]], color: '4', rate: 1, label: { x: 78, y: 6, text: 'SQL' } },
+      { pts: [[14, 3], [16, 3]], color: '3', rate: 1.6, label: { x: 14, y: 6, text: 'HTTPS' } },
+      { pts: [[32, 3], [34, 3]], color: '7', rate: 1.4, label: { x: 32, y: 6, text: 'tunnel' } },
+      { pts: [[55, 3], [57, 3]], color: '6', rate: 1.2, label: { x: 55, y: 6, text: 'LAN' } },
+      { pts: [[79, 3], [81, 3]], color: '4', rate: 1, label: { x: 79, y: 6, text: 'SQL' } },
     ],
     labels: [
-      { x: 37, y: 7, text: `╰${'─'.repeat(58)}╯`, color: '2' },
-      { x: 57, y: 8, text: 'homelab · Proxmox VE', color: '1' },
+      { x: 35, y: 7, text: `╰${'─'.repeat(60)}╯`, color: '2' },
+      { x: 55, y: 8, text: 'homelab · Proxmox VE', color: '1' },
     ],
     legend: [{ color: '3', text: t(lang, 'requisição', 'request') }],
     foot: t(lang, 'sem portas abertas no roteador', 'no open ports on the router'),
@@ -81,25 +81,78 @@ function homelab(lang) {
     nodes: [
       { x: 1, y: 7, w: 16, label: 'Cloudflare', sub: 'Zero-Trust', color: '7' },
       { x: 23, y: 7, w: 18, label: 'Tunnel', sub: t(lang, 'somente saída', 'outbound only'), color: '6' },
-      { x: 47, y: 7, w: 20, label: 'Proxmox VE', sub: 'Debian bare-metal', color: '3' },
-      { x: 77, y: 1, w: 20, label: 'LXC', sub: t(lang, 'não privilegiados', 'unprivileged'), color: '4' },
-      { x: 77, y: 7, w: 20, label: 'Workloads', sub: 'Rust · PostgreSQL', color: '4' },
-      { x: 77, y: 13, w: 20, label: 'ZFS', sub: t(lang, 'pools em mirror', 'mirrored pools'), color: '5', double: true },
-      { x: 77, y: 19, w: 20, label: 'Backup', sub: 'off-site', color: '5' },
+      { x: 47, y: 7, w: 21, label: 'Proxmox VE', sub: 'Debian bare-metal', color: '3' },
+      { x: 76, y: 1, w: 21, label: 'LXC', sub: t(lang, 'não privilegiados', 'unprivileged'), color: '4' },
+      { x: 76, y: 7, w: 21, label: 'Workloads', sub: 'Rust · PostgreSQL', color: '4' },
+      { x: 76, y: 13, w: 21, label: 'ZFS', sub: t(lang, 'pools em mirror', 'mirrored pools'), color: '5', double: true },
+      { x: 76, y: 19, w: 21, label: 'Backup', sub: 'off-site', color: '5' },
     ],
     edges: [
       { pts: [[17, 8], [22, 8]], color: '7', rate: 1.4, label: { x: 17, y: 6, text: 'HTTPS' } },
       { pts: [[41, 8], [46, 8]], color: '6', rate: 1.2 },
-      { pts: [[67, 8], [72, 8], [72, 2], [76, 2]], color: '4', rate: 0.9 },
-      { pts: [[67, 8], [76, 8]], color: '4', rate: 1 },
-      { pts: [[67, 8], [72, 8], [72, 14], [76, 14]], color: '5', rate: 0.7 },
-      { pts: [[87, 17], [87, 18]], color: '5', rate: 0.5 },
+      { pts: [[68, 8], [72, 8], [72, 2], [75, 2]], color: '4', rate: 0.9 },
+      { pts: [[68, 8], [75, 8]], color: '4', rate: 1 },
+      { pts: [[68, 8], [72, 8], [72, 14], [75, 14]], color: '5', rate: 0.7 },
+      { pts: [[86, 17], [86, 18]], color: '5', rate: 0.5 },
     ],
     legend: [
       { color: '7', text: t(lang, 'tráfego externo', 'external traffic') },
       { color: '4', text: 'workloads' },
       { color: '5', text: t(lang, 'dados e backup', 'data and backup') },
     ],
+  });
+}
+
+// ── winshare: captura → encoder único → fila por espectador → WebRTC → navegador ─────
+function winshare(lang) {
+  return archPiece({
+    slug: `winshare-${lang}`,
+    name: 'winshare pipeline',
+    note: 'winshare: Windows capture, a single encoder, a queue per viewer and WebRTC to the browser.',
+    cols: 98, rows: 14,
+    title: t(lang, 'winshare · pipeline de transmissão', 'winshare · streaming pipeline'),
+    titleRight: 'Rust · WebRTC',
+    nodes: [
+      { x: 1, y: 2, w: 18, label: t(lang, 'Captura', 'Capture'), sub: 'WGC · loopback', color: '3' },
+      { x: 22, y: 2, w: 17, label: t(lang, 'Encoder único', 'One encoder'), sub: 'H.264 · Opus', color: '7' },
+      { x: 42, y: 2, w: 20, label: t(lang, 'Fila por viewer', 'Per-viewer queue'), sub: t(lang, 'descarta quadros', 'drops frames'), color: '6' },
+      { x: 65, y: 2, w: 15, label: 'WebRTC', sub: 'SRTP · NACK', color: '4' },
+      { x: 83, y: 2, w: 15, label: t(lang, 'Navegador', 'Browser'), sub: t(lang, 'só o link', 'just a link'), color: '5' },
+    ],
+    edges: [
+      { pts: [[19, 3], [21, 3]], color: '3', rate: 1.6, label: { x: 19, y: 6, text: t(lang, 'quadros', 'frames') } },
+      { pts: [[39, 3], [41, 3]], color: '7', rate: 1.4, label: { x: 38, y: 6, text: t(lang, '1 codificação', '1 encode') } },
+      { pts: [[62, 3], [64, 3]], color: '6', rate: 1.2 },
+      { pts: [[80, 3], [82, 3]], color: '4', rate: 1 },
+      { pts: [[90, 6], [90, 8], [56, 8], [56, 6]], color: '8', rate: 0.5, label: { x: 54, y: 9, text: t(lang, 'perda · NACK · PLI → taxa adaptativa', 'loss · NACK · PLI → adaptive bitrate') } },
+    ],
+    legend: [{ color: '3', text: t(lang, 'mídia', 'media') }, { color: '8', text: t(lang, 'feedback de rede', 'network feedback') }],
+    foot: t(lang, 'sem SFU · conexão direta por espectador', 'no SFU · direct connection per viewer'),
+  });
+}
+
+// ── kanbn-mcp-server: cliente MCP ⇄ servidor MCP → API do Kanbn ──────────────────────
+function kanbn(lang) {
+  return archPiece({
+    slug: `kanbn-${lang}`,
+    name: 'kanbn-mcp-server',
+    note: 'An MCP client talks to kanbn-mcp-server over stdio, which calls the Kanbn REST API.',
+    cols: 96, rows: 11,
+    title: 'kanbn-mcp-server',
+    titleRight: 'Node · TypeScript',
+    nodes: [
+      { x: 1, y: 2, w: 19, label: t(lang, 'Cliente MCP', 'MCP client'), sub: 'Claude · Cursor', color: '6' },
+      { x: 24, y: 2, w: 22, label: 'kanbn-mcp-server', sub: t(lang, '15 ferramentas', '15 tools'), color: '7' },
+      { x: 50, y: 2, w: 23, label: 'API Kanbn', sub: t(lang, 'REST · chave de API', 'REST · API key'), color: '3' },
+      { x: 77, y: 2, w: 19, label: 'Kanbn', sub: t(lang, 'quadros · cards', 'boards · cards'), color: '5', double: true },
+    ],
+    edges: [
+      { pts: [[20, 3], [23, 3]], color: '6', bidir: true, rate: 1.4, label: { x: 20, y: 6, text: 'stdio' } },
+      { pts: [[46, 3], [49, 3]], color: '7', rate: 1.4, label: { x: 46, y: 6, text: 'HTTPS' } },
+      { pts: [[73, 3], [76, 3]], color: '3', rate: 1, label: { x: 73, y: 6, text: 'REST' } },
+    ],
+    labels: [{ x: 24, y: 7, text: t(lang, 'workspaces · boards · listas · cards', 'workspaces · boards · lists · cards'), color: '1' }],
+    legend: [{ color: '3', text: t(lang, 'chamada de ferramenta', 'tool call') }],
   });
 }
 
@@ -137,4 +190,6 @@ for (const lang of ['pt', 'en']) {
   diagrams[`retroyrd-fsm-${lang}`] = retroFsm(lang);
   diagrams[`coffeeyrd-fsm-${lang}`] = coffeeFsm(lang);
   diagrams[`homelab-${lang}`] = homelab(lang);
+  diagrams[`winshare-${lang}`] = winshare(lang);
+  diagrams[`kanbn-${lang}`] = kanbn(lang);
 }

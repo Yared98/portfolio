@@ -1,0 +1,37 @@
+---
+title: "Gift - A Private Wishlist, as a PWA, with a Tiny Homelab Footprint"
+description: "A personal portal to build and share wishlists through an unlisted link, installable as a PWA, with a Rust backend and React frontend running on roughly 15 to 25 MB of RAM."
+problem: "Wishlists on retail platforms expose your data to ads and indexing, and adding items from many different stores is tedious on a phone."
+solution: "A Rust (Axum + SQLite) application serving the compiled React frontend from a single binary, with a PWA, Web Share Target to receive links from other apps, automatic title, photo and price extraction from OpenGraph metadata, and Google sign-in."
+impact: "Roughly 15 to 25 MB of RAM in an Alpine container, a private token link that search engines do not index, and 12 color palettes plus a custom palette editor."
+date: 2026-09-28
+tags: ["Rust", "Axum", "SQLite", "React", "PWA", "Docker"]
+repoUrl: "https://github.com/Yared98/gift"
+brandColor: "emerald"
+lang: "en"
+---
+
+## The Problem
+
+Building a wishlist for friends and family usually means giving up privacy or pasting loose links into messages. The idea here is an elegant list that only people with the link can see, and that is quick to fill from a phone.
+
+## What It Delivers
+
+- **PWA with Web Share Target:** installs as an app on Android and iPhone. While browsing a store, the phone's native share button lists "Presentes" as a target and opens a drawer with the item already filled in.
+- **Magic Link:** paste a product URL and the backend extracts the title, photo and price from OpenGraph and page metadata.
+- **Privacy:** an unlisted view link with a secret token, `noindex, nofollow, noarchive, nosnippet` HTTP headers and meta tags, and a `robots.txt` that blocks crawlers.
+- **Filters:** dynamic categories, price range, desire level in stars and instant search.
+- **Visual identity:** 12 ready-made palettes and an editor with 4 colors (navigation, highlights, favorites and background), with a "Surprise me" button. The owner chooses whether guests see the list in automatic, light or dark mode.
+
+## Lean Architecture
+
+| Layer | Technology | Role |
+|---|---|---|
+| **Backend** | Rust (Axum) | API, Google OAuth 2.0 authentication and delivery of the static frontend |
+| **Database** | SQLite | A single file on a persistent volume |
+| **Frontend** | React + Vite + Tailwind CSS | Compiled and served by the same binary |
+| **Deploy** | Docker multi-stage (Alpine) | Roughly 15 to 25 MB of RAM at runtime |
+
+## Why a Homelab
+
+It is the kind of service that suits your own infrastructure: few users, personal data and minimal consumption. Configuration comes from environment variables, and the database lives on a volume that goes into the backup.

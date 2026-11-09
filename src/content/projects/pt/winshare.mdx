@@ -1,0 +1,43 @@
+---
+title: "winshare - Transmissão de Janela ou Monitor do Windows com Áudio, direto no Navegador"
+description: "Programa em Rust que captura uma janela ou monitor do Windows, com áudio, e transmite por WebRTC para quem abrir um link no navegador, sem instalar nada do lado de quem assiste."
+problem: "Compartilhar uma janela com áudio costuma exigir que todos instalem um cliente ou criem conta em uma plataforma, e as soluções de reunião tratam áudio por aplicativo e redes instáveis de forma limitada."
+solution: "Captura nativa com Windows Graphics Capture, áudio por aplicativo via Process Loopback, um único encoder H.264/Opus distribuído por uma fila independente para cada espectador e WebRTC com NACK, PLI e taxa de vídeo adaptativa."
+impact: "Um link com token aleatório de 128 bits que expira ao fechar o programa, painel local com a saúde de cada espectador, suporte a NAT/CGNAT via TURN e zero dependência de plataformas de terceiros para a mídia."
+date: 2026-11-08
+tags: ["Rust", "WebRTC", "H.264", "Opus", "Windows", "Cloudflare Tunnel"]
+repoUrl: "https://github.com/Yared98/winshare"
+brandColor: "indigo"
+lang: "pt"
+---
+import AsciiPiece from '../../../components/AsciiPiece.astro';
+
+## O Desafio: Compartilhar uma Janela com Áudio sem Instalar Nada
+
+Mostrar uma janela do Windows, com o som daquele programa, para alguém que só tem um navegador. O espectador abre um link e assiste. Do lado de quem transmite, o programa precisa capturar imagem e áudio com baixo custo, falar WebRTC e continuar funcionando quando a rede de um dos espectadores piora.
+
+## Pipeline de Transmissão
+
+<AsciiPiece piece="winshare-pt" label="Pipeline do winshare: a captura do Windows alimenta um encoder único de H.264 e Opus, que distribui para uma fila por espectador e segue por WebRTC até o navegador. O feedback de perda ajusta a taxa de vídeo." />
+
+- **Captura nativa:** Windows Graphics Capture para janela ou monitor. Numa janela, o áudio é só daquele programa (Process Loopback); num monitor, o áudio é o de todo o sistema.
+- **Um encoder para todos:** o vídeo é codificado uma única vez (OpenH264) e cada espectador recebe por uma fila própria. Um espectador lento perde quadros sem atrasar os demais.
+- **Rede instável:** o navegador pode pedir reenvio de pacotes (NACK) e um quadro completo novo (PLI). A taxa de vídeo se ajusta pela perda do pior espectador, entre um piso e um teto configuráveis.
+- **NAT e CGNAT:** aceita TURN fixo ou o TURN efêmero do Cloudflare Realtime. O link público pode sair por um Cloudflare Tunnel no domínio do próprio usuário.
+
+## Segurança por Construção
+
+- **Duas portas:** a pública só serve a página do espectador e o WebSocket dele. O painel e a API existem apenas em `127.0.0.1` e recusam requisições que venham por proxy ou com outro `Host`.
+- **Link imprevisível:** token aleatório de 128 bits gerado a cada execução. Fechou o programa, o link deixa de funcionar.
+- **Controles de sala:** senha opcional e limite de espectadores simultâneos.
+- **Logs sem exposição:** registros diários com o motivo de cada desconexão e IPs mascarados.
+
+## Operação no Dia a Dia
+
+Painel local com preview, link com botão de copiar, escolha de janela ou monitor e a saúde de cada espectador (caminho direto ou relay, RTT, perda, fps, kbps e reconexões). Ícone na bandeja, instância única e reinício automático com espera crescente caso o processo caia.
+
+## Limitações Conhecidas
+
+- Uma janela minimizada não entrega quadros, e o painel avisa. Para trocar de janela, compartilhe o monitor.
+- A codificação é por software (OpenH264), sem aceleração de hardware.
+- Não há SFU: cada espectador recebe uma conexão direta do PC, então o upload cresce com o número de espectadores.

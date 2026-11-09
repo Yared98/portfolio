@@ -1,0 +1,37 @@
+---
+title: "Gift - Lista de Presentes Privada, em PWA e de Baixíssimo Consumo no Homelab"
+description: "Portal pessoal para cadastrar e compartilhar listas de desejos por link não listado, instalável como PWA, com backend em Rust e frontend em React rodando em cerca de 15 a 25 MB de RAM."
+problem: "Listas de presentes em plataformas de varejo expõem os dados a anúncios e indexação, e cadastrar itens de várias lojas diferentes dá trabalho no celular."
+solution: "Aplicação em Rust (Axum + SQLite) servindo o frontend React compilado em um único binário, com PWA, Web Share Target para receber links de outros apps, extração automática de título, foto e preço por metadados OpenGraph e login com Google."
+impact: "Cerca de 15 a 25 MB de RAM em container Alpine, link privado com token que não é indexado por buscadores e 12 paletas de cores mais um editor de paleta própria."
+date: 2026-09-28
+tags: ["Rust", "Axum", "SQLite", "React", "PWA", "Docker"]
+repoUrl: "https://github.com/Yared98/gift"
+brandColor: "emerald"
+lang: "pt"
+---
+
+## O Problema
+
+Montar uma lista de presentes para amigos e família costuma significar abrir mão de privacidade ou copiar links soltos em mensagens. A ideia aqui é uma lista elegante, que só quem recebe o link consegue ver, e que seja rápida de alimentar pelo celular.
+
+## O que Entrega
+
+- **PWA com Web Share Target:** instala como app no Android e no iPhone. Ao navegar em uma loja, o botão nativo de compartilhar do celular tem "Presentes" como destino e abre uma gaveta com o item já preenchido.
+- **Link Mágico:** cole a URL de um produto e o backend extrai título, foto e preço por OpenGraph e metadados da página.
+- **Privacidade:** link de visualização não listado, com token secreto, cabeçalhos HTTP e meta tags `noindex, nofollow, noarchive, nosnippet` e `robots.txt` bloqueando rastreadores.
+- **Filtros:** categorias dinâmicas, faixa de preço, nível de desejo em estrelas e busca instantânea.
+- **Identidade visual:** 12 paletas prontas e um editor com 4 cores (navegação, destaques, favoritos e fundo), com botão "Surpreenda-me". O dono escolhe se os convidados veem a lista em modo automático, claro ou escuro.
+
+## Arquitetura Enxuta
+
+| Camada | Tecnologia | Papel |
+|---|---|---|
+| **Backend** | Rust (Axum) | API, autenticação com Google OAuth 2.0 e entrega do frontend estático |
+| **Banco** | SQLite | Arquivo único em volume persistente |
+| **Frontend** | React + Vite + Tailwind CSS | Compilado e servido pelo próprio binário |
+| **Deploy** | Docker multi-stage (Alpine) | Cerca de 15 a 25 MB de RAM em execução |
+
+## Por que no Homelab
+
+É o tipo de serviço que combina com infraestrutura própria: poucos usuários, dados pessoais e consumo mínimo. A configuração é feita por variáveis de ambiente, e o banco fica em um volume que entra no backup.

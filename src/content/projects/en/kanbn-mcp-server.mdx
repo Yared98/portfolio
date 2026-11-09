@@ -1,0 +1,42 @@
+---
+title: "kanbn-mcp-server - An MCP Server for AI Agents to Manage Kanban Boards"
+description: "A TypeScript Model Context Protocol server that exposes the Kanbn API as tools so Claude, Cursor and other MCP clients can list, create and move cards."
+problem: "AI agents can reason about tasks, but they had no way to read or change the Kanban board where the team actually works, which forced manual copy-and-paste of context."
+solution: "A stdio MCP server with 15 tools covering workspaces, boards, lists and cards, authenticated with an API key and configured through environment variables, compatible with any MCP client."
+impact: "The agent reads the board and creates and moves cards directly on the Kanbn instance, with no per-client custom integration and no credentials leaving the user's environment."
+date: 2026-10-14
+tags: ["TypeScript", "Node.js", "MCP", "REST API", "Kanban"]
+repoUrl: "https://github.com/Yared98/kanbn-mcp-server"
+brandColor: "zinc"
+lang: "en"
+---
+import AsciiPiece from '../../../components/AsciiPiece.astro';
+
+## The Problem: the Board Is Out of the Agent's Reach
+
+Kanbn is an open-source, Trello-style Kanban board that can run on your own infrastructure. An AI agent that helps with planning needs to see that board and act on it. Without that, every conversation starts from scratch and context is carried by hand.
+
+## Architecture
+
+<AsciiPiece piece="kanbn-en" label="An MCP client such as Claude or Cursor talks over stdio to kanbn-mcp-server, which calls the Kanbn REST API over HTTPS using an API key." />
+
+The server runs as a local process of the MCP client (`node dist/index.js`) and speaks JSON-RPC over stdio. Each tool becomes an authenticated REST call to the Kanbn API.
+
+## Exposed Tools (15)
+
+| Area | Tools |
+|---|---|
+| **Workspaces** | list, get and search boards and cards |
+| **Boards** | list, get (with columns and cards), create, update and delete |
+| **Lists (columns)** | create, rename or move, and delete |
+| **Cards** | get, create, update or move across columns and positions, and delete |
+
+## Design Decisions
+
+- **Environment-based config:** the instance URL and API key come from environment variables, never from code. The repository ships only a `.env.example`.
+- **Client-agnostic:** the same server works in Claude Desktop, Cursor or any MCP client with an `mcpServers` block in its config file.
+- **Clear scope:** the server translates protocol. Business rules and permissions stay in the Kanbn API.
+
+## How It Relates to the Rest of the Portfolio
+
+It is the same protocol that [Retroyrd](/en/projects/retroyrd/) exposes at `/mcp` so agents can take part in retrospectives. Here MCP is the product: a bridge between AI and a tool the team already uses.

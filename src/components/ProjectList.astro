@@ -22,6 +22,12 @@ const dailyProject = projects.find(p => p.id.includes('dailyyrd'));
 const planningProject = projects.find(p => p.id.includes('planningyrd'));
 const coffeeProject = projects.find(p => p.id.includes('coffeeyrd'));
 
+// Projetos menores: cartões compactos que levam ao estudo completo
+const moreSlugs = ['winshare', 'kanbn-mcp-server', 'gift'];
+const moreProjects = moreSlugs
+  .map((slug) => projects.find((p) => p.id.endsWith(`/${slug}`) || p.id === slug || p.id.includes(`/${slug}.`)))
+  .filter((p): p is NonNullable<typeof p> => Boolean(p));
+
 const colorStyles: Record<string, { btn: string; dot: string; border: string }> = {
   indigo: {
     btn: "bg-indigo-950/60 hover:bg-indigo-900/80 text-indigo-300 border-indigo-500/40 hover:border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]",
@@ -433,5 +439,50 @@ const suiteTools = [
         </div>
       </div>
     </article>
+
+    <!-- ========================================== -->
+    <!-- 4. MORE PROJECTS -->
+    <!-- ========================================== -->
+    {moreProjects.length > 0 && (
+      <div>
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-2 mb-6">
+          <h3 class="text-lg md:text-xl font-semibold text-zinc-100 tracking-tight">{t('projects.more_title')}</h3>
+          <p class="text-sm text-zinc-400 font-sans">{t('projects.more_desc')}</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {moreProjects.map((p) => {
+            const slug = p.id.split('/').pop()!.replace(/\.mdx?$/, '');
+            const style = colorStyles[p.data.brandColor ?? 'zinc'];
+            return (
+              <article class="border border-zinc-800/80 bg-zinc-900/70 hover:bg-zinc-900/85 hover:border-zinc-700/80 rounded p-5 flex flex-col justify-between transition-colors duration-150 group">
+                <div>
+                  <a href={`/${lang}/projects/${slug}/`} class="block">
+                    <h4 class="text-base font-semibold text-zinc-100 tracking-tight flex items-center gap-2 group-hover:text-white">
+                      <span class={`w-1.5 h-1.5 rounded-full ${style.dot}`} aria-hidden="true"></span>
+                      <span>{slug}</span>
+                    </h4>
+                  </a>
+                  <p class="text-sm text-zinc-300 font-sans leading-relaxed mt-3">{p.data.description}</p>
+                  {p.data.tags && (
+                    <div class="flex flex-wrap gap-1.5 mt-4">
+                      {p.data.tags.slice(0, 4).map((tag) => <TechBadge tech={tag} />)}
+                    </div>
+                  )}
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-4 mt-5 border-t border-zinc-800/40 text-xs font-mono whitespace-nowrap">
+                  {p.data.repoUrl ? (
+                    <a href={p.data.repoUrl} target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-zinc-100 transition-colors">{t('projects.view_repo')} &nearr;</a>
+                  ) : <span></span>}
+                  <a href={`/${lang}/projects/${slug}/`} class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 rounded transition-colors group/link">
+                    <span>{t('projects.view_study')}</span>
+                    <span class="group-hover/link:translate-x-0.5 transition-transform" aria-hidden="true">&rarr;</span>
+                  </a>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    )}
   </div>
 </section>

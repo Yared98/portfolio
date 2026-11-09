@@ -88,6 +88,9 @@ export const ui = {
     'projects.toolkit_subtools_title': 'Aplicações Integradas da Suite',
     'projects.case_enterprise_badge': 'Case Corporativo · Missão Crítica',
     'projects.case_production_badge': 'Produção Real · Arquitetura Web',
+    'projects.more_title': 'Mais Projetos',
+    'projects.more_desc': 'Ferramentas de código aberto e projetos pessoais, do sistema operacional à IA.',
+    'projects.view_repo': 'Ver repositório',
 
     // Homelab Callout
     'homelab.callout_tag': 'INFRAESTRUTURA & EXPERIMENTAÇÃO',
@@ -228,6 +231,9 @@ export const ui = {
     'projects.toolkit_subtools_title': 'Integrated Suite Applications',
     'projects.case_enterprise_badge': 'Enterprise Case · Mission-Critical',
     'projects.case_production_badge': 'Production System · Web Architecture',
+    'projects.more_title': 'More Projects',
+    'projects.more_desc': 'Open-source tools and personal projects, from the OS layer to AI.',
+    'projects.view_repo': 'View repository',
 
     // Homelab Callout
     'homelab.callout_tag': 'INFRASTRUCTURE & EXPERIMENTATION',
