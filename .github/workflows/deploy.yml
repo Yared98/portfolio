@@ -1,0 +1,49 @@
+name: CI / Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: portfolio-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Valida que o site compila (roda em PR e em push, na infra do GitHub)
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  # Deploy na infra local (CT 300 / web-shared) via runner self-hosted.
+  # Só em push na main, depois do build passar.
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, portfolio]
+    steps:
+      - name: Atualiza código e recria o container
+        run: |
+          set -euo pipefail
+          cd /apps/portfolio
+          git fetch origin main
+          git reset --hard origin/main
+          docker compose up -d --build
+          docker image prune -f
+
+      - name: Health check
+        run: |
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/pt/ || true)
+            [ "$code" = "200" ] && echo "OK: /pt/ respondeu 200" && exit 0
+            sleep 3
+          done
+          echo "Health check falhou (último status: $code)"; exit 1
