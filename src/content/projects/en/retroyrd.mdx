@@ -13,6 +13,8 @@ toolkit: true
 lang: "en"
 ---
 
+import AsciiPiece from '../../../components/AsciiPiece.astro';
+
 ![RetroYrd - Real-Time Agile Retrospective Platform](../../../assets/retroyrd-preview.png)
 
 ## The Challenge
@@ -32,9 +34,7 @@ To solve these pain points definitively, I engineered **RetroYrd** ([GitHub Repo
 
 RetroYrd replaces uncoordinated boards with a strictly typed 6-phase lifecycle governed by a backend state machine in Rust:
 
-```
-[ 1. ICEBREAKER ] ➔ [ 2. REFLECT ] ➔ [ 3. GROUP ] ➔ [ 4. VOTE ] ➔ [ 5. DISCUSS ] ➔ [ 6. ACTION ITEMS ]
-```
+<AsciiPiece piece="retroyrd-fsm-en" label="Six retrospective phases in sequence: Icebreaker, Reflect, Group, Vote, Discuss and Action Items" />
 
 1. **Icebreaker:** Synchronous team warm-up with mood check-ins and energizers to set an inclusive tone.
 2. **Reflect (Blind Reflection):** Participants compose cards independently. During this phase, other members' cards remain hidden to eliminate herd bias and social conformity.
@@ -48,6 +48,8 @@ RetroYrd replaces uncoordinated boards with a strictly typed 6-phase lifecycle g
 ## Technical Architecture & Performance
 
 The architecture adheres to **OpenSpec (Spec-Driven Development)**, achieving exceptional resource efficiency:
+
+<AsciiPiece piece="retroyrd-arch-en" label="Retroyrd architecture: React SPA over WebSocket to an Axum and Tokio broker, with a 6-phase FSM, an MCP server and SQLite" />
 
 | Layer | Technology | Architectural Role |
 | :--- | :--- | :--- |

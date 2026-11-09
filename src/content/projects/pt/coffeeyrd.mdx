@@ -13,6 +13,8 @@ toolkit: true
 lang: "pt"
 ---
 
+import AsciiPiece from '../../../components/AsciiPiece.astro';
+
 ## O Desafio: Reuniões Desestruturadas e Monopolizadas
 
 Em muitas equipes de engenharia e gestão de produtos, cerimônias de alinhamento e debates técnicos sofrem de problemas crônicos:
@@ -32,9 +34,7 @@ Para levar esse rito ao nível corporativo em tempo real e com custo zero de lic
 
 O fluxo do CoffeeYrd é governado por uma máquina de estados finitos estritamente tipada no backend em Rust, garantindo consistência e impedindo condições de corrida entre múltiplos facilitadores ou participantes:
 
-```
-[ 1. IDEATION ] ➔ [ 2. VOTING ] ➔ [ 3. DISCUSSION ] ➔ [ 4. COMPLETED ]
-```
+<AsciiPiece piece="coffeeyrd-fsm-pt" label="Quatro etapas da sessão do CoffeeYrd em sequência: Ideation, Voting, Discussion e Completed" />
 
 1. **Proposição Livre (Ideation):** Cada participante propõe tópicos livremente. A interface suporta Markdown e pré-visualização inline de cartões sem bloqueios de concorrência.
 2. **Votação Ponderada (Dot-Voting):** Cada membro recebe uma cota configurável de votos (ex: 3 a 5 votos) para distribuir nos temas prioritários. A contagem permanece oculta durante o rito para evitar o viés de ancoragem.

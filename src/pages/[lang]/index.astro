@@ -7,6 +7,7 @@ import Services from '../../components/Services.astro';
 import HomelabCallout from '../../components/HomelabCallout.astro';
 import Recommendations from '../../components/Recommendations.astro';
 import ConsultationCTA from '../../components/ConsultationCTA.astro';
+import AsciiPiece from '../../components/AsciiPiece.astro';
 import { type Lang } from '../../i18n/ui';
 
 export function getStaticPaths() {
@@ -35,10 +36,12 @@ const descriptions = {
   lang={lang}
 >
   <Hero lang={lang} />
+  <AsciiPiece piece="pulse-line" decorative panel={false} minPx={7} maxPx={24} class="my-2" />
   <SymptomsTriage lang={lang} />
   <ProjectList lang={lang} />
   <Services lang={lang} />
   <HomelabCallout lang={lang} />
   <Recommendations lang={lang} />
+  <AsciiPiece piece="dotted-rule" decorative panel={false} minPx={7} maxPx={24} class="my-2" />
   <ConsultationCTA lang={lang} />
 </Layout>

@@ -13,6 +13,8 @@ toolkit: true
 lang: "pt"
 ---
 
+import AsciiPiece from '../../../components/AsciiPiece.astro';
+
 ![Retroyrd - Plataforma de Retrospectivas Ágeis em Tempo Real](../../../assets/retroyrd-preview.png)
 
 ## O Desafio
@@ -32,19 +34,7 @@ Para resolver essas dores, projetei e construí o **Retroyrd** ([repositório no
 
 O backend do Retroyrd foi projetado em **Rust** utilizando o ecossistema **Axum**, **Tokio** e **Tower**, priorizando latência sub-milissegundo, segurança de memória em tempo de compilação e pegada de recursos ultraleve:
 
-```
-[ Usuários (React SPA) ] <===== WebSocket =====> [ Axum + Tokio WebSocket Broker ]
-                                                           |
-                                             +-------------+-------------+
-                                             |                           |
-                                             v                           v
-                                     [ FSM de 6 Fases ]          [ Servidor MCP ]
-                                     (Transições Rust)         (JSON-RPC 2.0 /mcp)
-                                             |                           ^
-                                             v                           |
-                                     [ SQLite (WAL) ]             [ Agentes de IA ]
-                                   (Persistência Local)        (Claude / Copilotos)
-```
+<AsciiPiece piece="retroyrd-arch-pt" label="Arquitetura do Retroyrd: SPA React conectada por WebSocket ao broker Axum e Tokio, com FSM de 6 fases, servidor MCP e SQLite" />
 
 1. **Pegada de Memória Mínima:** O binário nativo compilado em release consome **menos de 20MB de RAM** mesmo com dezenas de conexões concorrentes ativas, permitindo que a aplicação rode com folga nos menores containers do homelab.
 2. **Event Broker em Memória com Tokio Broadcast:** Atualizações de estado (criação de cards, votos, transições de fase e reações) são despachadas por canais `tokio::sync::broadcast`, garantindo que todos os clientes conectados recebam deltas instantaneamente com overhead zero de pooling HTTP.
@@ -56,9 +46,7 @@ O backend do Retroyrd foi projetado em **Rust** utilizando o ecossistema **Axum*
 
 Para evitar estados inconsistentes (como votos acontecendo antes do agrupamento ou cards criados após o arquivamento), o fluxo de cada quadro é governado por uma **Máquina de Estados Finita (Finite State Machine)** tipada no backend:
 
-```
-[1. SAFETY_CHECK] ──> [2. BRAINSTORM] ──> [3. GROUPING] ──> [4. VOTING] ──> [5. ACTION_ITEMS] ──> [6. ARCHIVED]
-```
+<AsciiPiece piece="retroyrd-fsm-pt" label="Seis fases da retrospectiva em sequência: SAFETY_CHECK, BRAINSTORM, GROUPING, VOTING, ACTION_ITEMS e ARCHIVED" />
 
 ### Regras Rigorosas em Cada Fase:
 

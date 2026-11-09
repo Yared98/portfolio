@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import TechBadge from '../../components/TechBadge.astro';
+import AsciiPiece from '../../components/AsciiPiece.astro';
 import { type Lang, useTranslations } from '../../i18n/ui';
 
 export function getStaticPaths() {
@@ -129,6 +130,15 @@ const principles = principlesData[lang] || principlesData.pt;
       {t('homelab.page_sublead')}
     </p>
   </section>
+
+  <!-- Topologia animada -->
+  <AsciiPiece
+    piece={`homelab-${lang}`}
+    label={lang === 'pt'
+      ? 'Topologia do homelab: Cloudflare Zero-Trust e túnel de saída até o Proxmox VE, com containers LXC, workloads, pools ZFS em mirror e backup off-site'
+      : 'Homelab topology: Cloudflare Zero-Trust and an outbound tunnel into Proxmox VE, with LXC containers, workloads, mirrored ZFS pools and off-site backup'}
+    class="mt-0 mb-16"
+  />
 
   <!-- Key Architecture Metrics / Quick Overview -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16 border-y border-zinc-800/60 py-6">

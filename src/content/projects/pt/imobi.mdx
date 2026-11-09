@@ -11,6 +11,8 @@ brandColor: "emerald"
 lang: "pt"
 ---
 
+import AsciiPiece from '../../../components/AsciiPiece.astro';
+
 ![Farias Dourado Imóveis - Visualização da Plataforma](../../../assets/imobi-preview.png)
 
 ## O Desafio
@@ -26,15 +28,7 @@ A proposta para a **Farias Dourado Imóveis** foi criar um ecossistema próprio,
 
 Uma das principais vantagens técnicas desse projeto foi sua integração vertical com o meu laboratório de infraestrutura (Homelab). O projeto opera com a seguinte arquitetura de microsserviços isolados:
 
-```
-[ Usuário Final ] ---> [ Cloudflare ] ---> [ Cloudflare Tunnel (Docker / LXC 200) ]
-                                                               |
-                                                               v
-                                                [ LXC 106 - imobi (Laravel App) ]
-                                                               |
-                                                               v
-                                                    [ LXC 101 - db-postgres-01 ]
-```
+<AsciiPiece piece="imobi-pt" label="Caminho da requisição no Imobi: usuário, Cloudflare, túnel, aplicação Laravel e banco PostgreSQL, todos no homelab" />
 
 1. **Monolito Laravel**: Renderização no lado do servidor (SSR) combinada com políticas de cache de rotas e visualizações, rodando no container LXC `106`.
 2. **Banco de Dados Centralizado (LXC 101)**: A aplicação se conecta diretamente à instância PostgreSQL principal do homelab, garantindo isolamento de persistência e backups agendados.

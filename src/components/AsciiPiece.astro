@@ -1,0 +1,91 @@
+---
+// Peça ASCII animada. Renderiza o primeiro quadro como texto no servidor (visível sem JS
+// e para buscadores) e o runtime da ascii-magic-art (MIT) assume com a animação em canvas.
+import { registry } from '../ascii/registry.js';
+
+interface Props {
+  piece: string;
+  /** Descrição para leitores de tela (obrigatória se não for decorativa). */
+  label?: string;
+  /** Peça puramente decorativa: escondida de leitores de tela. */
+  decorative?: boolean;
+  /** Moldura com fundo (padrão). Desligue para divisores e peças soltas. */
+  panel?: boolean;
+  /** Limites do tamanho de fonte (px) usado para ajustar a peça à largura disponível. */
+  minPx?: number;
+  maxPx?: number;
+  class?: string;
+}
+
+const { piece, label = '', decorative = false, panel = true, minPx = 9, maxPx = 15, class: cls = '' } = Astro.props;
+
+const load = registry[piece];
+if (!load) throw new Error(`AsciiPiece: peça desconhecida "${piece}"`);
+const mod = await load();
+const first = mod.default()(0);
+const text = typeof first === 'string' ? first : first.text;
+const { cols } = mod.meta;
+---
+
+<figure
+  class={`ascii-piece relative z-10 my-8 ${panel ? 'rounded border border-zinc-800/80 bg-zinc-950/90 p-3 sm:p-5' : ''} ${cls}`}
+  data-ascii-piece={piece}
+  data-cols={cols}
+  data-min={minPx}
+  data-max={maxPx}
+  role={decorative ? undefined : 'img'}
+  aria-label={decorative ? undefined : label}
+  aria-hidden={decorative ? 'true' : undefined}
+>
+  <div class="ascii-scroll overflow-x-auto">
+    <pre class="ascii-pre font-mono text-zinc-300" style={`font-size:${minPx}px`}>{text}</pre>
+  </div>
+</figure>
+
+<style is:global>
+  /* Neutraliza o estilo de <pre> do conteúdo MDX (borda, fundo, padding) */
+  .ascii-piece .ascii-pre {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    line-height: 1.2;
+  }
+</style>
+
+<script>
+  import { play } from 'ascii-magic-art/runtime/player.js';
+  import { CELL_W } from 'ascii-magic-art/runtime/canvas.js';
+  import { registry } from '../ascii/registry.js';
+
+  document.querySelectorAll<HTMLElement>('[data-ascii-piece]').forEach(async (fig) => {
+    const pre = fig.querySelector<HTMLPreElement>('pre');
+    const box = fig.querySelector<HTMLElement>('.ascii-scroll');
+    const load = registry[fig.dataset.asciiPiece as string];
+    if (!pre || !box || !load) return;
+
+    const cols = Number(fig.dataset.cols);
+    const min = Number(fig.dataset.min);
+    const max = Number(fig.dataset.max);
+
+    // Ajusta o tamanho da fonte para a peça caber na largura; abaixo do mínimo, rola na horizontal
+    const fit = () => {
+      const ideal = box.clientWidth / (cols * CELL_W);
+      pre.style.fontSize = `${Math.max(min, Math.min(max, ideal))}px`;
+      // Só rola quando nem o tamanho mínimo cabe (celular); folga de 2% evita barra por arredondamento
+      box.style.overflowX = ideal >= min * 0.98 ? 'hidden' : 'auto';
+    };
+    fit();
+
+    try {
+      const mod = await load();
+      play(pre, mod);
+      const canvas = (pre as any)._canvas as HTMLCanvasElement | undefined;
+      if (canvas) canvas.style.maxWidth = 'none';
+      new ResizeObserver(fit).observe(box);
+    } catch {
+      /* sem animação: o texto estático permanece */
+    }
+  });
+</script>

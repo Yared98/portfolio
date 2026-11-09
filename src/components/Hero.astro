@@ -7,12 +7,13 @@ interface Props {
 
 const { lang = defaultLang } = Astro.props;
 const t = useTranslations(lang);
+const overline = t('hero.overline');
 ---
 <section class="pb-16 md:pb-24 border-b border-zinc-800/40">
   <!-- Overline Tag -->
   <div class="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-zinc-500 uppercase mb-6">
     <span class="w-1.5 h-1.5 bg-zinc-500 rounded-none inline-block"></span>
-    {t('hero.overline')}
+    <span class="hero-type" style={`--n:${overline.length}`}>{overline}</span>
   </div>
 
   <!-- Headline -->
@@ -84,3 +85,19 @@ const t = useTranslations(lang);
     </div>
   </div>
 </section>
+
+<style>
+  /* Digita a linha de overline uma vez. O texto fica no HTML (SEO/leitores de tela) e é
+     visível por padrão: a animação só o recorta enquanto roda (fill-mode both), então se
+     ela não executar o texto continua legível. Respeita "reduzir movimento". */
+  @media (prefers-reduced-motion: no-preference) and (min-width: 640px) {
+    .hero-type {
+      display: inline-block;
+      animation: hero-type calc(var(--n) * 36ms) steps(var(--n), end) 0.5s both;
+    }
+    @keyframes hero-type {
+      from { clip-path: inset(0 100% 0 0); }
+      to { clip-path: inset(0 0 0 0); }
+    }
+  }
+</style>

@@ -13,6 +13,8 @@ toolkit: true
 lang: "en"
 ---
 
+import AsciiPiece from '../../../components/AsciiPiece.astro';
+
 ## The Challenge: Unstructured, Monopolized Meetings
 
 In many software development and product teams, discussions and alignment syncs suffer from chronic inefficiencies:
@@ -32,9 +34,7 @@ To modernize this ceremony for distributed engineering organizations, I engineer
 
 The lifecycle of every CoffeeYrd session is strictly governed by a typed state machine in Rust:
 
-```
-[ 1. IDEATION ] ➔ [ 2. VOTING ] ➔ [ 3. DISCUSSION ] ➔ [ 4. COMPLETED ]
-```
+<AsciiPiece piece="coffeeyrd-fsm-en" label="Four stages of a CoffeeYrd session in sequence: Ideation, Voting, Discussion and Completed" />
 
 1. **Free Ideation:** Attendees submit topic cards with real-time Markdown formatting and instant card preview.
 2. **Weighted Dot-Voting:** Configurable voting quotas per attendee (e.g., 3-5 votes) to democratically identify priority topics without anchoring bias.

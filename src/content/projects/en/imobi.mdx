@@ -11,6 +11,8 @@ brandColor: "emerald"
 lang: "en"
 ---
 
+import AsciiPiece from '../../../components/AsciiPiece.astro';
+
 ![Farias Dourado Real Estate - Platform Showcase](../../../assets/imobi-preview.png)
 
 ## The Challenge
@@ -26,6 +28,8 @@ The solution delivered for **Farias Dourado Imóveis** unified an exceptional en
 ---
 
 ## Technical Architecture & Highlights
+
+<AsciiPiece piece="imobi-en" label="Imobi request path: user, Cloudflare, tunnel, Laravel app and PostgreSQL, all in the homelab" />
 
 - **Server-Side Rendering (SSR) with Laravel:** Generates semantic, search-indexable HTML on the server before client dispatch, maximizing Core Web Vitals.
 - **Automated Image Optimization Pipeline:** High-resolution property uploads are automatically converted to next-generation WebP formats via Sharp/GD, slashing image payloads by up to 75% without perceptible loss in visual fidelity.

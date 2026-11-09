@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Recommendations from '../../components/Recommendations.astro';
 import TechBadge from '../../components/TechBadge.astro';
+import TechTicker from '../../components/TechTicker.astro';
 import { type Lang, useTranslations } from '../../i18n/ui';
 
 export function getStaticPaths() {
@@ -109,6 +110,7 @@ const skillsData = {
 const experience = experienceData[lang] || experienceData.pt;
 const education = educationData[lang] || educationData.pt;
 const skills = skillsData[lang] || skillsData.pt;
+const tickerItems = [...new Set(skills.flatMap((s) => s.items))];
 ---
 
 <Layout 
@@ -136,6 +138,8 @@ const skills = skillsData[lang] || skillsData.pt;
       <strong class="text-zinc-200 font-mono text-xs uppercase tracking-wider">{t('career.consultative_title')}</strong> {t('career.consultative_desc')}
     </p>
   </section>
+
+  <TechTicker items={tickerItems} />
 
   <div class="space-y-16">
     <!-- Experience -->

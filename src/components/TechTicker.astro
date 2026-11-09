@@ -1,0 +1,55 @@
+---
+// Faixa de tecnologias em rolagem contínua, estilo letreiro. Puramente decorativa:
+// a lista completa e acessível já existe na página, então fica escondida de leitores de tela.
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="tech-ticker my-10 overflow-hidden border-y border-zinc-800/60 py-3 font-mono text-xs text-zinc-400" aria-hidden="true">
+  <div class="tech-track">
+    {[0, 1].map((copy) => (
+      <ul class="tech-set" data-copy={copy}>
+        {items.map((item) => (
+          <li class="whitespace-nowrap">
+            <span class="text-zinc-600">[</span> {item} <span class="text-zinc-600">]</span>
+          </li>
+        ))}
+      </ul>
+    ))}
+  </div>
+</div>
+
+<style>
+  .tech-ticker {
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  .tech-track {
+    display: flex;
+    width: max-content;
+    animation: tech-scroll 45s linear infinite;
+  }
+  .tech-ticker:hover .tech-track {
+    animation-play-state: paused;
+  }
+  .tech-set {
+    display: flex;
+    gap: 2.5rem;
+    padding-right: 2.5rem;
+    margin: 0;
+    list-style: none;
+  }
+  @keyframes tech-scroll {
+    to { transform: translateX(-50%); }
+  }
+  /* Sem movimento: mostra uma cópia só, parada e com quebra de linha */
+  @media (prefers-reduced-motion: reduce) {
+    .tech-track { animation: none; width: auto; }
+    .tech-set[data-copy='1'] { display: none; }
+    .tech-set { flex-wrap: wrap; row-gap: 0.5rem; }
+    .tech-ticker { mask-image: none; -webkit-mask-image: none; }
+  }
+</style>
