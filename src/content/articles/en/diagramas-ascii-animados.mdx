@@ -1,0 +1,70 @@
+---
+title: "Animated ASCII architecture diagrams, with no images and no weight"
+description: "How the diagrams on this site are drawn in text, rendered on the server and animated only when the browser can."
+date: 2026-11-13
+tags: ["Astro", "ASCII", "Front-end", "Accessibility"]
+lang: "en"
+---
+
+import AsciiPiece from '../../../components/AsciiPiece.astro';
+
+The case studies on this site have architecture diagrams. Instead of exporting images from a drawing tool, they are text: boxes, arrows and labels made of characters, animated on a canvas. This is the one for Imobi:
+
+<AsciiPiece piece="imobi-en" label="Imobi architecture: the user goes through Cloudflare and a tunnel to Laravel and PostgreSQL in the homelab." />
+
+This article explains why I chose this route and how it works.
+
+## Why text
+
+A PNG diagram has three problems that bothered me:
+
+- **It goes stale.** Changing a node means opening the tool, exporting and replacing the file. In text, changing a node is changing a line of code, and the change shows up in the Git history like any other.
+- **It does not translate.** The site is bilingual. With images, every diagram becomes two files. With text, the same diagram takes the language as a parameter.
+- **It does not match the rest.** An image carries the colours and typography of whoever exported it. Text uses the same monospaced font and the same palette as the site.
+
+## A specification, not a drawing
+
+Each diagram is described by a specification: a list of nodes with position and width, and a list of connections between points on the grid.
+
+```js
+archPiece({
+  cols: 98, rows: 12,
+  nodes: [
+    { x: 1,  y: 2, w: 13, label: 'User',       sub: 'browser' },
+    { x: 17, y: 2, w: 15, label: 'Cloudflare', sub: 'DNS · edge' },
+  ],
+  edges: [
+    { pts: [[14, 3], [16, 3]], label: { x: 14, y: 6, text: 'HTTPS' } },
+  ],
+});
+```
+
+The function that receives this does three things.
+
+First, it **validates**. If a label does not fit in its box, if a node leaves the grid or if a connection has a diagonal segment, the build fails with a message naming the diagram and the element. A broken diagram never reaches production.
+
+Then it **picks the characters for the connections**. Each cell a connection passes through records which sides it connects on, and the character follows from that combination: `─` for a straight run, `╭` for a corner, `┬` for a fork, `┼` for a crossing. I describe the path; the junctions come out on their own.
+
+Finally, it **animates**. Pulses travel along the connections in the direction of flow, which shows where each request comes from and where it goes without needing a legend.
+
+The engine is derived from a piece in the [ascii-magic-art](https://github.com/kailashsr38/ascii-magic-art) library, which is MIT licensed, and uses its runtime to play the animation.
+
+## Rendered on the server first
+
+The point I cared about most: the page has to work without JavaScript.
+
+At build time, Astro runs each diagram once, takes the first frame and writes it into the HTML inside a `<pre>`. Search engines and screen readers get the text, and whoever opens the page sees the diagram immediately, before any script loads.
+
+When the JavaScript arrives, the runtime takes over and draws the animation on a canvas in the same place. If the script fails, the static text stays there.
+
+Three details complete the behaviour:
+
+- **Loading on demand.** A registry maps each diagram name to a dynamic `import()`, so each page downloads only the diagrams it uses.
+- **Fitting the width.** The font size is computed so the diagram fits the available width. Below a minimum legible size, it scrolls horizontally instead of shrinking further.
+- **Description for screen readers.** Each diagram has alternative text describing the flow in one sentence, because a grid of box-drawing characters read aloud helps nobody.
+
+## What I take from this
+
+The decision was not aesthetic first. It was treating the diagram as code: versioned, validated at build time, parameterised by language and cheap to maintain. The terminal look came as a consequence, and ended up becoming the identity of the site.
+
+The same logic applies to client systems: what is described as data and validated automatically ages better than what is drawn by hand.

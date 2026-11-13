@@ -1,0 +1,28 @@
+---
+// Últimos artigos na home. Não renderiza nada enquanto não houver artigo publicado.
+import SectionHead from './SectionHead.astro';
+import ArticleList from './ArticleList.astro';
+import { type Lang, defaultLang } from '../i18n/ui';
+import { getArticles } from '../utils/articles';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+const articles = (await getArticles(lang)).slice(0, 3);
+const c = {
+  pt: { label: 'ARTIGOS', title: 'Notas de engenharia', desc: 'O que aprendi construindo e operando os projetos acima.', all: 'Ver todos os artigos' },
+  en: { label: 'ARTICLES', title: 'Engineering notes', desc: 'What I learned building and running the projects above.', all: 'See all articles' },
+}[lang];
+---
+
+{articles.length > 0 && (
+  <section class="border-t border-term-line/60 py-16 md:py-20 scroll-mt-20" id="artigos">
+    <SectionHead label={c.label} title={c.title} desc={c.desc} />
+    <ArticleList articles={articles} lang={lang} />
+    <p class="mt-6 font-mono text-xs">
+      <a href={`/${lang}/artigos/`} class="text-term-dim hover:text-zinc-100">{c.all} <span aria-hidden="true">→</span></a>
+    </p>
+  </section>
+)}

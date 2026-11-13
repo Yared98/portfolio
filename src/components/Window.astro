@@ -1,0 +1,36 @@
+---
+// Janela no estilo "tela de terminal": barra de título com os três pontos, corpo e,
+// opcionalmente, uma linha de status no rodapé (slot "status").
+interface Props {
+  title: string;
+  /** Texto curto à direita da barra de título. */
+  meta?: string;
+  /** Se informado, a janela inteira vira um link. */
+  href?: string;
+  /** Tag do elemento quando não é link. */
+  as?: 'div' | 'article' | 'section' | 'aside' | 'form';
+  /** Remove o padding do corpo (para conteúdo que encosta na moldura). */
+  flush?: boolean;
+  class?: string;
+  [key: string]: any;
+}
+
+const { title, meta, href, as = 'div', flush = false, class: cls = '', ...rest } = Astro.props;
+const Tag = href ? 'a' : as;
+---
+
+<Tag class={`tui-win ${cls}`} href={href} {...rest}>
+  <div class="tui-bar">
+    <span class="tui-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="tui-title">{title}</span>
+    {meta && <span class="tui-meta">{meta}</span>}
+  </div>
+  <div class={flush ? 'flex-1' : 'tui-body'}>
+    <slot />
+  </div>
+  {Astro.slots.has('status') && (
+    <div class="tui-status">
+      <slot name="status" />
+    </div>
+  )}
+</Tag>

@@ -1,6 +1,8 @@
 ---
 // Faixa de tecnologias em rolagem contínua, estilo letreiro. Puramente decorativa:
 // a lista completa e acessível já existe na página, então fica escondida de leitores de tela.
+import { getTechBadgeStyle } from '../utils/techColors';
+
 interface Props {
   items: string[];
 }
@@ -8,13 +10,13 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<div class="tech-ticker my-10 overflow-hidden border-y border-zinc-800/60 py-3 font-mono text-xs text-zinc-400" aria-hidden="true">
+<div class="tech-ticker my-10 overflow-hidden border-y border-term-line py-3 font-mono text-xs text-term-dim" aria-hidden="true">
   <div class="tech-track">
     {[0, 1].map((copy) => (
       <ul class="tech-set" data-copy={copy}>
         {items.map((item) => (
           <li class="whitespace-nowrap">
-            <span class="text-zinc-600">[</span> {item} <span class="text-zinc-600">]</span>
+            <span class="text-term-line">[</span> <span class={getTechBadgeStyle(item).text}>{item}</span> <span class="text-term-line">]</span>
           </li>
         ))}
       </ul>

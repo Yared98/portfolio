@@ -1,18 +1,21 @@
 ---
 import '@fontsource/geist-sans';
-import '@fontsource/ibm-plex-mono';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@fontsource/ibm-plex-mono/600.css';
 import '../styles/global.css';
-import AsciiRain from '../components/AsciiRain.astro';
+import AsciiWorkspaces from '../components/AsciiWorkspaces.astro';
 import { type Lang, defaultLang, useTranslations, getLocalizedPath } from '../i18n/ui';
 
 interface Props {
 	title: string;
 	description?: string;
 	lang?: Lang;
+	noindex?: boolean;
 }
 
 const currentPath = Astro.url.pathname;
-const { title, description = "Arquitetura de Software & Consultoria Técnica", noindex = false } = Astro.props;
+const { title, description = "Software sob medida, integrações e infraestrutura para empresas.", noindex = false } = Astro.props;
 const lang: Lang = Astro.props.lang || (currentPath.startsWith('/en') ? 'en' : 'pt');
 const t = useTranslations(lang);
 
@@ -21,6 +24,19 @@ const site = Astro.site ?? new URL('https://yared.com.br');
 const normalizedPath = currentPath.endsWith('/') ? currentPath : `${currentPath}/`;
 const canonicalUrl = new URL(normalizedPath, site).href;
 const ogImage = new URL('/og-image.png', site).href;
+// Janelas da navegação; a ativa é a de prefixo mais específico que casa com a rota
+const section = normalizedPath.replace(/^\/(pt|en)/, '');
+const nav = [
+	{ label: t('nav.home'), path: '/' },
+	{ label: t('nav.services'), path: '/servicos/' },
+	{ label: t('nav.projects'), path: '/projects/' },
+	{ label: t('nav.about'), path: '/trajetoria/' },
+].map((n) => ({
+	label: n.label.toLowerCase(),
+	href: `/${lang}${n.path}`,
+	active: n.path === '/' ? section === '/' : section.startsWith(n.path),
+}));
+
 const alternates = [
 	{ hreflang: 'pt-BR', href: new URL(getLocalizedPath(currentPath, 'pt'), site).href },
 	{ hreflang: 'en', href: new URL(getLocalizedPath(currentPath, 'en'), site).href },
@@ -58,70 +74,95 @@ const alternates = [
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={ogImage} />
 	</head>
-	<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col antialiased selection:bg-zinc-800 selection:text-zinc-50">
-		<AsciiRain />
-		<header class="w-full border-b border-zinc-800/40 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-50">
-			<div class="container-base h-16 flex justify-between items-center">
-				<a href={`/${lang}/`} class="flex items-center gap-3 group focus:outline-none">
-					<span class="text-sm font-semibold tracking-tight text-zinc-100 group-hover:text-white transition-colors">
-						Matheus Yared
-					</span>
-					<span class="hidden sm:inline-block text-xs font-mono text-zinc-500 border-l border-zinc-800 pl-3">
-						{t('nav.software_arch')}
-					</span>
-				</a>
-				
-				<div class="flex items-center gap-4 sm:gap-6">
-					<nav class="flex items-center gap-4 sm:gap-5 text-sm text-zinc-400">
-						<a href={`/${lang}/projects/`} class="hover:text-zinc-100 transition-colors">{t('nav.projects')}</a>
-						<a href={`/${lang}/trajetoria/`} class="hover:text-zinc-100 transition-colors">{t('nav.trajectory')}</a>
-						<a href={`/${lang}/homelab/`} class="hover:text-zinc-100 transition-colors">{t('nav.homelab')}</a>
-					</nav>
+	<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col antialiased selection:bg-term-green selection:text-zinc-950">
+		<a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[60] btn-tui">{lang === 'pt' ? 'Pular para o conteúdo' : 'Skip to content'}</a>
+		<AsciiWorkspaces />
 
-					<!-- Language Switcher Toggle -->
-					<div class="flex items-center p-0.5 rounded border border-zinc-800 bg-zinc-900/90 text-[11px] font-mono">
-						<a 
-							href={getLocalizedPath(currentPath, 'pt')} 
-							class={`px-2 py-0.5 rounded transition-colors ${lang === 'pt' ? 'bg-zinc-800 text-zinc-100 font-semibold shadow-xs' : 'text-zinc-400 hover:text-zinc-200'}`}
+		<!-- Barra de navegação no estilo de barra de status do tmux: sessão à esquerda, janelas numeradas -->
+		<header class="sticky top-0 z-50 w-full border-b border-term-line bg-zinc-950/90 backdrop-blur-md font-mono">
+			<div class="container-base flex h-12 items-center justify-between gap-4">
+				<a href={`/${lang}/`} aria-label="Matheus Yared" class="flex shrink-0 items-center gap-2 text-sm font-semibold text-zinc-100 hover:text-white">
+					<span class="bg-term-green px-1.5 py-0.5 text-xs text-zinc-950">yared</span>
+				</a>
+
+				<nav class="hidden items-center gap-1 text-xs md:flex" aria-label={lang === 'pt' ? 'Principal' : 'Main'}>
+					{nav.map((item, i) => (
+						<a
+							href={item.href}
+							aria-current={item.active ? 'page' : undefined}
+							class={`px-2 py-1 transition-colors ${item.active ? 'bg-zinc-800 text-zinc-50' : 'text-zinc-400 hover:text-zinc-100'}`}
+						>
+							<span class="text-term-dim" aria-hidden="true">{i}:</span>{item.label}{item.active && <span class="text-term-green" aria-hidden="true">*</span>}
+						</a>
+					))}
+				</nav>
+
+				<div class="flex shrink-0 items-center gap-3 text-xs">
+					<div class="flex items-center border border-term-line">
+						<a
+							href={getLocalizedPath(currentPath, 'pt')}
+							class={`px-2 py-1 transition-colors ${lang === 'pt' ? 'bg-zinc-800 text-zinc-50' : 'text-zinc-400 hover:text-zinc-100'}`}
 							aria-label="Mudar para Português"
-						>
-							PT
-						</a>
-						<a 
-							href={getLocalizedPath(currentPath, 'en')} 
-							class={`px-2 py-0.5 rounded transition-colors ${lang === 'en' ? 'bg-zinc-800 text-zinc-100 font-semibold shadow-xs' : 'text-zinc-400 hover:text-zinc-200'}`}
+							aria-current={lang === 'pt' ? 'true' : undefined}
+						>PT</a>
+						<a
+							href={getLocalizedPath(currentPath, 'en')}
+							class={`px-2 py-1 transition-colors ${lang === 'en' ? 'bg-zinc-800 text-zinc-50' : 'text-zinc-400 hover:text-zinc-100'}`}
 							aria-label="Switch to English"
-						>
-							EN
-						</a>
+							aria-current={lang === 'en' ? 'true' : undefined}
+						>EN</a>
 					</div>
-					
-					<div class="hidden md:flex items-center gap-2 pl-4 border-l border-zinc-800/60">
-						<span class="relative flex h-2 w-2">
-							<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-							<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-						</span>
-						<span class="text-xs font-mono text-zinc-400">{t('nav.available')}</span>
-					</div>
+					<a href={`/${lang}/#contato`} class="btn-tui !px-2.5 !py-1.5 !text-xs">
+						<span class="hidden sm:inline">{t('nav.quote')}</span>
+						<span class="sm:hidden">{lang === 'pt' ? 'Orçamento' : 'Quote'}</span>
+					</a>
 				</div>
 			</div>
+
+			<!-- No celular as janelas viram uma segunda linha rolável -->
+			<nav class="border-t border-term-line md:hidden" aria-label={lang === 'pt' ? 'Principal' : 'Main'}>
+				<div class="container-base flex gap-1 overflow-x-auto py-1.5 text-xs">
+					{nav.map((item, i) => (
+						<a
+							href={item.href}
+							aria-current={item.active ? 'page' : undefined}
+							class={`shrink-0 px-2 py-1 ${item.active ? 'bg-zinc-800 text-zinc-50' : 'text-zinc-400'}`}
+						>
+							<span class="text-term-dim" aria-hidden="true">{i}:</span>{item.label}{item.active && <span class="text-term-green" aria-hidden="true">*</span>}
+						</a>
+					))}
+				</div>
+			</nav>
 		</header>
-		
-		<main class="relative z-10 flex-grow container-base py-12 md:py-20">
+
+		<main id="conteudo" class="relative z-10 flex-grow container-base py-10 md:py-16">
 			<slot />
 		</main>
 
-		<footer class="relative z-10 w-full border-t border-zinc-800/40 mt-auto bg-zinc-950/50">
-			<div class="container-base py-10 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-zinc-500 font-mono">
-				<div class="flex items-center gap-3">
-					<span>{t('footer.rights')}</span>
+		<!-- Rodapé como linha de status de editor -->
+		<footer class="relative z-10 mt-auto w-full border-t border-term-line bg-zinc-950/80 font-mono text-xs text-term-dim">
+			<div class="container-base flex flex-col gap-4 py-6 md:flex-row md:items-center md:justify-between">
+				<div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+					<span class="flex items-center gap-2 text-zinc-300">
+						<span class="relative flex h-2 w-2" aria-hidden="true">
+							<span class="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-term-green opacity-75"></span>
+							<span class="relative inline-flex h-2 w-2 rounded-full bg-term-green"></span>
+						</span>
+						{lang === 'pt' ? 'disponível para projetos' : 'available for projects'}
+					</span>
+					<span aria-hidden="true">│</span>
+					<span>{lang === 'pt' ? 'Curitiba/PR · remoto' : 'Curitiba, Brazil · remote'}</span>
+					<span aria-hidden="true">│</span>
+					<span>© 2026 Matheus Yared</span>
 				</div>
-				<div class="flex items-center gap-6">
-					<a href="https://github.com/Yared98" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-300 transition-colors">GitHub &nearr;</a>
-					<a href="https://linkedin.com/in/yared98" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-300 transition-colors">LinkedIn &nearr;</a>
-					<a href="mailto:mathyared@gmail.com" class="hover:text-zinc-300 transition-colors">mathyared@gmail.com</a>
+				<div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+					<a href={`/${lang}/homelab/`} class="hover:text-zinc-100">{t('nav.homelab')}</a>
+					<a href="https://github.com/Yared98" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-100">GitHub <span aria-hidden="true">↗</span></a>
+					<a href="https://linkedin.com/in/yared98" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-100">LinkedIn <span aria-hidden="true">↗</span></a>
+					<a href="mailto:contato@yared.com.br" class="hover:text-zinc-100">contato@yared.com.br</a>
 				</div>
 			</div>
 		</footer>
+
 	</body>
 </html>

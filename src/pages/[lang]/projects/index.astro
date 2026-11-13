@@ -2,6 +2,7 @@
 import Layout from '../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import ProjectList from '../../../components/ProjectList.astro';
+import SectionHead from '../../../components/SectionHead.astro';
 import { type Lang, useTranslations } from '../../../i18n/ui';
 
 export function getStaticPaths() {
@@ -35,17 +36,8 @@ const descriptions = {
     lang={lang}
   />
   
-  <section class="mt-4 mb-16">
-    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 mb-6">
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-      {lang === 'pt' ? 'CASOS SELECIONADOS · PRODUÇÃO REAL' : 'SELECTED CASES · PRODUCTION SYSTEMS'}
-    </div>
-    <h1 class="text-3xl md:text-5xl font-sans font-semibold tracking-tight text-zinc-100 mb-6 leading-tight">
-      {t('projects.all_cases_title')}
-    </h1>
-    <p class="text-zinc-300 font-serif max-w-3xl leading-relaxed text-lg">
-      {t('projects.all_cases_desc')}
-    </p>
+  <section class="mt-4">
+    <SectionHead level={1} label={lang === 'pt' ? 'PROJETOS' : 'PROJECTS'} title={t('projects.all_cases_title')} desc={t('projects.all_cases_desc')} />
   </section>
 
   <ProjectList lang={lang} />

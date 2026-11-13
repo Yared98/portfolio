@@ -14,26 +14,23 @@ const { segments } = Astro.props;
 const lang: Lang = Astro.props.lang || (currentPath.startsWith('/en') ? 'en' : 'pt');
 const t = useTranslations(lang);
 ---
-<nav aria-label="Breadcrumb" class="pb-8 pt-4">
-  <ol role="list" class="flex items-center space-x-2 text-xs font-mono text-zinc-500">
-    <li>
-      <a href={`/${lang}/`} class="hover:text-zinc-300 transition-colors">{t('crumbs.home')}</a>
+<nav aria-label="Breadcrumb" class="pb-8 pt-4 min-w-0">
+  <ol role="list" class="flex items-center min-w-0 text-xs font-mono text-term-dim">
+    <li class="shrink-0">
+      <a href={`/${lang}/`} class="text-term-green hover:text-zinc-50 transition-colors" aria-label={t('crumbs.home')}>~</a>
     </li>
-    {segments.map((segment) => (
-      <>
-        <li>
-          <span class="text-zinc-700">/</span>
-        </li>
-        <li>
-          {segment.href ? (
-            <a href={segment.href} class="hover:text-zinc-300 transition-colors">
-              {segment.label}
-            </a>
+    {segments.map((segment, i) => {
+      const last = i === segments.length - 1;
+      return (
+        <li class={last ? 'min-w-0 truncate' : 'shrink-0'}>
+          <span class="text-term-line" aria-hidden="true">/</span>
+          {segment.href && !last ? (
+            <a href={segment.href} class="hover:text-zinc-50 transition-colors">{segment.label}</a>
           ) : (
-            <span class="text-zinc-300" aria-current="page">{segment.label}</span>
+            <span class="text-zinc-300" aria-current={last ? 'page' : undefined}>{segment.label}</span>
           )}
         </li>
-      </>
-    ))}
+      );
+    })}
   </ol>
 </nav>

@@ -4,6 +4,10 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Recommendations from '../../components/Recommendations.astro';
 import TechBadge from '../../components/TechBadge.astro';
 import TechTicker from '../../components/TechTicker.astro';
+import Window from '../../components/Window.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import Principles from '../../components/Principles.astro';
+import HomelabCallout from '../../components/HomelabCallout.astro';
 import { type Lang, useTranslations } from '../../i18n/ui';
 
 export function getStaticPaths() {
@@ -123,19 +127,10 @@ const tickerItems = [...new Set(skills.flatMap((s) => s.items))];
     lang={lang}
   />
   
-  <section class="mt-4 mb-16">
-    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 mb-6">
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-      {t('career.tag')}
-    </div>
-    <h1 class="text-3xl md:text-5xl font-sans font-semibold tracking-tight text-zinc-100 mb-6 leading-tight">
-      {t('career.title')}
-    </h1>
-    <p class="text-zinc-300 font-serif max-w-3xl leading-relaxed text-lg mb-4">
-      {t('career.lead')}
-    </p>
-    <p class="text-zinc-400 font-sans max-w-3xl leading-relaxed text-sm">
-      <strong class="text-zinc-200 font-mono text-xs uppercase tracking-wider">{t('career.consultative_title')}</strong> {t('career.consultative_desc')}
+  <section class="mt-4 mb-10">
+    <SectionHead level={1} label={lang === 'pt' ? 'SOBRE' : 'ABOUT'} title={t('career.title')} desc={t('career.lead')} class="!mb-4" />
+    <p class="text-zinc-400 max-w-3xl leading-relaxed text-sm">
+      <strong class="text-term-green font-mono text-xs uppercase tracking-wider">{t('career.consultative_title')}</strong> {t('career.consultative_desc')}
     </p>
   </section>
 
@@ -144,67 +139,66 @@ const tickerItems = [...new Set(skills.flatMap((s) => s.items))];
   <div class="space-y-16">
     <!-- Experience -->
     <section>
-      <h2 class="text-xs font-mono text-zinc-500 mb-8 tracking-wider uppercase border-b border-zinc-800/60 pb-3">
-        {t('career.experience_title')}
-      </h2>
-      <div class="space-y-8 mt-6">
+      <h2 class="prompt mb-6">{t('career.experience_title')}</h2>
+      <div class="space-y-4">
         {experience.map((job) => (
-          <div class="border border-zinc-800/80 bg-zinc-900/70 p-6 md:p-8 hover:border-zinc-700 transition-colors">
-            <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-4">
-              <h3 class="text-xl font-semibold text-zinc-100 tracking-tight">
-                {job.role} <span class="text-zinc-400 font-normal">· {job.company}</span>
-              </h3>
-              <span class="text-xs font-mono text-zinc-400 bg-zinc-900 px-2.5 py-1 border border-zinc-800 self-start sm:self-auto">
-                {job.date}
-              </span>
-            </div>
-            <ul class="list-disc list-inside text-sm text-zinc-300 space-y-2.5 font-sans leading-relaxed">
+          <Window as="article" title={job.company} meta={job.date}>
+            <h3 class="text-lg md:text-xl font-semibold text-zinc-100 mb-4">{job.role}</h3>
+            <ul class="text-sm text-zinc-300 space-y-2.5 leading-relaxed">
               {job.highlights.map((item) => (
-                <li class="marker:text-zinc-600">{item}</li>
+                <li class="flex gap-2"><span class="text-term-green font-mono shrink-0" aria-hidden="true">&gt;</span><span class="min-w-0">{item}</span></li>
               ))}
             </ul>
-          </div>
+          </Window>
         ))}
       </div>
     </section>
 
     <!-- Skills and Competencies -->
     <section>
-      <h2 class="text-xs font-mono text-zinc-500 mb-8 tracking-wider uppercase border-b border-zinc-800/60 pb-3">
-        {t('career.skills_title')}
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <h2 class="prompt mb-6">{t('career.skills_title')}</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         {skills.map((s) => (
-          <div class="border border-zinc-800/80 bg-zinc-900/70 p-6">
-            <h3 class="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-4">{s.category}</h3>
-            <div class="flex flex-wrap gap-2">
+          <Window as="article" title={s.category}>
+            <h3 class="sr-only">{s.category}</h3>
+            <div class="flex flex-wrap gap-x-3 gap-y-2">
               {s.items.map((item: string) => (
                 <TechBadge tech={item} />
               ))}
             </div>
-          </div>
+          </Window>
         ))}
       </div>
     </section>
 
     <!-- Education -->
     <section>
-      <h2 class="text-xs font-mono text-zinc-500 mb-8 tracking-wider uppercase border-b border-zinc-800/60 pb-3">
-        {t('career.education_title')}
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <h2 class="prompt mb-6">{t('career.education_title')}</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {education.map((edu) => (
-          <div class="border border-zinc-800/80 bg-zinc-900/70 p-6">
-            <div class="text-xs font-mono text-zinc-400 mb-2">{edu.date}</div>
-            <h3 class="text-lg font-semibold text-zinc-100 mb-2 tracking-tight">{edu.degree}</h3>
-            <p class="text-sm text-zinc-400 font-serif leading-relaxed">{edu.institution}</p>
-          </div>
+          <Window as="article" title={edu.date}>
+            <h3 class="text-lg font-semibold text-zinc-100 mb-2">{edu.degree}</h3>
+            <p class="text-sm text-zinc-400 leading-relaxed">{edu.institution}</p>
+          </Window>
         ))}
       </div>
     </section>
   </div>
 
-  <div class="mt-20 border-t border-zinc-800/60 pt-16">
-    <Recommendations lang={lang} />
-  </div>
+  <Principles lang={lang} />
+  <HomelabCallout lang={lang} />
+
+  <Recommendations lang={lang} />
+
+  <section class="py-16">
+    <Window title={lang === 'pt' ? 'contato' : 'contact'}>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <p class="text-zinc-300">{lang === 'pt' ? 'Quer conversar sobre um projeto?' : 'Want to talk about a project?'}</p>
+        <a href={`/${lang}/#contato`} class="btn-tui self-start">
+          <span>{lang === 'pt' ? 'Solicitar orçamento' : 'Request a quote'}</span>
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </Window>
+  </section>
 </Layout>

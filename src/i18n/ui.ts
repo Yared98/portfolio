@@ -10,6 +10,11 @@ export const defaultLang: Lang = 'pt';
 export const ui = {
   pt: {
     // Navigation
+    'nav.home': 'Início',
+    'nav.services': 'Serviços',
+    'nav.articles': 'Artigos',
+    'nav.about': 'Sobre',
+    'nav.quote': 'Solicitar orçamento',
     'nav.projects': 'Projetos',
     'nav.trajectory': 'Trajetória',
     'nav.homelab': 'Homelab',
@@ -18,7 +23,9 @@ export const ui = {
 
     // Breadcrumbs
     'crumbs.home': 'Início',
-    'crumbs.projects': 'Projetos',
+    'crumbs.projects': 'projetos',
+    'crumbs.services': 'servicos',
+    'crumbs.articles': 'artigos',
     'crumbs.trajectory': 'Trajetória',
     'crumbs.homelab': 'Homelab',
 
@@ -153,6 +160,11 @@ export const ui = {
   },
   en: {
     // Navigation
+    'nav.home': 'Home',
+    'nav.services': 'Services',
+    'nav.articles': 'Articles',
+    'nav.about': 'About',
+    'nav.quote': 'Request a quote',
     'nav.projects': 'Projects',
     'nav.trajectory': 'Career',
     'nav.homelab': 'Homelab',
@@ -161,7 +173,9 @@ export const ui = {
 
     // Breadcrumbs
     'crumbs.home': 'Home',
-    'crumbs.projects': 'Projects',
+    'crumbs.projects': 'projects',
+    'crumbs.services': 'services',
+    'crumbs.articles': 'articles',
     'crumbs.trajectory': 'Career',
     'crumbs.homelab': 'Homelab',
 

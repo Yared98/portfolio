@@ -1,0 +1,48 @@
+---
+// Lista de artigos no estilo de listagem de diretório (`ls -l`): data, título, tags.
+import { type Lang, defaultLang } from '../i18n/ui';
+import { type Article, articleSlug, formatDate } from '../utils/articles';
+
+interface Props {
+  articles: Article[];
+  lang?: Lang;
+}
+
+const { articles, lang = defaultLang } = Astro.props;
+---
+
+<div class="tui-win">
+  <div class="tui-bar">
+    <span class="tui-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="tui-title">ls -lt {lang === 'pt' ? 'artigos/' : 'articles/'}</span>
+    <span class="tui-meta">{articles.length} {articles.length === 1 ? (lang === 'pt' ? 'arquivo' : 'file') : (lang === 'pt' ? 'arquivos' : 'files')}</span>
+  </div>
+  {articles.length === 0 ? (
+    <p class="tui-body font-mono text-sm text-term-dim">
+      {lang === 'pt' ? 'Nenhum artigo publicado ainda.' : 'No articles published yet.'}
+    </p>
+  ) : (
+    <ul class="divide-y divide-term-line">
+      {articles.map((a) => (
+        <li>
+          <a href={`/${lang}/artigos/${articleSlug(a)}/`} class="group grid gap-x-6 gap-y-1 p-4 transition-colors hover:bg-zinc-900/60 sm:grid-cols-[7.5rem_minmax(0,1fr)] md:p-5">
+            <time datetime={a.data.date.toISOString()} class="font-mono text-xs leading-6 text-term-dim">
+              {formatDate(a.data.date, lang)}
+            </time>
+            <div class="min-w-0">
+              <h3 class="text-base font-semibold text-zinc-100 group-hover:text-white">
+                {a.data.title} <span class="font-mono text-term-dim group-hover:text-term-green" aria-hidden="true">→</span>
+              </h3>
+              <p class="mt-1 text-sm leading-relaxed text-zinc-400">{a.data.description}</p>
+              {a.data.tags && (
+                <div class="mt-2 flex flex-wrap gap-x-2 gap-y-1">
+                  {a.data.tags.map((t) => <span class="chip">{t}</span>)}
+                </div>
+              )}
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</div>

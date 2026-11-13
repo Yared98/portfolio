@@ -1,5 +1,7 @@
 ---
 import { type Lang, defaultLang, useTranslations } from '../i18n/ui';
+import Window from './Window.astro';
+import SectionHead from './SectionHead.astro';
 
 interface Props {
   lang?: Lang;
@@ -57,35 +59,36 @@ const recommendations = {
 
 const items = recommendations[lang] || recommendations.pt;
 ---
-<section class="py-16 md:py-24 border-b border-zinc-800/40 overflow-hidden">
-  <div class="flex items-end justify-between mb-10">
-    <div>
-      <div class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">{t('rec.tag')}</div>
-      <h2 class="text-2xl md:text-3xl font-semibold text-zinc-100 tracking-tight">{t('rec.title')}</h2>
-    </div>
-    <a href="https://linkedin.com/in/yared98" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-zinc-100 transition-colors">
+<section class="py-16 md:py-24 border-b border-term-line overflow-hidden">
+  <div class="flex items-end justify-between gap-4">
+    <SectionHead label={lang === 'pt' ? 'RECOMENDAÇÕES' : 'ENDORSEMENTS'} title={t('rec.title')} />
+    <a href="https://linkedin.com/in/yared98" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex mb-10 shrink-0 items-center gap-1.5 text-xs font-mono text-term-blue hover:text-zinc-50 transition-colors">
       <span>{t('rec.linkedin')}</span>
       <span aria-hidden="true">&nearr;</span>
     </a>
   </div>
-  
-  <div class="relative w-full">
-    <!-- CSS-only horizontal scroll carousel with custom scrollbar -->
-    <div class="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-6 pt-2 custom-scrollbar w-full">
-      {items.map((rec) => (
-        <div class="snap-start shrink-0 w-[85%] sm:w-[50%] lg:w-[38%] flex flex-col justify-between border border-zinc-800/60 bg-zinc-900/70 p-6 md:p-7 rounded hover:border-zinc-700/60 transition-colors">
-          <blockquote class="text-sm md:text-base text-zinc-300 font-sans leading-relaxed mb-8 relative">
-            <span class="text-3xl text-zinc-700 font-serif leading-none select-none block mb-2">&ldquo;</span>
-            <span>{rec.text}</span>
-          </blockquote>
-          <div class="mt-auto border-t border-zinc-800/40 pt-4">
-            <div class="text-sm font-semibold text-zinc-100 tracking-tight">{rec.name}</div>
-            <div class="text-xs font-mono text-zinc-500 mt-1">{rec.role}</div>
-          </div>
-        </div>
-      ))}
-    </div>
+
+  <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 custom-scrollbar w-full">
+    {items.map((rec, i) => (
+      <Window
+        as="article"
+        title={`${lang === 'pt' ? 'recomendacao' : 'endorsement'}/${String(i + 1).padStart(2, '0')}`}
+        class="snap-start shrink-0 w-[85%] sm:w-[50%] lg:w-[38%]"
+      >
+        <blockquote class="text-sm md:text-base text-zinc-300 leading-relaxed">
+          <span class="text-term-green select-none" aria-hidden="true">&gt; </span>{rec.text}
+        </blockquote>
+        <Fragment slot="status">
+          <span class="text-zinc-300">{rec.name}</span>
+          <span>{rec.role}</span>
+        </Fragment>
+      </Window>
+    ))}
   </div>
+  <a href="https://linkedin.com/in/yared98" target="_blank" rel="noopener noreferrer" class="sm:hidden mt-4 inline-flex items-center gap-1.5 text-xs font-mono text-term-blue">
+    <span>{t('rec.linkedin')}</span>
+    <span aria-hidden="true">&nearr;</span>
+  </a>
 </section>
 
 <style>
@@ -94,11 +97,11 @@ const items = recommendations[lang] || recommendations.pt;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
     background: #18181b;
-    border-radius: 2px;
+    border-radius: 0;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: #3f3f46;
-    border-radius: 2px;
+    border-radius: 0;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #52525b;

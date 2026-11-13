@@ -1,0 +1,109 @@
+---
+// Grade de serviços. `detailed` mostra entregas e prova (página de serviços);
+// sem ele, mostra o resumo com link para a página (home).
+import Window from './Window.astro';
+import SectionHead from './SectionHead.astro';
+import TechBadge from './TechBadge.astro';
+import { services } from '../data/services';
+import { type Lang, defaultLang } from '../i18n/ui';
+
+interface Props {
+  lang?: Lang;
+  detailed?: boolean;
+}
+
+const { lang = defaultLang, detailed = false } = Astro.props;
+const items = services[lang] || services.pt;
+
+const c = {
+  pt: {
+    label: 'SERVIÇOS',
+    title: 'O que eu posso construir para você',
+    desc: 'Quatro frentes de trabalho, cada uma com entregas definidas e um caso real por trás.',
+    when: 'Quando faz sentido',
+    get: 'O que você recebe',
+    proof: 'Caso real',
+    more: 'detalhes',
+    all: 'Ver todos os serviços em detalhe',
+    quote: 'Solicitar orçamento',
+  },
+  en: {
+    label: 'SERVICES',
+    title: 'What I can build for you',
+    desc: 'Four lines of work, each with defined deliverables and a real case behind it.',
+    when: 'When it makes sense',
+    get: 'What you get',
+    proof: 'Real case',
+    more: 'details',
+    all: 'See all services in detail',
+    quote: 'Request a quote',
+  },
+}[lang];
+---
+
+<section class="border-t border-term-line/60 py-16 md:py-20 scroll-mt-20" id="servicos">
+  {!detailed && <SectionHead label={c.label} title={c.title} desc={c.desc} />}
+
+  <div class={`grid grid-cols-1 gap-4 ${detailed ? '' : 'md:grid-cols-2'}`}>
+    {items.map((s, i) => (
+      detailed ? (
+        <Window as="article" title={s.cmd} meta={`0${i + 1}/0${items.length}`} id={s.id} class="scroll-mt-24">
+          <div class="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+            <div>
+              <h2 class="text-xl font-semibold text-zinc-50 md:text-2xl">{s.title}</h2>
+              <p class="mt-3 text-sm leading-relaxed text-zinc-300 md:text-base">{s.pitch}</p>
+              <div class="mt-6 font-mono text-[11px] uppercase tracking-wider text-term-orange">{c.when}</div>
+              <p class="mt-1.5 text-sm leading-relaxed text-zinc-400">{s.when}</p>
+            </div>
+            <div>
+              <div class="font-mono text-[11px] uppercase tracking-wider text-term-green">{c.get}</div>
+              <ul class="mt-2 space-y-2">
+                {s.deliverables.map((d) => (
+                  <li class="flex gap-2 text-sm leading-relaxed text-zinc-300">
+                    <span class="font-mono text-term-green" aria-hidden="true">✓</span>
+                    <span>{d}</span>
+                  </li>
+                ))}
+              </ul>
+              {s.proof && (
+                <>
+                  <div class="mt-6 font-mono text-[11px] uppercase tracking-wider text-term-blue">{c.proof}</div>
+                  <a href={`/${lang}/projects/${s.proof.slug}/`} class="mt-1.5 inline-block text-sm text-zinc-200 underline decoration-term-line underline-offset-4 hover:decoration-zinc-400">
+                    {s.proof.label} <span aria-hidden="true">→</span>
+                  </a>
+                </>
+              )}
+            </div>
+          </div>
+          <Fragment slot="status">
+            <span class="flex flex-wrap gap-x-2 gap-y-1">{s.stack.map((t) => <TechBadge tech={t} />)}</span>
+            <a href="#contato" class="text-term-green hover:text-zinc-50">{c.quote} <span aria-hidden="true">↵</span></a>
+          </Fragment>
+        </Window>
+      ) : (
+        <Window href={`/${lang}/servicos/#${s.id}`} title={s.cmd} meta={`0${i + 1}/0${items.length}`}>
+          <h3 class="text-lg font-semibold text-zinc-50">{s.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-zinc-400">{s.pitch}</p>
+          <ul class="mt-4 space-y-1.5">
+            {s.deliverables.slice(0, 3).map((d) => (
+              <li class="flex gap-2 text-sm text-zinc-300">
+                <span class="font-mono text-term-green" aria-hidden="true">✓</span>
+                <span>{d}</span>
+              </li>
+            ))}
+          </ul>
+          <Fragment slot="status">
+            <span class="flex flex-wrap gap-x-2 gap-y-1">{s.stack.slice(0, 3).map((t) => <TechBadge tech={t} />)}</span>
+            <span class="text-zinc-300">{c.more} <span aria-hidden="true">→</span></span>
+          </Fragment>
+        </Window>
+      )
+    ))}
+  </div>
+
+  {!detailed && (
+    <p class="mt-6 font-mono text-xs">
+      <a href={`/${lang}/servicos/`} class="text-term-dim hover:text-zinc-100">{c.all} <span aria-hidden="true">→</span></a>
+    </p>
+  )}
+</section>

@@ -1,0 +1,48 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import ServiceGrid from '../../components/ServiceGrid.astro';
+import SymptomsTriage from '../../components/SymptomsTriage.astro';
+import Process from '../../components/Process.astro';
+import Contact from '../../components/Contact.astro';
+import { type Lang, useTranslations } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'pt' } },
+    { params: { lang: 'en' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
+
+const c = {
+  pt: {
+    metaTitle: 'Serviços: software sob medida, IA, migração e performance | Matheus Yared',
+    metaDesc: 'Software sob medida, integrações e automação com IA, migração para a nuvem e diagnóstico de performance. Veja o que está incluído em cada serviço e os casos reais por trás.',
+    label: 'SERVIÇOS',
+    title: 'O que eu posso construir para você.',
+    desc: 'Cada serviço abaixo tem entregas definidas e um caso real que mostra como ele funciona na prática. Se o seu problema não se encaixa em nenhum, me conte mesmo assim.',
+  },
+  en: {
+    metaTitle: 'Services: custom software, AI, migration and performance | Matheus Yared',
+    metaDesc: 'Custom software, AI integrations and automation, cloud migration and performance diagnosis. See what each service includes and the real cases behind it.',
+    label: 'SERVICES',
+    title: 'What I can build for you.',
+    desc: 'Each service below has defined deliverables and a real case showing how it works in practice. If your problem fits none of them, tell me anyway.',
+  },
+}[lang];
+---
+
+<Layout title={c.metaTitle} description={c.metaDesc} lang={lang}>
+  <Breadcrumbs segments={[{ label: t('crumbs.services') }]} lang={lang} />
+  <SectionHead level={1} label={c.label} title={c.title} desc={c.desc} class="!mb-0 mt-4" />
+  <div class="mt-10 [&>section:first-child]:border-t-0 [&>section:first-child]:pt-0">
+    <ServiceGrid lang={lang} detailed />
+  </div>
+  <SymptomsTriage lang={lang} />
+  <Process lang={lang} />
+  <Contact lang={lang} />
+</Layout>

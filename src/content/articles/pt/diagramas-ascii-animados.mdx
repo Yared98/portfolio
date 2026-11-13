@@ -1,0 +1,70 @@
+---
+title: "Diagramas de arquitetura em ASCII animado, sem imagens e sem peso"
+description: "Como os diagramas deste site são desenhados em texto, renderizados no servidor e animados só quando o navegador pode."
+date: 2026-11-13
+tags: ["Astro", "ASCII", "Front-end", "Acessibilidade"]
+lang: "pt"
+---
+
+import AsciiPiece from '../../../components/AsciiPiece.astro';
+
+Os estudos de caso deste site têm diagramas de arquitetura. Em vez de exportar imagens de uma ferramenta de desenho, eles são texto: caixas, setas e rótulos em caracteres, animados em um canvas. Este é o do Imobi:
+
+<AsciiPiece piece="imobi-pt" label="Arquitetura do Imobi: o usuário passa pela Cloudflare e por um túnel até o Laravel e o PostgreSQL no homelab." />
+
+Este artigo explica por que escolhi esse caminho e como ele funciona.
+
+## Por que texto
+
+Um diagrama em PNG tem três problemas que me incomodavam:
+
+- **Fica desatualizado.** Mudar um nó exige abrir a ferramenta, exportar e substituir o arquivo. Em texto, mudar um nó é mudar uma linha de código, e a alteração aparece no histórico do Git como qualquer outra.
+- **Não traduz.** O site é bilíngue. Com imagem, cada diagrama vira dois arquivos. Com texto, o mesmo diagrama recebe o idioma como parâmetro.
+- **Não combina com o resto.** Uma imagem tem as cores e a tipografia de quem a exportou. O texto usa a mesma fonte monoespaçada e a mesma paleta do site.
+
+## Uma especificação, não um desenho
+
+Cada diagrama é descrito por uma especificação: uma lista de nós com posição e largura, e uma lista de ligações entre pontos da grade.
+
+```js
+archPiece({
+  cols: 98, rows: 12,
+  nodes: [
+    { x: 1,  y: 2, w: 13, label: 'Usuário',    sub: 'navegador' },
+    { x: 17, y: 2, w: 15, label: 'Cloudflare', sub: 'DNS · borda' },
+  ],
+  edges: [
+    { pts: [[14, 3], [16, 3]], label: { x: 14, y: 6, text: 'HTTPS' } },
+  ],
+});
+```
+
+A função que recebe isso faz três coisas.
+
+Primeiro, **valida**. Se um rótulo não cabe na caixa, se um nó sai da grade ou se uma ligação tem um trecho diagonal, o build falha com uma mensagem que diz qual diagrama e qual elemento. Um diagrama quebrado nunca chega à produção.
+
+Depois, **escolhe os caracteres das ligações**. Cada célula por onde passa uma ligação guarda os lados em que ela se conecta, e o caractere sai dessa combinação: `─` para uma reta, `╭` para uma curva, `┬` para uma bifurcação, `┼` para um cruzamento. Eu descrevo o caminho; as junções saem sozinhas.
+
+Por fim, **anima**. Pulsos percorrem as ligações na direção do fluxo, o que mostra de onde vem e para onde vai cada requisição sem precisar de legenda.
+
+O motor é derivado de uma peça da biblioteca [ascii-magic-art](https://github.com/kailashsr38/ascii-magic-art), que é MIT, e usa o runtime dela para tocar a animação.
+
+## Renderizado no servidor primeiro
+
+O ponto que mais me importava: a página precisa funcionar sem JavaScript.
+
+No build, o Astro executa cada diagrama uma vez, pega o primeiro quadro e o escreve no HTML dentro de um `<pre>`. Buscadores e leitores de tela recebem o texto, e quem abre a página vê o diagrama imediatamente, antes de qualquer script carregar.
+
+Quando o JavaScript chega, o runtime assume e passa a desenhar a animação em um canvas no mesmo lugar. Se o script falhar, o texto estático continua ali.
+
+Três detalhes completam o comportamento:
+
+- **Carregamento sob demanda.** Um registro mapeia o nome de cada diagrama para um `import()` dinâmico, então cada página baixa só os diagramas que usa.
+- **Ajuste à largura.** O tamanho da fonte é calculado para o diagrama caber na largura disponível. Abaixo de um tamanho mínimo legível, ele passa a rolar na horizontal em vez de encolher mais.
+- **Descrição para leitores de tela.** Cada diagrama tem um texto alternativo que descreve o fluxo em uma frase, porque uma grade de caracteres de desenho lida em voz alta não ajuda ninguém.
+
+## O que eu levo disso
+
+A decisão não foi estética primeiro. Foi tratar o diagrama como código: versionado, validado no build, parametrizado por idioma e barato de manter. O visual de terminal veio como consequência, e acabou virando a identidade do site.
+
+A mesma lógica vale para sistemas de clientes: o que é descrito como dado e validado automaticamente envelhece melhor do que o que é desenhado à mão.

@@ -15,6 +15,15 @@
   --color-zinc-800: #27272a;
   --color-zinc-900: #18181b;
   --color-zinc-950: #09090b;
+
+  /* Paleta de terminal (a mesma usada nas peças ASCII animadas) */
+  --color-term-green: #7ee787;
+  --color-term-blue: #79c0ff;
+  --color-term-orange: #ffa657;
+  --color-term-red: #ff7b72;
+  --color-term-violet: #d2a8ff;
+  --color-term-dim: #8b949e;
+  --color-term-line: #30363d;
 }
 
 @layer base {
@@ -34,6 +43,17 @@
     color: var(--color-zinc-50);
     font-weight: 600;
     letter-spacing: -0.025em;
+  }
+
+  /* Títulos principais em mono: a página se lê como uma tela de terminal */
+  h1, h2 {
+    font-family: var(--font-mono);
+    letter-spacing: -0.04em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-term-green);
+    outline-offset: 2px;
   }
 
   a {
@@ -83,4 +103,173 @@ html {
 }
 .mdx-content pre code {
   @apply bg-transparent border-none p-0;
+}
+
+/* ── Vocabulário de "tela de terminal" (TUI) ─────────────────────────────────────── */
+
+/* Janela: moldura fina, barra de título com os três pontos e rodapé de status opcional */
+.tui-win {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-term-line);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--color-zinc-950) 88%, transparent);
+  transition: border-color 0.15s ease;
+}
+a.tui-win:hover,
+.tui-win.is-link:hover {
+  border-color: var(--color-zinc-500);
+}
+.tui-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2rem;
+  padding: 0 0.75rem;
+  border-bottom: 1px solid var(--color-term-line);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--color-term-dim);
+}
+.tui-dots {
+  display: inline-flex;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
+.tui-dots i {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--color-term-line);
+}
+.tui-dots i:nth-child(1) { background: var(--color-term-red); }
+.tui-dots i:nth-child(2) { background: var(--color-term-orange); }
+.tui-dots i:nth-child(3) { background: var(--color-term-green); }
+.tui-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tui-meta {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.tui-body {
+  flex: 1;
+  padding: 1.25rem;
+}
+@media (min-width: 768px) {
+  .tui-body { padding: 1.5rem; }
+}
+.tui-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--color-term-line);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-term-dim);
+}
+
+/* Cabeçalho de seção: "/ROTULO" sublinhado com "=====" */
+.sec-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-term-green);
+}
+.sec-rule {
+  display: block;
+  color: var(--color-term-line);
+  letter-spacing: 0.08em;
+  user-select: none;
+}
+
+/* Botões: bloco em vídeo inverso (primário) e moldura fina (secundário) */
+.btn-tui,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.btn-tui {
+  background: var(--color-term-green);
+  color: var(--color-zinc-950);
+}
+.btn-tui:hover {
+  background: var(--color-zinc-50);
+}
+.btn-ghost {
+  border-color: var(--color-term-line);
+  color: var(--color-zinc-300);
+  font-weight: 500;
+}
+.btn-ghost:hover {
+  border-color: var(--color-zinc-500);
+  color: var(--color-zinc-50);
+}
+
+/* Linha de comando: "$ comando" */
+.prompt {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-term-dim);
+}
+.prompt::before {
+  content: "$ ";
+  color: var(--color-term-green);
+}
+
+/* Etiqueta entre colchetes: [ Rust ] */
+.chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+/* Cor padrão dentro de uma camada: estilos fora de camadas sempre vencem os utilitários
+   do Tailwind, e aqui as classes de cor por tecnologia precisam vencer. */
+@layer components {
+  .chip {
+    color: var(--color-term-dim);
+  }
+}
+.chip::before { content: "["; color: var(--color-term-line); margin-right: 0.25em; }
+.chip::after { content: "]"; color: var(--color-term-line); margin-left: 0.25em; }
+
+/* Campos de formulário no estilo de tela de texto */
+.tui-field {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--color-term-line);
+  border-radius: 4px;
+  background: var(--color-zinc-950);
+  color: var(--color-zinc-100);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+.tui-field::placeholder { color: var(--color-zinc-600); }
+.tui-field:focus {
+  outline: none;
+  border-color: var(--color-term-green);
 }

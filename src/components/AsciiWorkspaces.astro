@@ -1,0 +1,360 @@
+---
+// Fundo decorativo: várias "áreas de trabalho" em ASCII lado a lado, como um gerenciador de
+// janelas em mosaico. Cada janela roda uma ferramenta do dia a dia (logs, editor, métricas,
+// processos, deploy, mapa de serviços, SQL, kanban). Tudo desfocado e apagado atrás do
+// conteúdo; canvas fixo, sem interação e escondido de leitores de tela.
+---
+
+<canvas id="ascii-bg" aria-hidden="true" class="pointer-events-none fixed inset-0 z-0 h-full w-full"></canvas>
+
+<style>
+  #ascii-bg {
+    filter: blur(2.4px);
+    /* Bem apagado atrás da coluna de conteúdo, cheio nas laterais. Em telas estreitas,
+       onde tudo é conteúdo, o fundo inteiro fica apagado. */
+    --m: linear-gradient(
+      to right,
+      #000 calc(50% - 46rem),
+      rgba(0, 0, 0, 0.28) calc(50% - 31rem),
+      rgba(0, 0, 0, 0.28) calc(50% + 31rem),
+      #000 calc(50% + 46rem)
+    );
+    mask-image: var(--m);
+    -webkit-mask-image: var(--m);
+  }
+</style>
+
+<script>
+  const canvas = document.getElementById('ascii-bg') as HTMLCanvasElement | null;
+  const ctx = canvas?.getContext('2d');
+
+  if (canvas && ctx) {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const MONO = '"IBM Plex Mono", ui-monospace, monospace';
+    const FONT = 14;
+    const FRAME_MS = 1000 / 15;
+
+    // Paleta de terminal (RGB), a mesma do restante do site
+    const GREEN = '126, 231, 135', BLUE = '121, 192, 255', ORANGE = '255, 166, 87', RED = '255, 123, 114';
+    const VIOLET = '210, 168, 255', CYAN = '86, 212, 221', GOLD = '242, 204, 96';
+    const TEXT = '230, 237, 243', DIM = '139, 148, 158';
+    const ACCENTS = [GREEN, BLUE, ORANGE, VIOLET, CYAN, GOLD];
+
+    /** Área de desenho de uma janela: coordenadas locais, recortadas ao tamanho interno. */
+    type G = { w: number; h: number; seed: number; put: (x: number, y: number, s: string, c?: string, a?: number) => void };
+    type Widget = { name: string; draw: (g: G, t: number) => void };
+    type Tile = { x: number; y: number; w: number; h: number; seed: number; color: string; widget: Widget };
+
+    const hash = (n: number) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+    const pick = <T,>(arr: T[], n: number) => arr[Math.floor(hash(n) * arr.length) % arr.length];
+    const wave = (i: number, s: number) => 0.5 + 0.28 * Math.sin(i * 0.31 + s) + 0.22 * Math.sin(i * 0.83 + s * 2.3);
+    const pad = (s: string | number, n: number) => String(s).padEnd(n);
+    const SPIN = '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏';
+    const BARS = ' ▁▂▃▄▅▆▇█';
+
+    // ── logs: linhas novas entram por baixo ────────────────────────────────────────
+    const LOG: [string, string][] = [
+      ['INFO', 'GET /api/pedidos 200 12ms'], ['INFO', 'job backup concluído'], ['WARN', 'fila acima de 80%'],
+      ['INFO', 'deploy v2.4.1 ok'], ['ERROR', 'timeout em db-replica'], ['INFO', 'POST /api/login 200 31ms'],
+      ['INFO', 'cache hit 97%'], ['WARN', 'latência p95 420ms'], ['INFO', 'migração 0042 aplicada'],
+      ['INFO', 'GET /health 200 2ms'], ['INFO', 'worker-3 processou 128 itens'], ['INFO', 'snapshot zfs criado'],
+    ];
+    const LEVEL: Record<string, string> = { INFO: GREEN, WARN: ORANGE, ERROR: RED };
+    const logs: Widget = {
+      name: 'logs',
+      draw(g, t) {
+        const step = Math.floor(t / 0.9) + g.seed * 13;
+        for (let i = 0; i < g.h; i++) {
+          const n = step - (g.h - 1 - i);
+          const [lvl, msg] = pick(LOG, n * 7.3 + g.seed);
+          const sec = ((n % 3600) + 3600) % 3600;
+          g.put(0, i, `14:${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`, DIM, 0.55);
+          g.put(9, i, lvl, LEVEL[lvl], 0.95);
+          g.put(15, i, msg, TEXT, i === g.h - 1 ? 0.9 : 0.6);
+        }
+      },
+    };
+
+    // ── editor: código sendo digitado, com numeração de linhas ─────────────────────
+    const CODE: [string, string][] = [
+      ['// valida o pedido antes de gravar', DIM], ['async fn criar_pedido(', VIOLET], ['    db: &Pool, novo: NovoPedido,', TEXT],
+      [') -> Result<Pedido> {', VIOLET], ['    novo.validar()?;', TEXT], ['    let tx = db.begin().await?;', BLUE],
+      ['    let pedido = tx.inserir(&novo).await?;', TEXT], ['    estoque::reservar(&tx, &pedido).await?;', TEXT],
+      ['    tx.commit().await?;', BLUE], ['    fila.publicar(Evento::Criado(pedido.id));', GOLD], ['    Ok(pedido)', GREEN], ['}', VIOLET],
+    ];
+    const CODE_LEN = CODE.reduce((a, [s]) => a + s.length, 0);
+    const editor: Widget = {
+      name: 'editor',
+      draw(g, t) {
+        let left = Math.floor(((t + g.seed * 5) * 16) % (CODE_LEN + 70));
+        const first = Math.max(0, CODE.length - g.h);
+        for (let i = 0; i < CODE.length; i++) {
+          const [s, c] = CODE[i];
+          const n = Math.min(s.length, left);
+          const y = i - first;
+          g.put(0, y, String(i + 1).padStart(2), DIM, 0.4);
+          g.put(4, y, s.slice(0, n), c, 0.8);
+          left -= n;
+          if (n < s.length || i === CODE.length - 1) {
+            if (Math.floor(t * 2.5) % 2 === 0) g.put(4 + n, y, '█', TEXT, 0.9);
+            break;
+          }
+        }
+      },
+    };
+
+    // ── metricas: três sparklines e um gráfico de barras que anda ──────────────────
+    const SERIES: [string, string, number, string][] = [['cpu', GREEN, 100, '%'], ['mem', BLUE, 64, 'G'], ['req/s', ORANGE, 900, '']];
+    const metrics: Widget = {
+      name: 'metricas',
+      draw(g, t) {
+        const shift = Math.floor(t * 3);
+        const sw = Math.max(4, g.w - 16);
+        SERIES.forEach(([label, color, max, unit], k) => {
+          let line = '';
+          for (let x = 0; x < sw; x++) line += BARS[1 + Math.floor(wave(x + shift, k * 4 + g.seed) * 7.99)];
+          g.put(0, k, pad(label, 6), DIM, 0.7);
+          g.put(7, k, line, color, 0.85);
+          g.put(8 + sw, k, `${Math.round(wave(sw - 1 + shift, k * 4 + g.seed) * max)}${unit}`, TEXT, 0.8);
+        });
+        const top = SERIES.length + 1, H = g.h - top;
+        for (let r = 0; r < H; r++) {
+          let line = '';
+          for (let x = 0; x < g.w; x += 2) {
+            const v = wave(Math.floor(x / 2) + shift, 9 + g.seed) * H - (H - 1 - r);
+            line += (v >= 1 ? '█' : v > 0 ? BARS[Math.floor(v * 8)] : ' ') + ' ';
+          }
+          g.put(0, top + r, line, VIOLET, 0.25 + 0.6 * (r / Math.max(1, H - 1)));
+        }
+      },
+    };
+
+    // ── processos: tabela no estilo htop, com barras de CPU ────────────────────────
+    const PROCS = ['postgres', 'api-pedidos', 'nginx', 'worker-fila', 'redis', 'cloudflared', 'backup-zfs', 'mcp-server', 'sqlservr', 'grafana'];
+    const procs: Widget = {
+      name: 'processos',
+      draw(g, t) {
+        g.put(0, 0, `${pad('PID', 6)}${pad('NOME', 13)}${pad('CPU', 13)}MEM`, TEXT, 0.75);
+        for (let i = 0; i < Math.min(PROCS.length, g.h - 1); i++) {
+          const cpu = Math.max(0.03, wave(Math.floor(t * 1.5) * 0.9 + i * 5, g.seed + i));
+          const bar = Math.round(cpu * 10);
+          g.put(0, i + 1, pad(1200 + Math.floor(hash(i + g.seed) * 8000), 6), DIM, 0.55);
+          g.put(6, i + 1, pad(PROCS[(i + g.seed) % PROCS.length], 13), TEXT, 0.7);
+          g.put(19, i + 1, '|'.repeat(bar), cpu > 0.72 ? ORANGE : GREEN, 0.9);
+          g.put(19 + bar, i + 1, '·'.repeat(10 - bar), DIM, 0.35);
+          g.put(32, i + 1, `${Math.round(40 + hash(i * 3 + g.seed) * 900)}M`, DIM, 0.6);
+        }
+      },
+    };
+
+    // ── deploy: etapas de um pipeline, uma por vez ─────────────────────────────────
+    const STEPS = ['lint', 'build', 'testes', 'imagem', 'deploy', 'health'];
+    const deploy: Widget = {
+      name: 'deploy',
+      draw(g, t) {
+        const per = 2.4, total = STEPS.length * per + 4;
+        const lt = (t + g.seed * 3) % total, cur = lt / per;
+        const bw = Math.max(4, Math.min(16, g.w - 20));
+        g.put(0, 0, `$ deploy --producao  #${240 + Math.floor((t + g.seed * 3) / total)}`, DIM, 0.7);
+        STEPS.forEach((s, i) => {
+          const y = 2 + i;
+          if (i < Math.floor(cur)) {
+            g.put(0, y, '✓', GREEN, 0.95); g.put(2, y, pad(s, 8), TEXT, 0.7);
+            g.put(11, y, '█'.repeat(bw), GREEN, 0.75); g.put(12 + bw, y, 'ok', GREEN, 0.8);
+          } else if (i === Math.floor(cur)) {
+            const n = Math.floor((cur - i) * bw);
+            g.put(0, y, SPIN[Math.floor(t * 10) % SPIN.length], BLUE, 1); g.put(2, y, pad(s, 8), TEXT, 0.95);
+            g.put(11, y, '█'.repeat(n), BLUE, 0.9); g.put(11 + n, y, '░'.repeat(bw - n), DIM, 0.45);
+            g.put(12 + bw, y, `${Math.floor((cur - i) * 100)}%`, BLUE, 0.9);
+          } else {
+            g.put(0, y, '·', DIM, 0.5); g.put(2, y, pad(s, 8), DIM, 0.5); g.put(11, y, '░'.repeat(bw), DIM, 0.3);
+          }
+        });
+        if (cur >= STEPS.length) g.put(0, 3 + STEPS.length, '● no ar · 0 erros', GREEN, 0.95);
+      },
+    };
+
+    // ── servicos: mapa com pulsos de dados entre os serviços ───────────────────────
+    const NAMES = ['api', 'db', 'cache', 'fila', 'worker', 'auth', 'cdn', 'erp', 'mcp', 'vpn', 'web', 'backup'];
+    const flow: Widget = {
+      name: 'servicos',
+      draw(g, t) {
+        const bw = 10, colsN = g.w >= 40 ? 3 : 2, rowsN = g.h >= 11 ? 3 : 2;
+        const gx = Math.floor((g.w - bw) / (colsN - 1)), gy = Math.floor((g.h - 3) / (rowsN - 1));
+        const at = (c: number, r: number) => ({ x: c * gx, y: r * gy });
+        for (let r = 0; r < rowsN; r++) for (let c = 0; c < colsN; c++) {
+          const { x, y } = at(c, r), id = r * colsN + c + g.seed, color = ACCENTS[id % ACCENTS.length];
+          if (c < colsN - 1) { // ligação para a direita
+            const len = gx - bw, p = Math.floor(((t * 9 + hash(id) * 40) % (len + 14)));
+            g.put(x + bw, y + 1, '─'.repeat(len - 1) + '▸', DIM, 0.4);
+            for (let i = 0; i < 4; i++) if (p - i >= 0 && p - i < len) g.put(x + bw + p - i, y + 1, i ? '─' : '●', color, 1 - i * 0.22);
+          }
+          if (r < rowsN - 1) { // ligação para baixo
+            const len = gy - 3, p = Math.floor(((t * 5 + hash(id + 50) * 30) % (len + 10)));
+            for (let i = 0; i < len; i++) g.put(x + 4, y + 3 + i, i === len - 1 ? '▾' : '│', DIM, 0.4);
+            if (p < len) g.put(x + 4, y + 3 + p, '●', color, 1);
+          }
+          g.put(x, y, `╭${'─'.repeat(bw - 2)}╮`, color, 0.6);
+          g.put(x, y + 1, '│', color, 0.6); g.put(x + bw - 1, y + 1, '│', color, 0.6);
+          g.put(x, y + 2, `╰${'─'.repeat(bw - 2)}╯`, color, 0.6);
+          g.put(x + 2, y + 1, NAMES[id % NAMES.length], color, 0.95);
+        }
+      },
+    };
+
+    // ── sql: consulta digitada e o resultado chegando linha a linha ────────────────
+    const QUERY = ['SELECT cliente, pedidos, total', '  FROM vendas_mes', ' WHERE status = \'aberto\'', ' ORDER BY total DESC;'];
+    const RESULT = [['Farias Dourado', '42', '18.420,00'], ['Grupo Araucária', '37', '15.980,50'], ['Mercado Sul', '29', '11.204,90'], ['Lumen Tech', '18', '7.310,00'], ['Oficina Prado', '11', '3.870,40']];
+    const Q_LEN = QUERY.reduce((a, s) => a + s.length, 0);
+    const sql: Widget = {
+      name: 'sql',
+      draw(g, t) {
+        const total = Q_LEN / 18 + RESULT.length * 0.35 + 6;
+        const lt = (t + g.seed * 4) % total;
+        let left = Math.floor(lt * 18), y = 0;
+        for (const s of QUERY) {
+          const n = Math.min(s.length, left);
+          g.put(0, y, y ? '   ' : 'sql>', GREEN, 0.8); g.put(5, y, s.slice(0, n), BLUE, 0.85);
+          left -= n; y++;
+          if (n < s.length) return;
+        }
+        const rt = lt - Q_LEN / 18 - 0.4;
+        if (rt < 0) return;
+        g.put(0, y + 1, `${pad('cliente', 17)}${pad('ped', 5)}total`, TEXT, 0.8);
+        g.put(0, y + 2, '─'.repeat(Math.min(g.w, 33)), DIM, 0.45);
+        const shown = Math.min(RESULT.length, Math.floor(rt / 0.35));
+        for (let i = 0; i < shown; i++) {
+          const [a, b, c] = RESULT[i];
+          g.put(0, y + 3 + i, pad(a, 17), TEXT, 0.65); g.put(17, y + 3 + i, pad(b, 5), GOLD, 0.8); g.put(22, y + 3 + i, c, GREEN, 0.8);
+        }
+        if (shown === RESULT.length) g.put(0, y + 4 + shown, `(${shown} linhas) 4 ms`, DIM, 0.6);
+      },
+    };
+
+    // ── kanban: cartões andando entre as colunas ───────────────────────────────────
+    const CARDS = ['painel admin', 'api pedidos', 'login google', 'relatório', 'migração', 'backup', 'webhook', 'testes'];
+    const kanban: Widget = {
+      name: 'kanban',
+      draw(g, t) {
+        const cwid = Math.floor(g.w / 3), step = Math.floor((t + g.seed * 2) / 2.2);
+        const colsK: [string, string][] = [['a fazer', ORANGE], ['fazendo', BLUE], ['feito', GREEN]];
+        const lists: string[][] = [[], [], []];
+        CARDS.forEach((c, k) => lists[Math.min(2, Math.floor(((step + k * 4) % 12) / 4))].push(c));
+        colsK.forEach(([label, color], c) => {
+          const x = c * cwid;
+          g.put(x, 0, `${label} ${lists[c].length}`, color, 0.95);
+          g.put(x, 1, '─'.repeat(cwid - 2), color, 0.45);
+          lists[c].forEach((card, i) => {
+            if (2 + i * 2 >= g.h) return;
+            g.put(x, 2 + i * 2, '▪', color, 0.9);
+            g.put(x + 2, 2 + i * 2, card.slice(0, cwid - 4), TEXT, 0.7);
+          });
+        });
+      },
+    };
+
+    const WIDGETS = [logs, flow, editor, metrics, deploy, procs, sql, kanban];
+
+    const bg = document.createElement('canvas');
+    const bgCtx = bg.getContext('2d')!;
+    let W = 0, H = 0, cw = 8.4, chh = 18;
+    let tiles: Tile[] = [];
+    let raf = 0, last = 0, t0 = performance.now();
+
+    // Divide a tela em janelas, como um gerenciador em mosaico: larguras variam por linha
+    function build() {
+      let seed = 11;
+      const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+      const cols = Math.floor(W / cw), rows = Math.floor(H / chh);
+      const ty = Math.max(1, Math.round(rows / 17)), th = Math.floor(rows / ty);
+      const tx = Math.max(1, Math.round(cols / 50)), base = Math.floor(cols / tx);
+      tiles = [];
+      let k = Math.floor(rnd() * WIDGETS.length);
+      for (let r = 0; r < ty; r++) {
+        let x = 0;
+        for (let c = 0; c < tx; c++) {
+          const w = c === tx - 1 ? cols - x : base + Math.floor((rnd() - 0.5) * 12);
+          const widget = WIDGETS[k % WIDGETS.length];
+          tiles.push({ x, y: r * th, w: w - 1, h: th - 1, seed: tiles.length + 1, color: ACCENTS[k % ACCENTS.length], widget });
+          k += r % 2 ? 3 : 1; // evita repetir a mesma ferramenta na vizinhança
+          x += w;
+        }
+        k += 2;
+      }
+
+      // Camada estática: as molduras das janelas, com barra de título
+      bgCtx.clearRect(0, 0, bg.width, bg.height);
+      bgCtx.font = `${FONT}px ${MONO}`;
+      bgCtx.textBaseline = 'top';
+      tiles.forEach((tl, i) => {
+        const put = (x: number, y: number, s: string, c: string, a: number) => {
+          bgCtx.fillStyle = `rgba(${c}, ${a})`;
+          bgCtx.fillText(s, (tl.x + x) * cw, (tl.y + y) * chh);
+        };
+        const title = ` ${i + 1}:${tl.widget.name} `;
+        put(0, 0, `╭─${'─'.repeat(Math.max(0, tl.w - 3))}╮`, tl.color, 0.4);
+        put(3, 0, title, tl.color, 0.95);
+        for (let y = 1; y < tl.h - 1; y++) { put(0, y, '│', tl.color, 0.4); put(tl.w - 1, y, '│', tl.color, 0.4); }
+        put(0, tl.h - 1, `╰${'─'.repeat(Math.max(0, tl.w - 2))}╯`, tl.color, 0.4);
+      });
+    }
+
+    function resize() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas!.width = bg.width = W;
+      canvas!.height = bg.height = H;
+      ctx!.font = `${FONT}px ${MONO}`;
+      cw = ctx!.measureText('M').width || 8.4;
+      chh = Math.round(FONT * 1.3);
+      build();
+    }
+
+    function draw(t: number) {
+      ctx!.clearRect(0, 0, W, H);
+      ctx!.drawImage(bg, 0, 0);
+      ctx!.font = `${FONT}px ${MONO}`;
+      ctx!.textBaseline = 'top';
+      for (const tl of tiles) {
+        const ox = tl.x + 2, oy = tl.y + 1;
+        const g: G = {
+          w: tl.w - 4, h: tl.h - 2, seed: tl.seed,
+          put(x, y, s, c = DIM, a = 0.7) {
+            if (y < 0 || y >= g.h || x >= g.w) return;
+            if (x < 0) { s = s.slice(-x); x = 0; }
+            s = s.slice(0, g.w - x);
+            if (!s) return;
+            ctx!.fillStyle = `rgba(${c}, ${a})`;
+            ctx!.fillText(s, (ox + x) * cw, (oy + y) * chh);
+          },
+        };
+        if (g.w > 8 && g.h > 3) tl.widget.draw(g, t);
+      }
+    }
+
+    function loop(now: number) {
+      raf = requestAnimationFrame(loop);
+      if (now - last < FRAME_MS) return;
+      last = now;
+      draw((now - t0) / 1000 + 20);
+    }
+
+    const start = () => {
+      cancelAnimationFrame(raf);
+      // Parado (aba oculta ou "reduzir movimento"): um quadro fixo, já com conteúdo
+      if (reduceMotion.matches || document.hidden) { draw(20); return; }
+      raf = requestAnimationFrame(loop);
+    };
+
+    let timer = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(timer);
+      timer = window.setTimeout(() => { resize(); start(); }, 150);
+    });
+    document.addEventListener('visibilitychange', start);
+    reduceMotion.addEventListener('change', start);
+    document.fonts?.ready.then(() => { resize(); start(); });
+    resize();
+    start();
+  }
+</script>

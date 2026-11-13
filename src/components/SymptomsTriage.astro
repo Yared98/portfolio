@@ -1,5 +1,7 @@
 ---
 import { type Lang, defaultLang, useTranslations } from '../i18n/ui';
+import Window from './Window.astro';
+import SectionHead from './SectionHead.astro';
 
 interface Props {
   lang?: Lang;
@@ -36,62 +38,41 @@ const symptoms = [
 ];
 ---
 
-<section class="py-16 md:py-20 border-b border-zinc-800/40 scroll-mt-20" id="diagnostico">
-  <!-- Header -->
-  <div class="max-w-3xl mb-12">
-    <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-amber-400/90 mb-3">
-      <span class="w-1.5 h-1.5 bg-amber-400 rounded-none inline-block"></span>
-      {t('triage.tag')}
-    </div>
-    <h2 class="text-2xl sm:text-3xl md:text-4xl font-semibold text-zinc-50 tracking-tight leading-tight">
-      {t('triage.title')}
-    </h2>
-    <p class="mt-4 text-base text-zinc-400 font-sans leading-relaxed">
-      {t('triage.lead')}
-    </p>
-  </div>
+<section class="py-16 md:py-20 border-b border-term-line scroll-mt-20" id="diagnostico">
+  <SectionHead label={lang === 'pt' ? 'SINTOMAS' : 'SYMPTOMS'} title={t('triage.title')} desc={t('triage.lead')} />
 
-  <!-- 4 Symptoms Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     {symptoms.map((symptom) => (
-      <div class="border border-zinc-800/80 bg-zinc-900/70 hover:bg-zinc-900/85 hover:border-zinc-700/80 rounded p-6 transition-all duration-150 flex flex-col justify-between group">
-        <div>
-          <div class="flex items-center justify-between text-xs font-mono text-zinc-500 mb-3">
-            <span class="text-zinc-600 group-hover:text-zinc-400 transition-colors">SYMPTOM // {symptom.code}</span>
-            <span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800/80 text-[11px] text-zinc-400">
-              {symptom.tag}
-            </span>
-          </div>
-          <h3 class="text-lg font-medium text-zinc-100 group-hover:text-white tracking-tight mb-2">
-            {symptom.title}
-          </h3>
-          <p class="text-xs md:text-sm text-zinc-400 font-sans leading-relaxed">
-            {symptom.desc}
-          </p>
-        </div>
-      </div>
+      <Window
+        as="article"
+        title={`${lang === 'pt' ? 'sintoma' : 'symptom'}/${symptom.code}`}
+        meta={symptom.tag}
+      >
+        <h3 class="text-base md:text-lg font-semibold text-zinc-100 mb-2 flex gap-2">
+          <span class="text-term-orange font-mono shrink-0" aria-hidden="true">WARN</span>
+          <span class="min-w-0">{symptom.title}</span>
+        </h3>
+        <p class="text-sm text-zinc-400 leading-relaxed">{symptom.desc}</p>
+      </Window>
     ))}
   </div>
 
-  <!-- Bottom Resolution Pitch & CTA -->
-  <div class="mt-6 border border-zinc-800/60 bg-gradient-to-r from-zinc-900/40 via-zinc-900/20 to-zinc-950 p-6 md:p-8 rounded flex flex-col md:flex-row md:items-center justify-between gap-6">
-    <div class="max-w-2xl">
-      <div class="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1.5">
-        {lang === 'pt' ? 'Proposta de Intervenção Técnica' : 'Technical Engagement Value'}
+  <Window title={lang === 'pt' ? 'diagnostico' : 'diagnosis'} class="mt-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="max-w-2xl">
+        <div class="text-xs font-mono text-term-dim uppercase tracking-wider mb-1.5">
+          {lang === 'pt' ? 'Proposta de Intervenção Técnica' : 'Technical Engagement Value'}
+        </div>
+        <p class="text-sm md:text-base text-zinc-300 leading-relaxed">
+          {t('triage.bottom_pitch')}
+        </p>
       </div>
-      <p class="text-sm md:text-base text-zinc-300 font-sans leading-relaxed">
-        {t('triage.bottom_pitch')}
-      </p>
+      <div class="shrink-0">
+        <a href="#contato" id="triage-cta-btn" class="btn-tui">
+          <span>{t('triage.cta_btn')}</span>
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
     </div>
-    <div class="shrink-0">
-      <a
-        href="#consultoria"
-        id="triage-cta-btn"
-        class="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-100 hover:bg-white text-zinc-950 text-sm font-semibold rounded transition-colors shadow-sm"
-      >
-        <span>{t('triage.cta_btn')}</span>
-        <span aria-hidden="true">&rarr;</span>
-      </a>
-    </div>
-  </div>
+  </Window>
 </section>

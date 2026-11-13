@@ -1,0 +1,47 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import SectionHead from '../../../components/SectionHead.astro';
+import ArticleList from '../../../components/ArticleList.astro';
+import { type Lang, useTranslations } from '../../../i18n/ui';
+import { getArticles } from '../../../utils/articles';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'pt' } },
+    { params: { lang: 'en' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
+const articles = await getArticles(lang);
+
+const c = {
+  pt: {
+    metaTitle: 'Artigos e notas de engenharia | Matheus Yared',
+    metaDesc: 'Textos técnicos sobre os sistemas que construo e opero: arquitetura, Rust, infraestrutura própria e integrações com IA.',
+    label: 'ARTIGOS',
+    title: 'Notas de engenharia.',
+    desc: 'Textos sobre o que aprendi construindo e operando os meus projetos. Para os estudos de caso completos, veja a página de projetos.',
+    projects: 'Ver projetos',
+  },
+  en: {
+    metaTitle: 'Articles and engineering notes | Matheus Yared',
+    metaDesc: 'Technical writing about the systems I build and run: architecture, Rust, self-hosted infrastructure and AI integrations.',
+    label: 'ARTICLES',
+    title: 'Engineering notes.',
+    desc: 'Writing about what I learned building and running my projects. For the full case studies, see the projects page.',
+    projects: 'See projects',
+  },
+}[lang];
+---
+
+<Layout title={c.metaTitle} description={c.metaDesc} lang={lang}>
+  <Breadcrumbs segments={[{ label: t('crumbs.articles') }]} lang={lang} />
+  <SectionHead level={1} label={c.label} title={c.title} desc={c.desc} class="mt-4" />
+  <ArticleList articles={articles} lang={lang} />
+  <p class="mt-6 font-mono text-xs">
+    <a href={`/${lang}/projects/`} class="text-term-dim hover:text-zinc-100">{c.projects} <span aria-hidden="true">→</span></a>
+  </p>
+</Layout>

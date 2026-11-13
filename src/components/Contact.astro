@@ -1,0 +1,134 @@
+---
+// Contato: um briefing curto que abre o e-mail do visitante já preenchido (o site é
+// estático, não há backend). Sem JS, os links diretos de e-mail e LinkedIn continuam ali.
+import SectionHead from './SectionHead.astro';
+import { services } from '../data/services';
+import { type Lang, defaultLang } from '../i18n/ui';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = defaultLang } = Astro.props;
+const items = services[lang] || services.pt;
+const EMAIL = 'contato@yared.com.br';
+
+const c = {
+  pt: {
+    label: 'CONTATO',
+    title: 'Conte o que você precisa',
+    desc: 'Descreva o problema em poucas linhas. Respondo por e-mail com as próximas perguntas e, quando o escopo estiver claro, uma proposta por escrito.',
+    win: 'novo-briefing',
+    name: 'Nome',
+    company: 'Empresa',
+    optional: 'opcional',
+    service: 'Serviço',
+    other: 'Ainda não sei / outro',
+    message: 'O que você precisa resolver?',
+    placeholder: 'Ex.: nosso controle de pedidos está em planilhas e não acompanha mais o volume...',
+    send: 'Abrir e-mail com o briefing',
+    hint: 'Abre o seu aplicativo de e-mail com a mensagem pronta. Nada é enviado por este site.',
+    direct: 'Prefere escrever direto?',
+    location: 'Atendimento remoto · base em Curitiba/PR',
+    subject: 'Orçamento',
+    lName: 'Nome', lCompany: 'Empresa', lService: 'Serviço',
+  },
+  en: {
+    label: 'CONTACT',
+    title: 'Tell me what you need',
+    desc: 'Describe the problem in a few lines. I reply by email with the next questions and, once the scope is clear, a written proposal.',
+    win: 'new-briefing',
+    name: 'Name',
+    company: 'Company',
+    optional: 'optional',
+    service: 'Service',
+    other: 'Not sure yet / other',
+    message: 'What do you need to solve?',
+    placeholder: 'E.g. our order tracking lives in spreadsheets and no longer keeps up with volume...',
+    send: 'Open email with the briefing',
+    hint: 'Opens your email app with the message ready. Nothing is sent through this site.',
+    direct: 'Rather write directly?',
+    location: 'Remote engagements · based in Curitiba, Brazil',
+    subject: 'Quote request',
+    lName: 'Name', lCompany: 'Company', lService: 'Service',
+  },
+}[lang];
+---
+
+<section class="border-t border-term-line/60 py-16 md:py-20 scroll-mt-20" id="contato">
+  <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-12">
+    <div>
+      <SectionHead label={c.label} title={c.title} desc={c.desc} class="!mb-8" />
+      <p class="font-mono text-xs text-term-dim">{c.direct}</p>
+      <ul class="mt-3 space-y-2 font-mono text-sm">
+        <li>
+          <a href={`mailto:${EMAIL}`} class="text-zinc-200 underline decoration-term-line underline-offset-4 hover:decoration-zinc-400">{EMAIL}</a>
+        </li>
+        <li>
+          <a href="https://linkedin.com/in/yared98" target="_blank" rel="noopener noreferrer" class="text-zinc-200 underline decoration-term-line underline-offset-4 hover:decoration-zinc-400">linkedin.com/in/yared98 <span aria-hidden="true">↗</span></a>
+        </li>
+      </ul>
+      <p class="mt-6 font-mono text-xs text-term-dim">{c.location}</p>
+    </div>
+
+    <form
+      class="tui-win"
+      id="briefing-form"
+      data-email={EMAIL}
+      data-subject={c.subject}
+      data-l-name={c.lName}
+      data-l-company={c.lCompany}
+      data-l-service={c.lService}
+    >
+      <div class="tui-bar">
+        <span class="tui-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="tui-title">{c.win}</span>
+      </div>
+      <div class="tui-body space-y-4">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label class="block">
+            <span class="mb-1.5 block font-mono text-xs text-zinc-400">{c.name}</span>
+            <input class="tui-field" type="text" name="name" autocomplete="name" required />
+          </label>
+          <label class="block">
+            <span class="mb-1.5 block font-mono text-xs text-zinc-400">{c.company} <span class="text-zinc-600">({c.optional})</span></span>
+            <input class="tui-field" type="text" name="company" autocomplete="organization" />
+          </label>
+        </div>
+        <label class="block">
+          <span class="mb-1.5 block font-mono text-xs text-zinc-400">{c.service}</span>
+          <select class="tui-field" name="service">
+            {items.map((s) => <option value={s.title}>{s.title}</option>)}
+            <option value={c.other}>{c.other}</option>
+          </select>
+        </label>
+        <label class="block">
+          <span class="mb-1.5 block font-mono text-xs text-zinc-400">{c.message}</span>
+          <textarea class="tui-field" name="message" rows="5" required placeholder={c.placeholder}></textarea>
+        </label>
+      </div>
+      <div class="tui-status">
+        <span class="max-w-[22rem] leading-relaxed">{c.hint}</span>
+        <button type="submit" class="btn-tui">
+          <span>{c.send}</span>
+          <span aria-hidden="true">↵</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#briefing-form');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const d = form.dataset;
+    const f = new FormData(form);
+    const get = (k: string) => String(f.get(k) ?? '').trim();
+    const lines = [`${d.lName}: ${get('name')}`];
+    if (get('company')) lines.push(`${d.lCompany}: ${get('company')}`);
+    lines.push(`${d.lService}: ${get('service')}`, '', get('message'));
+    const subject = `${d.subject}: ${get('service')}`;
+    window.location.href = `mailto:${d.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+  });
+</script>

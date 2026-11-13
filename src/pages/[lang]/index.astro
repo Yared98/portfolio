@@ -1,13 +1,11 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Hero from '../../components/Hero.astro';
-import SymptomsTriage from '../../components/SymptomsTriage.astro';
+import ServiceGrid from '../../components/ServiceGrid.astro';
+import Process from '../../components/Process.astro';
 import ProjectList from '../../components/ProjectList.astro';
-import Services from '../../components/Services.astro';
-import HomelabCallout from '../../components/HomelabCallout.astro';
 import Recommendations from '../../components/Recommendations.astro';
-import ConsultationCTA from '../../components/ConsultationCTA.astro';
-import AsciiPiece from '../../components/AsciiPiece.astro';
+import Contact from '../../components/Contact.astro';
 import { type Lang } from '../../i18n/ui';
 
 export function getStaticPaths() {
@@ -20,28 +18,25 @@ export function getStaticPaths() {
 const { lang } = Astro.params as { lang: Lang };
 
 const titles = {
-  pt: "Eliminando gargalos de arquitetura e fricção técnica. | Matheus Yared",
-  en: "Eliminating architectural bottlenecks and technical friction. | Matheus Yared",
+  pt: "Software sob medida, integrações e infraestrutura | Matheus Yared",
+  en: "Custom software, integrations and infrastructure | Matheus Yared",
 };
 
 const descriptions = {
-  pt: "Atuo na intersecção entre regras de negócio e infraestrutura. Elimino a causa raiz de instabilidades para construir arquiteturas resilientes que suportam escala sustentável.",
-  en: "Operating at the intersection of business logic and systems infrastructure. Eradicating root-cause instability to engineer resilient architectures built for sustainable scale.",
+  pt: "Desenvolvo sistemas, integrações com IA, migrações para a nuvem e diagnósticos de performance sob encomenda para empresas. Escopo claro, entrega em produção e código que fica com você.",
+  en: "I build systems, AI integrations, cloud migrations and performance diagnostics to order for companies. Clear scope, delivery in production, and code that stays with you.",
 };
 ---
 
-<Layout 
+<Layout
   title={titles[lang] || titles.pt}
   description={descriptions[lang] || descriptions.pt}
   lang={lang}
 >
   <Hero lang={lang} />
-  <AsciiPiece piece="pulse-line" decorative panel={false} minPx={7} maxPx={24} class="my-2" />
-  <SymptomsTriage lang={lang} />
+  <ServiceGrid lang={lang} />
+  <Process lang={lang} />
   <ProjectList lang={lang} />
-  <Services lang={lang} />
-  <HomelabCallout lang={lang} />
   <Recommendations lang={lang} />
-  <AsciiPiece piece="dotted-rule" decorative panel={false} minPx={7} maxPx={24} class="my-2" />
-  <ConsultationCTA lang={lang} />
+  <Contact lang={lang} />
 </Layout>

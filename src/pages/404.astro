@@ -10,19 +10,16 @@ import AsciiPiece from '../components/AsciiPiece.astro';
 >
   <div class="grid md:grid-cols-2 gap-10 items-center min-h-[50vh] py-16">
     <div class="flex flex-col items-start justify-center">
-    <div class="font-mono text-xs text-zinc-600 mb-6 uppercase tracking-widest">Erro 404</div>
-    <h1 class="text-5xl md:text-7xl font-sans font-semibold tracking-tight text-zinc-100 mb-6">
-      Página não <span class="text-zinc-600">encontrada.</span>
+    <p class="font-mono text-sm text-term-red mb-2">cd: no such file or directory</p>
+    <div class="prompt mb-6">cd {'/'}404</div>
+    <h1 class="text-4xl md:text-6xl font-semibold text-zinc-100 mb-6">
+      Página não <span class="text-term-dim">encontrada.</span>
     </h1>
-    <p class="text-zinc-400 font-mono max-w-md mb-10 leading-relaxed">
+    <p class="text-zinc-400 max-w-md mb-10 leading-relaxed">
       A rota que você tentou acessar não existe ou foi movida. Confira o endereço ou volte para a home.
     </p>
-    <a
-      href="/"
-      id="not-found-home-link"
-      class="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-100 text-zinc-950 text-sm font-semibold font-sans hover:bg-white transition-colors"
-    >
-      ← Voltar para home
+    <a href="/" id="not-found-home-link" class="btn-tui">
+      <span aria-hidden="true">&larr;</span> Voltar para home
     </a>
     </div>
     <AsciiPiece

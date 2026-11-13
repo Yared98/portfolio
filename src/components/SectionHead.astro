@@ -1,0 +1,26 @@
+---
+// Cabeçalho de seção: rótulo "/NOME" sublinhado com "=====", título e descrição opcional.
+interface Props {
+  label: string;
+  title: string;
+  desc?: string;
+  /** Nível do título (h1 nas páginas internas, h2 nas seções). */
+  level?: 1 | 2;
+  class?: string;
+}
+
+const { label, title, desc, level = 2, class: cls = '' } = Astro.props;
+const H = `h${level}` as 'h1' | 'h2';
+const slash = `/${label}`;
+---
+
+<div class={`mb-10 max-w-3xl ${cls}`}>
+  <div class="sec-label">
+    {slash}
+    <span class="sec-rule" aria-hidden="true">{'='.repeat(slash.length)}</span>
+  </div>
+  <H class={`mt-4 font-semibold text-zinc-50 ${level === 1 ? 'text-3xl md:text-5xl leading-[1.1]' : 'text-2xl md:text-3xl leading-tight'}`}>
+    {title}
+  </H>
+  {desc && <p class="mt-4 text-base text-zinc-400 leading-relaxed">{desc}</p>}
+</div>

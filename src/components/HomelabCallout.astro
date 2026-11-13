@@ -1,6 +1,7 @@
 ---
 import { type Lang, defaultLang, useTranslations } from '../i18n/ui';
 import TechBadge from './TechBadge.astro';
+import Window from './Window.astro';
 
 interface Props {
   lang?: Lang;
@@ -9,35 +10,32 @@ interface Props {
 const { lang = defaultLang } = Astro.props;
 const t = useTranslations(lang);
 ---
-<section class="py-16 md:py-24 border-b border-zinc-800/40 scroll-mt-20" id="homelab">
-  <div class="border border-zinc-800/60 bg-zinc-900/70 hover:border-zinc-700/60 rounded p-6 md:p-8 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-6">
-    <div class="max-w-2xl">
-      <div class="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2">
-        <span class="w-1.5 h-1.5 bg-zinc-500 rounded-none inline-block"></span>
-        {t('homelab.callout_tag')}
+<section class="py-16 md:py-24 border-b border-term-line scroll-mt-20" id="homelab">
+  <Window title="homelab" meta="proxmox · zfs · lxc" as="div">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="max-w-2xl">
+        <div class="text-xs font-mono uppercase tracking-wider text-term-blue mb-2">
+          {t('homelab.callout_tag')}
+        </div>
+        <h3 class="text-xl md:text-2xl font-semibold text-zinc-100 mb-3">
+          {t('homelab.callout_title')}
+        </h3>
+        <p class="text-sm md:text-base text-zinc-400 leading-relaxed">
+          {t('homelab.callout_desc')}
+        </p>
+        <div class="flex flex-wrap gap-x-3 gap-y-1.5 mt-4">
+          <TechBadge tech="Proxmox VE" />
+          <TechBadge tech="ZFS Mirror" />
+          <TechBadge tech="Zero-Trust Tunnels" />
+          <TechBadge tech={lang === 'pt' ? 'Isolamento LXC' : 'LXC Isolation'} />
+        </div>
       </div>
-      <h3 class="text-xl md:text-2xl font-semibold text-zinc-100 tracking-tight mb-3">
-        {t('homelab.callout_title')}
-      </h3>
-      <p class="text-sm md:text-base text-zinc-400 font-sans leading-relaxed">
-        {t('homelab.callout_desc')}
-      </p>
-      <div class="flex flex-wrap gap-2 mt-4">
-        <TechBadge tech="Proxmox VE" />
-        <TechBadge tech="ZFS Mirror" />
-        <TechBadge tech="Zero-Trust Tunnels" />
-        <TechBadge tech={lang === 'pt' ? 'Isolamento LXC' : 'LXC Isolation'} />
+      <div class="shrink-0 self-start md:self-center">
+        <a href={`/${lang}/homelab/`} class="btn-ghost">
+          <span>{t('homelab.callout_btn')}</span>
+          <span aria-hidden="true">&rarr;</span>
+        </a>
       </div>
     </div>
-    
-    <div class="flex-shrink-0 self-start md:self-center">
-      <a
-        href={`/${lang}/homelab/`}
-        class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-mono text-zinc-300 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded transition-colors bg-zinc-900/40"
-      >
-        <span>{t('homelab.callout_btn')}</span>
-        <span aria-hidden="true">&rarr;</span>
-      </a>
-    </div>
-  </div>
+  </Window>
 </section>
